@@ -7,6 +7,9 @@
     "vite.config.ts"
   ],
   "compilerOptions": {
+    "isolatedModules": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
     "target": "ES2022",
     "jsx": "react-jsx",
     "module": "ESNext",

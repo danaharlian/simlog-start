@@ -1,0 +1,20 @@
+# CODEOWNERS.example → copy to `.github/CODEOWNERS` (GitHub) and adapt owners.
+# These files DEFINE the quality gates. An agent that cannot suppress an error may try to weaken a gate instead,
+# so changes here need a human owner's review. This only works if branch protection has
+# "Require review from Code Owners" enabled (a repository setting a human must switch on; not verified here).
+
+/eslint.config.js            @your-org/platform
+/eslint.no-suppress.js       @your-org/platform
+/eslint.boundaries.js        @your-org/platform
+/eslint.code-rules.js        @your-org/platform
+/eslint.ai-docs.js           @your-org/platform
+/tsconfig*.json              @your-org/platform
+/package.json                @your-org/platform
+/pnpm-lock.yaml              @your-org/platform
+/scripts/check-*.mjs         @your-org/platform
+/shadcn-primitives.lock.json @your-org/platform
+/.claude/                    @your-org/platform
+/.mcp.json                   @your-org/platform
+/.github/                    @your-org/platform
+/AGENTS.md                   @your-org/platform
+/docs/03-standards/          @your-org/platform

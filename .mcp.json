@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "shadcn": {
+      "command": "pnpm",
+      "args": ["dlx", "shadcn@4.23.0", "mcp"]
+    },
+    "drizzle": {
+      "command": "pnpm",
+      "args": ["exec", "drizzle-kit", "mcp"]
+    },
+    "better-auth": {
+      "type": "http",
+      "url": "https://mcp.better-auth.com/mcp"
+    }
+  }
+}

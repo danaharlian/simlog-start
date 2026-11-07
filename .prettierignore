@@ -1,3 +1,15 @@
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+# ai-coding-docs: docs, agent files, tooling, and generated files are not formatted by the app
+docs/
+.claude/
+.github/
+.mcp.json
+specs/
+AGENTS.md
+CLAUDE.md
+install.mjs
+install.sh
+installer/
+src/routeTree.gen.ts

@@ -1,0 +1,777 @@
+{
+  "files": {
+    "docs/00-principles/anti-hallucination.md": {
+      "src": "89c2f0e338e373a3ad9191b37e854bdf273755a69694d3a80327ee4f411226b0",
+      "dst": "89c2f0e338e373a3ad9191b37e854bdf273755a69694d3a80327ee4f411226b0"
+    },
+    "docs/00-principles/progressive-disclosure.md": {
+      "src": "988ae6420828585bb5afb296c49e3eab81533b118003a3a80b9c23383c1f92b6",
+      "dst": "988ae6420828585bb5afb296c49e3eab81533b118003a3a80b9c23383c1f92b6"
+    },
+    "docs/01-workflow/definition-of-done.md": {
+      "src": "bcdd2e6636f8a53b2d46fb6834b47a128a3d7f31e004eb8e5675fc9593dd58be",
+      "dst": "bcdd2e6636f8a53b2d46fb6834b47a128a3d7f31e004eb8e5675fc9593dd58be"
+    },
+    "docs/01-workflow/roles.md": {
+      "src": "ad6f3b6b3236438c1e60c9ea07908c987cf7a9c692e53e74d27c734173f00716",
+      "dst": "ad6f3b6b3236438c1e60c9ea07908c987cf7a9c692e53e74d27c734173f00716"
+    },
+    "docs/01-workflow/sdlc-pipeline.md": {
+      "src": "98612d1fcd705b59689aeff4853057e23e95ca367efda6482c88f2f0cba695b8",
+      "dst": "98612d1fcd705b59689aeff4853057e23e95ca367efda6482c88f2f0cba695b8"
+    },
+    "docs/02-architecture/cross-feature-communication.md": {
+      "src": "7f604a46d26ea5febdaca88dcc15b9dab8dd370369fa8b38916dbe96a657bb59",
+      "dst": "7f604a46d26ea5febdaca88dcc15b9dab8dd370369fa8b38916dbe96a657bb59"
+    },
+    "docs/02-architecture/data-fetching.md": {
+      "src": "654b3b5e09937dc76db3653415b0a5048bb916d7fb850b39e8a9fddb6daa9331",
+      "dst": "654b3b5e09937dc76db3653415b0a5048bb916d7fb850b39e8a9fddb6daa9331"
+    },
+    "docs/02-architecture/design-principles.md": {
+      "src": "7f8fe6c9c174b60f1b524c2316504f43563c4a0469907b0c3f92717d0059345b",
+      "dst": "7f8fe6c9c174b60f1b524c2316504f43563c4a0469907b0c3f92717d0059345b"
+    },
+    "docs/02-architecture/folder-structure.md": {
+      "src": "1cf91d6630b4961c910c0435e40924ae42dcf0cfe2bb6e7fc3cc690f40cfc8dc",
+      "dst": "1cf91d6630b4961c910c0435e40924ae42dcf0cfe2bb6e7fc3cc690f40cfc8dc"
+    },
+    "docs/02-architecture/modular-monolith.md": {
+      "src": "e6f861b0a44f0d1b465d4de345022cac4e7f89e1b83b4c148ee41af4caefc461",
+      "dst": "e6f861b0a44f0d1b465d4de345022cac4e7f89e1b83b4c148ee41af4caefc461"
+    },
+    "docs/02-architecture/state-management.md": {
+      "src": "a2a926a609fd6dc575eb11d0ed7d578c605f57a445e9e258445ffbff17bc277b",
+      "dst": "a2a926a609fd6dc575eb11d0ed7d578c605f57a445e9e258445ffbff17bc277b"
+    },
+    "docs/03-standards/api-conventions.md": {
+      "src": "0b2be933c3a2e5da54110366675374c5d1d3f4689c80edecc37897530f57d6b2",
+      "dst": "0b2be933c3a2e5da54110366675374c5d1d3f4689c80edecc37897530f57d6b2"
+    },
+    "docs/03-standards/coding-standards.md": {
+      "src": "2406853683a52ed7f2382aebd197257823e5a97b7aaf84764c2ca118ebcbf49d",
+      "dst": "2406853683a52ed7f2382aebd197257823e5a97b7aaf84764c2ca118ebcbf49d"
+    },
+    "docs/03-standards/components.md": {
+      "src": "0f29c963a13bae0ae07c215c1ebc33eb46dd27098936eeab786a63b759129674",
+      "dst": "0f29c963a13bae0ae07c215c1ebc33eb46dd27098936eeab786a63b759129674"
+    },
+    "docs/03-standards/conventions.md": {
+      "src": "c658e66ff90db5e2ff0a1d35b5a968661605b25c0a105f136ac044c888e581c4",
+      "dst": "c658e66ff90db5e2ff0a1d35b5a968661605b25c0a105f136ac044c888e581c4"
+    },
+    "docs/03-standards/database.md": {
+      "src": "d8331ac9fc91d7d3d0c15d05b66995a8fb33709fac701d30b6a39da0820bcac8",
+      "dst": "d8331ac9fc91d7d3d0c15d05b66995a8fb33709fac701d30b6a39da0820bcac8"
+    },
+    "docs/03-standards/environment.md": {
+      "src": "25c8698ccfa44cee501bf89734a603ae049e950d3dea069ea5681183364980b3",
+      "dst": "25c8698ccfa44cee501bf89734a603ae049e950d3dea069ea5681183364980b3"
+    },
+    "docs/03-standards/error-handling.md": {
+      "src": "4c9bdd057e4b2cd2ae1f129ebfc2c155fac28c6c92128457c284abf941051c83",
+      "dst": "4c9bdd057e4b2cd2ae1f129ebfc2c155fac28c6c92128457c284abf941051c83"
+    },
+    "docs/03-standards/git-and-commits.md": {
+      "src": "c625b8b077d7ba20d5ba9aa976149e8cbe1bd91802ef32dd992e972fa6c7a600",
+      "dst": "c625b8b077d7ba20d5ba9aa976149e8cbe1bd91802ef32dd992e972fa6c7a600"
+    },
+    "docs/03-standards/glossary.md": {
+      "src": "cf5f57675795e17cbcf69f8d7c06dc56693144b0c7f593619c30635abe75dd88",
+      "dst": "cf5f57675795e17cbcf69f8d7c06dc56693144b0c7f593619c30635abe75dd88"
+    },
+    "docs/03-standards/linting-and-formatting.md": {
+      "src": "3b867e5e247d251fccb62ad868c39b9e194be8869299db8bc8f7d85e6631f167",
+      "dst": "3b867e5e247d251fccb62ad868c39b9e194be8869299db8bc8f7d85e6631f167"
+    },
+    "docs/03-standards/logging.md": {
+      "src": "beb6f2c80eb17d8f7acaa66c0c6443a7a42ecc051b7bec5ece68e6c9eca3a50c",
+      "dst": "beb6f2c80eb17d8f7acaa66c0c6443a7a42ecc051b7bec5ece68e6c9eca3a50c"
+    },
+    "docs/03-standards/no-suppression.md": {
+      "src": "591a5e79cdc46a341ee7c76ce0e5fc915c41b0e0f7848245fa841d9e24cc21f7",
+      "dst": "591a5e79cdc46a341ee7c76ce0e5fc915c41b0e0f7848245fa841d9e24cc21f7"
+    },
+    "docs/03-standards/security.md": {
+      "src": "e169e2c5dc14594b87bb2d07f05d06dd5a56e9eec8d1ac830f02d5fbea7684f3",
+      "dst": "e169e2c5dc14594b87bb2d07f05d06dd5a56e9eec8d1ac830f02d5fbea7684f3"
+    },
+    "docs/03-standards/testing.md": {
+      "src": "1b45dfe03f3379c9f46de010bf365ae833650d73ffd58c80e0ed885420592dd2",
+      "dst": "1b45dfe03f3379c9f46de010bf365ae833650d73ffd58c80e0ed885420592dd2"
+    },
+    "docs/03-standards/typescript.md": {
+      "src": "ee828d2d39edb82c0d0c971907e5b67938f22cb71d0cfdd5ee06e80750541e8b",
+      "dst": "ee828d2d39edb82c0d0c971907e5b67938f22cb71d0cfdd5ee06e80750541e8b"
+    },
+    "docs/03-standards/writing.md": {
+      "src": "aa20441be7b541375bdfd7cc15bc3f6c49d34bedd5d5f7328082d77bf65cc775",
+      "dst": "aa20441be7b541375bdfd7cc15bc3f6c49d34bedd5d5f7328082d77bf65cc775"
+    },
+    "docs/04-stack/better-auth.md": {
+      "src": "b461cd44e6fb3c8d713dc84f7462d8b0c4b1f1c4ca7ab06e33c21fc331ca9a65",
+      "dst": "b461cd44e6fb3c8d713dc84f7462d8b0c4b1f1c4ca7ab06e33c21fc331ca9a65"
+    },
+    "docs/04-stack/drizzle-concurrency.md": {
+      "src": "c6c48018365f80d2d5070f455e03ce2c85fc6ff1e96e4e6abc0d6088adc11a12",
+      "dst": "c6c48018365f80d2d5070f455e03ce2c85fc6ff1e96e4e6abc0d6088adc11a12"
+    },
+    "docs/04-stack/drizzle-postgres.md": {
+      "src": "d9e50d5f51946a1a7da07cdcf4a2ff551c1a4c1b70d5dcef01c13a40b341cd5a",
+      "dst": "d9e50d5f51946a1a7da07cdcf4a2ff551c1a4c1b70d5dcef01c13a40b341cd5a"
+    },
+    "docs/04-stack/tailwind-shadcn.md": {
+      "src": "59413551daec06c53d39307a15479430ffe40418a56b6afa00b4ea4125ebacbf",
+      "dst": "59413551daec06c53d39307a15479430ffe40418a56b6afa00b4ea4125ebacbf"
+    },
+    "docs/04-stack/tanstack-form.md": {
+      "src": "f79e6cc1059c786f541df32d1508dd5fec135a0960883106213d0680d0a4a855",
+      "dst": "f79e6cc1059c786f541df32d1508dd5fec135a0960883106213d0680d0a4a855"
+    },
+    "docs/04-stack/tanstack-query.md": {
+      "src": "59b1f05fad5a1bdead6031d5a64ca7cebab312707827470cd2e826355d59f908",
+      "dst": "59b1f05fad5a1bdead6031d5a64ca7cebab312707827470cd2e826355d59f908"
+    },
+    "docs/04-stack/tanstack-router.md": {
+      "src": "d65bfce4e3c92284a3029a6b0fb6b39b3518e04ed8967c6351bdd1854a564273",
+      "dst": "d65bfce4e3c92284a3029a6b0fb6b39b3518e04ed8967c6351bdd1854a564273"
+    },
+    "docs/04-stack/tanstack-start.md": {
+      "src": "2e1a5af76cef1c82d20270752c8baefed10d30404b3e6665b3edb6ea16532344",
+      "dst": "2e1a5af76cef1c82d20270752c8baefed10d30404b3e6665b3edb6ea16532344"
+    },
+    "docs/04-stack/tanstack-table.md": {
+      "src": "a84e518298a92914a39bec7c7a227751b0afecfc3574bd7f89d9110d4981f4d5",
+      "dst": "a84e518298a92914a39bec7c7a227751b0afecfc3574bd7f89d9110d4981f4d5"
+    },
+    "docs/04-stack/versions.md": {
+      "src": "37d042dff256f3be5ac5d44a1b856046305b2009bcf9d1b34fe9e68c43c7b133",
+      "dst": "37d042dff256f3be5ac5d44a1b856046305b2009bcf9d1b34fe9e68c43c7b133"
+    },
+    "docs/04-stack/zod.md": {
+      "src": "3e588633488d42b1ace1749a350a15cb342583a8d1431f8eb769ee9384ae6941",
+      "dst": "3e588633488d42b1ace1749a350a15cb342583a8d1431f8eb769ee9384ae6941"
+    },
+    "docs/05-agent-tooling/mcp.md": {
+      "src": "7d724ad54ca903a6342dc801480194c2acb65fd223497e257113af4b648b9f18",
+      "dst": "7d724ad54ca903a6342dc801480194c2acb65fd223497e257113af4b648b9f18"
+    },
+    "docs/05-agent-tooling/skills.md": {
+      "src": "91812a6f1c330ae0217dae2bd1bccb361ae70aee3010efde687621541d34b2c1",
+      "dst": "91812a6f1c330ae0217dae2bd1bccb361ae70aee3010efde687621541d34b2c1"
+    },
+    "docs/README.md": {
+      "src": "9fc9cfb5498f308bf2e8c88e340d94b851565648851609569123f185e97b272e",
+      "dst": "9fc9cfb5498f308bf2e8c88e340d94b851565648851609569123f185e97b272e"
+    },
+    "docs/decisions/0001-feature-driven-modular-monolith.md": {
+      "src": "819c16885c50473a913d2be1a5ce23780061c6461ed147ba5d293f8b80dd948d",
+      "dst": "819c16885c50473a913d2be1a5ce23780061c6461ed147ba5d293f8b80dd948d"
+    },
+    "docs/decisions/0002-verify-first-agent-docs.md": {
+      "src": "4e271f0216b17ce8e38364a947c7a6aefd4dddcb9bb9d79664b9585920fd7e48",
+      "dst": "4e271f0216b17ce8e38364a947c7a6aefd4dddcb9bb9d79664b9585920fd7e48"
+    },
+    "docs/decisions/0003-tooling-baseline.md": {
+      "src": "da32caab35bf38085d3da9671a0782d0d4eb044d7f83b4b96e9f3ce65e376b5c",
+      "dst": "da32caab35bf38085d3da9671a0782d0d4eb044d7f83b4b96e9f3ce65e376b5c"
+    },
+    "docs/decisions/0004-no-suppression-policy.md": {
+      "src": "17f1f8cd01bbbd5bb59081038f0ba9955a9b789a5bb5ceb1798ca2091e03ae6f",
+      "dst": "17f1f8cd01bbbd5bb59081038f0ba9955a9b789a5bb5ceb1798ca2091e03ae6f"
+    },
+    "docs/decisions/0005-pipeline-revision.md": {
+      "src": "d0963616a80e1cd0d725a2e741aa8af018266b5043021ddab7aeaa5de970ee2e",
+      "dst": "d0963616a80e1cd0d725a2e741aa8af018266b5043021ddab7aeaa5de970ee2e"
+    },
+    "docs/decisions/0006-error-model.md": {
+      "src": "a7a7cc93846a5ddc03262c36b26308c143aae8e8e7cb45d6ef392a1b9548df25",
+      "dst": "a7a7cc93846a5ddc03262c36b26308c143aae8e8e7cb45d6ef392a1b9548df25"
+    },
+    "docs/decisions/0007-open-decisions-resolved.md": {
+      "src": "7d3f157e330d1bcf5e6efcb7991ee936030e91866f6e7956f72c6acf871d5930",
+      "dst": "7d3f157e330d1bcf5e6efcb7991ee936030e91866f6e7956f72c6acf871d5930"
+    },
+    "docs/decisions/0008-table-v9-and-drizzle-v1-rc.md": {
+      "src": "70a141bdf0c9a458f5efe6ea47d0a82aa8eeca8559d498c8300afc0fa9dfd7f4",
+      "dst": "70a141bdf0c9a458f5efe6ea47d0a82aa8eeca8559d498c8300afc0fa9dfd7f4"
+    },
+    "docs/decisions/0009-cross-feature-communication.md": {
+      "src": "e90618c2b98040f7fa5489d0569cd515115d5af550f8ec1eab67357d61f1daa9",
+      "dst": "e90618c2b98040f7fa5489d0569cd515115d5af550f8ec1eab67357d61f1daa9"
+    },
+    "docs/decisions/0010-reference-template-comparison.md": {
+      "src": "9a7241a4b87a1d572450cb6a000da134b4da3312f4ca3e0503311053c4144743",
+      "dst": "9a7241a4b87a1d572450cb6a000da134b4da3312f4ca3e0503311053c4144743"
+    },
+    "docs/decisions/0011-coding-component-conventions-comparison.md": {
+      "src": "c58582734c5a906467b326e7019a41031d0d477e8e66094ec100357f7f6d1941",
+      "dst": "c58582734c5a906467b326e7019a41031d0d477e8e66094ec100357f7f6d1941"
+    },
+    "docs/decisions/0012-server-routes-reach-services.md": {
+      "src": "6bc2ad94b2170f815f4d8a80c5fd45c38f42ad3c7524143dfa62a601fdd92732",
+      "dst": "6bc2ad94b2170f815f4d8a80c5fd45c38f42ad3c7524143dfa62a601fdd92732"
+    },
+    "docs/decisions/0013-pure-business-rules-file.md": {
+      "src": "438a5296ce54c4c659ebeb7ce9c3894d99112ec9a4ca63883f11b36132b00b9a",
+      "dst": "438a5296ce54c4c659ebeb7ce9c3894d99112ec9a4ca63883f11b36132b00b9a"
+    },
+    "docs/decisions/0014-data-fetching-database-comparison.md": {
+      "src": "fa53b76950f0d97f9d956efd5d96fc3148d047e9c6460c4f7f44da1b24bd7fe4",
+      "dst": "fa53b76950f0d97f9d956efd5d96fc3148d047e9c6460c4f7f44da1b24bd7fe4"
+    },
+    "docs/decisions/0015-standards-tooling-comparison.md": {
+      "src": "da8cd657fc3a3bb522e3991d36ad5686edaf438d06e4950a249ee3286ded910e",
+      "dst": "da8cd657fc3a3bb522e3991d36ad5686edaf438d06e4950a249ee3286ded910e"
+    },
+    "docs/decisions/0016-pipeline-templates-comparison.md": {
+      "src": "06913a6eb82f4e2eec0fbfe7d2785b9a3b34ba1d700c7e623b7363743c0c7ac2",
+      "dst": "06913a6eb82f4e2eec0fbfe7d2785b9a3b34ba1d700c7e623b7363743c0c7ac2"
+    },
+    "docs/decisions/0017-pipeline-order.md": {
+      "src": "ce96dc66e74c8b6166ddbc0c48c7c067ec212ce4847414a506050e632ad6c332",
+      "dst": "ce96dc66e74c8b6166ddbc0c48c7c067ec212ce4847414a506050e632ad6c332"
+    },
+    "docs/decisions/0018-approval-and-gate-owners.md": {
+      "src": "6b8b8e8a4da50995cfaa1ab84fab8a3d8197dc75d97c9f8cd5dfc2bd56aa308b",
+      "dst": "6b8b8e8a4da50995cfaa1ab84fab8a3d8197dc75d97c9f8cd5dfc2bd56aa308b"
+    },
+    "docs/decisions/0019-check-hardening.md": {
+      "src": "0378d17814e2180e1cd64d5be4854b0dfc0356bb625fd68cd3644655a9ce0bf6",
+      "dst": "0378d17814e2180e1cd64d5be4854b0dfc0356bb625fd68cd3644655a9ce0bf6"
+    },
+    "docs/decisions/0020-decision-authority.md": {
+      "src": "ea1c7d63fef2e023e3deeef49c4d245d08dc2e6f2f6b90d95b6634358771da1d",
+      "dst": "ea1c7d63fef2e023e3deeef49c4d245d08dc2e6f2f6b90d95b6634358771da1d"
+    },
+    "docs/decisions/0021-master-document-comparison.md": {
+      "src": "7e375848613014fe26d53e73c4eff19e5e05e0cb87dfe5d7e7b412a77d66fe0f",
+      "dst": "7e375848613014fe26d53e73c4eff19e5e05e0cb87dfe5d7e7b412a77d66fe0f"
+    },
+    "docs/decisions/0022-gate-holes-and-installer-cleanup.md": {
+      "src": "a510d35381f858e7e5aa3143418655bac75cb14af57a8fb515eb5082ce42ae68",
+      "dst": "a510d35381f858e7e5aa3143418655bac75cb14af57a8fb515eb5082ce42ae68"
+    },
+    "docs/decisions/0023-ci-for-the-docs-repo.md": {
+      "src": "a89f9d263b10380cb44af51594bff7930d238ce3caa10c98abe28ce3cc9a7b86",
+      "dst": "a89f9d263b10380cb44af51594bff7930d238ce3caa10c98abe28ce3cc9a7b86"
+    },
+    "docs/decisions/0024-shadcn-skill-composition.md": {
+      "src": "b4d3d6ec4cc6dd98be4df1b82e0dc71338690d88f539c654eadc4261e22ead2b",
+      "dst": "b4d3d6ec4cc6dd98be4df1b82e0dc71338690d88f539c654eadc4261e22ead2b"
+    },
+    "docs/decisions/0025-check-ui-gate.md": {
+      "src": "347cad87431c8fa2ef371a70d2e05a67273a955e5932a02e1ad6148225b8d998",
+      "dst": "347cad87431c8fa2ef371a70d2e05a67273a955e5932a02e1ad6148225b8d998"
+    },
+    "docs/decisions/0026-primitive-flow-and-lock-hook.md": {
+      "src": "f7a13fe291dd401741cf878d3e35f97e0638d04b153cf4afdae162dde32ebe96",
+      "dst": "f7a13fe291dd401741cf878d3e35f97e0638d04b153cf4afdae162dde32ebe96"
+    },
+    "docs/decisions/0027-shadcn-mcp.md": {
+      "src": "f3fd4294788c1e52564c76adacf7e833d11448c8102aefbd7229c784f48eb7eb",
+      "dst": "f3fd4294788c1e52564c76adacf7e833d11448c8102aefbd7229c784f48eb7eb"
+    },
+    "docs/decisions/0028-one-mcp-config.md": {
+      "src": "f82b207a27e9be617a32677845386a5b7107b4702b402a029f115d3571d9930e",
+      "dst": "f82b207a27e9be617a32677845386a5b7107b4702b402a029f115d3571d9930e"
+    },
+    "docs/decisions/0029-drizzle-mcp-and-skill.md": {
+      "src": "648c7d3d58d94cb50dd0213f84fcb82c56c4cd1ce8e4aa9fc60a63985c63b6ba",
+      "dst": "648c7d3d58d94cb50dd0213f84fcb82c56c4cd1ce8e4aa9fc60a63985c63b6ba"
+    },
+    "docs/decisions/0030-better-auth-mcp-and-skills.md": {
+      "src": "323d441e7ba620d5752a1cfa7c517da7bfd533697adf4a077c73fa1a86383d29",
+      "dst": "323d441e7ba620d5752a1cfa7c517da7bfd533697adf4a077c73fa1a86383d29"
+    },
+    "docs/decisions/0031-qa-concurrency-and-deprecation.md": {
+      "src": "8a7a6ba3937336c3d007068b4fd6d21f417194960be4b13ee50bc557fc0302cc",
+      "dst": "8a7a6ba3937336c3d007068b4fd6d21f417194960be4b13ee50bc557fc0302cc"
+    },
+    "docs/decisions/0032-concurrency-mechanisms-smells-comments-format.md": {
+      "src": "e24e9ee38c7c38e80527d983b9410e2b999560cd7fa6543402898fc3abcb41da",
+      "dst": "e24e9ee38c7c38e80527d983b9410e2b999560cd7fa6543402898fc3abcb41da"
+    },
+    "docs/decisions/0033-environment-comparison.md": {
+      "src": "3f488f04d86a1eaf26248e8e49e240911880950ccbd6f190f4d38ec77cb037f4",
+      "dst": "3f488f04d86a1eaf26248e8e49e240911880950ccbd6f190f4d38ec77cb037f4"
+    },
+    "docs/decisions/0034-size-limits-magic-numbers-installer-split.md": {
+      "src": "6ed8b57f15641d8c305251feefc19228d9814fdc33cc5db98b9ed3023ce8ac7e",
+      "dst": "6ed8b57f15641d8c305251feefc19228d9814fdc33cc5db98b9ed3023ce8ac7e"
+    },
+    "docs/decisions/0035-cross-feature-query-freshness.md": {
+      "src": "33b627ff9191000f1c83c87a282f7cf5a4ecd524d4f52d1a99ca7328ceb2c1da",
+      "dst": "33b627ff9191000f1c83c87a282f7cf5a4ecd524d4f52d1a99ca7328ceb2c1da"
+    },
+    "docs/decisions/0036-format-and-lint-hook.md": {
+      "src": "e5ac8d4371b2aa6584eaf6ab843ece652170391a7ca6182cb781710f18b46e03",
+      "dst": "e5ac8d4371b2aa6584eaf6ab843ece652170391a7ca6182cb781710f18b46e03"
+    },
+    "docs/decisions/README.md": {
+      "src": "6856b4c5f3ef2163b858cf3a50683fbadc25fc76165b4d7bfd8cebee446f3859",
+      "dst": "6856b4c5f3ef2163b858cf3a50683fbadc25fc76165b4d7bfd8cebee446f3859"
+    },
+    "docs/examples/CODEOWNERS.example": {
+      "src": "b9075e0540996f2a3c8a95940dbfcee28fe48a361b5475e6357891589f6c0982",
+      "dst": "b9075e0540996f2a3c8a95940dbfcee28fe48a361b5475e6357891589f6c0982"
+    },
+    "docs/examples/check-lint-integrity.mjs": {
+      "src": "af917bdab1885fa34a0770ce47b2368b4a81e93527894236bb645fc5384bf39a",
+      "dst": "af917bdab1885fa34a0770ce47b2368b4a81e93527894236bb645fc5384bf39a"
+    },
+    "docs/examples/check-suppressions.mjs": {
+      "src": "065b8e235db3d4e13e187fad0442eed40fb73491e3cb802bb36f153d7fda08be",
+      "dst": "065b8e235db3d4e13e187fad0442eed40fb73491e3cb802bb36f153d7fda08be"
+    },
+    "docs/examples/check-ui.mjs": {
+      "src": "98ecd4eb76a4bf936bd11cb8546eaf2ecc879ca306cb774f528924fb1a648c87",
+      "dst": "98ecd4eb76a4bf936bd11cb8546eaf2ecc879ca306cb774f528924fb1a648c87"
+    },
+    "docs/examples/claude-settings.hooks.json": {
+      "src": "3e58b817b83572b8e42ca516077f7cd95d59ca46a374ec03df9b72ae1350e18a",
+      "dst": "3e58b817b83572b8e42ca516077f7cd95d59ca46a374ec03df9b72ae1350e18a"
+    },
+    "docs/examples/eslint.boundaries.js": {
+      "src": "f559637aa9e74bfd4093330363c6f3b8b3ec3f37305724fe0adb66ab013229fd",
+      "dst": "f559637aa9e74bfd4093330363c6f3b8b3ec3f37305724fe0adb66ab013229fd"
+    },
+    "docs/examples/eslint.code-rules.js": {
+      "src": "4205e697fa70c63a5c7c2e30cea0d02da655b9ec11f7616a754dae6d780b51cf",
+      "dst": "4205e697fa70c63a5c7c2e30cea0d02da655b9ec11f7616a754dae6d780b51cf"
+    },
+    "docs/examples/eslint.no-suppress.js": {
+      "src": "0a54e180f6e28a28932442c5d06a537537095375025a251cd6f3304aa5dcc67f",
+      "dst": "0a54e180f6e28a28932442c5d06a537537095375025a251cd6f3304aa5dcc67f"
+    },
+    "docs/examples/format-and-lint.hook.mjs": {
+      "src": "f1dfe93c38fd17ee7ddac2726f50ea0987dd7ea66160bb771fca46cb20a790cd",
+      "dst": "f1dfe93c38fd17ee7ddac2726f50ea0987dd7ea66160bb771fca46cb20a790cd"
+    },
+    "docs/examples/no-suppress.hook.mjs": {
+      "src": "d07768c17227e045470fd040c31ad8ae0852d64319bdd6c8de8c3f190993efc5",
+      "dst": "d07768c17227e045470fd040c31ad8ae0852d64319bdd6c8de8c3f190993efc5"
+    },
+    "docs/examples/protect-migrations.hook.mjs": {
+      "src": "f2a749d2e9b645d6349c2a428b2be27df219b4997cedfcb87d242936c397b8c0",
+      "dst": "f2a749d2e9b645d6349c2a428b2be27df219b4997cedfcb87d242936c397b8c0"
+    },
+    "docs/examples/protect-ui-lock.hook.mjs": {
+      "src": "23c44d7fbaad1081228212a07230f33f3b980cb6e21656e4eee5f776133136d6",
+      "dst": "23c44d7fbaad1081228212a07230f33f3b980cb6e21656e4eee5f776133136d6"
+    },
+    "docs/templates/adr.md": {
+      "src": "4fce90ae43c0dda6af8ee0b756420ba7986ba2dbd2f737538977928ad91f82f2",
+      "dst": "4fce90ae43c0dda6af8ee0b756420ba7986ba2dbd2f737538977928ad91f82f2"
+    },
+    "docs/templates/architecture-review.md": {
+      "src": "b2c25c070132d6babe9038bac1d5e6a28674991e46fbae4ba13afa3637784539",
+      "dst": "b2c25c070132d6babe9038bac1d5e6a28674991e46fbae4ba13afa3637784539"
+    },
+    "docs/templates/feature-spec.md": {
+      "src": "562656c1af57e1c036cb37fa9d1ad058d32bfa002e2697f4d719a4ae2f8087de",
+      "dst": "562656c1af57e1c036cb37fa9d1ad058d32bfa002e2697f4d719a4ae2f8087de"
+    },
+    "docs/templates/idea.md": {
+      "src": "48e85083d1945ecff99e28feb9c2bf5c2d3600a8113995fd50256f75995f342d",
+      "dst": "48e85083d1945ecff99e28feb9c2bf5c2d3600a8113995fd50256f75995f342d"
+    },
+    "docs/templates/issue.md": {
+      "src": "5bc93850eab64532dd98aef01b7a966e5b666564a61ff7b4a7a531f1c9063264",
+      "dst": "5bc93850eab64532dd98aef01b7a966e5b666564a61ff7b4a7a531f1c9063264"
+    },
+    "docs/templates/learnings.md": {
+      "src": "e9fc0dc3397e12f6ac0ff5e5934275e8417e2e954a72fabda7b9822fb7d50a5c",
+      "dst": "e9fc0dc3397e12f6ac0ff5e5934275e8417e2e954a72fabda7b9822fb7d50a5c"
+    },
+    "docs/templates/measure.md": {
+      "src": "6c01a5d6fea9541ea2e5a6d1cfbcc16f8ee79f68cc44d659517f2ad7fc0a4a41",
+      "dst": "6c01a5d6fea9541ea2e5a6d1cfbcc16f8ee79f68cc44d659517f2ad7fc0a4a41"
+    },
+    "docs/templates/pr-checklist.md": {
+      "src": "79105b7e2473ed6a9e0eee7a36b838e1df675387355dba42b0cc9f8c6f6df434",
+      "dst": "79105b7e2473ed6a9e0eee7a36b838e1df675387355dba42b0cc9f8c6f6df434"
+    },
+    "docs/templates/prd.md": {
+      "src": "cc37687c54c6f67cf4e35b2a95a0586d4f1f2a3c938d3501e53c4647aa52cb22",
+      "dst": "cc37687c54c6f67cf4e35b2a95a0586d4f1f2a3c938d3501e53c4647aa52cb22"
+    },
+    "docs/templates/prototype.md": {
+      "src": "fb1ce2948156daac8c6f5fa841d57766f3b5ff223ff79f501fa3e2ee84f32145",
+      "dst": "fb1ce2948156daac8c6f5fa841d57766f3b5ff223ff79f501fa3e2ee84f32145"
+    },
+    "docs/templates/qa.md": {
+      "src": "09636b603a005931b3d41e5df326e2c6f13ab0f148a7d3026ed001eec39e5156",
+      "dst": "09636b603a005931b3d41e5df326e2c6f13ab0f148a7d3026ed001eec39e5156"
+    },
+    "docs/templates/release-checklist.md": {
+      "src": "b704241c6665c7bad3a42ce2879e1c19c498996b48d73aa584bc368d2aad0067",
+      "dst": "b704241c6665c7bad3a42ce2879e1c19c498996b48d73aa584bc368d2aad0067"
+    },
+    "docs/templates/research.md": {
+      "src": "d7a88e318153c57faaa84002aacb3407a7be3a70cad78fa984514867301602eb",
+      "dst": "d7a88e318153c57faaa84002aacb3407a7be3a70cad78fa984514867301602eb"
+    },
+    "docs/templates/review-log.md": {
+      "src": "6f02d4861dfd12104fc5775011d18727e8bd6a7b4b7e63c53ea40bdf115486f3",
+      "dst": "6f02d4861dfd12104fc5775011d18727e8bd6a7b4b7e63c53ea40bdf115486f3"
+    },
+    "docs/templates/tasks.md": {
+      "src": "55269835c75b898e1d940e4873ab6a4766381b474bb55f7c76050410963475af",
+      "dst": "55269835c75b898e1d940e4873ab6a4766381b474bb55f7c76050410963475af"
+    },
+    ".claude/skills/add-db-table/SKILL.md": {
+      "src": "54838466c27c2c218005eea8b94290de8637b5afda696089a47a625352b2a33d",
+      "dst": "54838466c27c2c218005eea8b94290de8637b5afda696089a47a625352b2a33d"
+    },
+    ".claude/skills/add-route/SKILL.md": {
+      "src": "0af2f2404e4f72a32b0b2b45da89c9f8b57d6bb9b1a80f298b1ff04458e7abd2",
+      "dst": "0af2f2404e4f72a32b0b2b45da89c9f8b57d6bb9b1a80f298b1ff04458e7abd2"
+    },
+    ".claude/skills/add-server-function/SKILL.md": {
+      "src": "73b7777e98c9912b3bef6616f64a274930621a7aa3bd072552b29e2d8e9aa6e6",
+      "dst": "73b7777e98c9912b3bef6616f64a274930621a7aa3bd072552b29e2d8e9aa6e6"
+    },
+    ".claude/skills/add-server-route/SKILL.md": {
+      "src": "354fb6f7580c00671d0a515b54f7831165affa4d7355223db951dae671c1fbb3",
+      "dst": "354fb6f7580c00671d0a515b54f7831165affa4d7355223db951dae671c1fbb3"
+    },
+    ".claude/skills/add-tests/SKILL.md": {
+      "src": "b9ade32c60a819484543f13ea2916324cefa4c010a4795f884166aaf45d8c4ef",
+      "dst": "b9ade32c60a819484543f13ea2916324cefa4c010a4795f884166aaf45d8c4ef"
+    },
+    ".claude/skills/add-ui-component/SKILL.md": {
+      "src": "221f880f3dedb4ddfade460489307e32472ff0f104f830a08c3b800f50e3d4e0",
+      "dst": "221f880f3dedb4ddfade460489307e32472ff0f104f830a08c3b800f50e3d4e0"
+    },
+    ".claude/skills/better-auth-best-practices/SKILL.md": {
+      "src": "afdbdcae7ac9eedd91fc79fd4e2dbfb820bf22a1e8a88095d2582f84bc801e2e",
+      "dst": "afdbdcae7ac9eedd91fc79fd4e2dbfb820bf22a1e8a88095d2582f84bc801e2e"
+    },
+    ".claude/skills/better-auth-security-best-practices/SKILL.md": {
+      "src": "5ddd0f3e5c1f86edb5b9be8ac9878891c11c8a08e58bf191b0d57a21a17338fd",
+      "dst": "5ddd0f3e5c1f86edb5b9be8ac9878891c11c8a08e58bf191b0d57a21a17338fd"
+    },
+    ".claude/skills/build-task/SKILL.md": {
+      "src": "74b3003c026fac00920078f6352b88d185b4ecd6cde58da60b792058d7893db5",
+      "dst": "74b3003c026fac00920078f6352b88d185b4ecd6cde58da60b792058d7893db5"
+    },
+    ".claude/skills/change-dependency/SKILL.md": {
+      "src": "fa1ad585020de01bc62642cc88940182a6ec9cf2594b55b59ea5693bbd9f9d24",
+      "dst": "fa1ad585020de01bc62642cc88940182a6ec9cf2594b55b59ea5693bbd9f9d24"
+    },
+    ".claude/skills/close-out/SKILL.md": {
+      "src": "93c8fa6fdcf948eaba2fdc48d9961e5184dcc3bc37dd3d5e973fb0c6bdc7b836",
+      "dst": "93c8fa6fdcf948eaba2fdc48d9961e5184dcc3bc37dd3d5e973fb0c6bdc7b836"
+    },
+    ".claude/skills/code-review/SKILL.md": {
+      "src": "667657f1d046ca4b936dde0dca800f1a17d6c0b1b0ba2284a4e58da6122e0e8f",
+      "dst": "667657f1d046ca4b936dde0dca800f1a17d6c0b1b0ba2284a4e58da6122e0e8f"
+    },
+    ".claude/skills/create-auth/SKILL.md": {
+      "src": "9383a27fe8e95b1af8e16e6bdf8d4c7758a08e198ec82224c2cdf5fbc68a1141",
+      "dst": "9383a27fe8e95b1af8e16e6bdf8d4c7758a08e198ec82224c2cdf5fbc68a1141"
+    },
+    ".claude/skills/drizzle/SKILL.md": {
+      "src": "1974294cd8b544b3ccde4894cc19c5b6928f992fbc0ce605d6a596b88f331cc7",
+      "dst": "1974294cd8b544b3ccde4894cc19c5b6928f992fbc0ce605d6a596b88f331cc7"
+    },
+    ".claude/skills/drizzle/generate.md": {
+      "src": "dd372ecba9c5d0da80c405be73227b5efbc7a217afb2955d7caacc342a8b00ae",
+      "dst": "dd372ecba9c5d0da80c405be73227b5efbc7a217afb2955d7caacc342a8b00ae"
+    },
+    ".claude/skills/drizzle/hints.md": {
+      "src": "4842d8f9c2781e554f2246f42cbe9545a885058598cf82d3f9cf9d423b03319a",
+      "dst": "4842d8f9c2781e554f2246f42cbe9545a885058598cf82d3f9cf9d423b03319a"
+    },
+    ".claude/skills/drizzle/migrations.md": {
+      "src": "88f42428e56267fe494e2a743769ebf90434a06d58c640e9c0ab006ee74cf5fd",
+      "dst": "88f42428e56267fe494e2a743769ebf90434a06d58c640e9c0ab006ee74cf5fd"
+    },
+    ".claude/skills/drizzle/output-modes.md": {
+      "src": "2b0d5e32e4e0abf6712ce5621da2576fedabe440e80f2ad976d9c012e0bd8bd3",
+      "dst": "2b0d5e32e4e0abf6712ce5621da2576fedabe440e80f2ad976d9c012e0bd8bd3"
+    },
+    ".claude/skills/drizzle/pull.md": {
+      "src": "8c86edb4a8590031f6b65776d0abb53efc70593728342561a0500cfb808c7ad4",
+      "dst": "8c86edb4a8590031f6b65776d0abb53efc70593728342561a0500cfb808c7ad4"
+    },
+    ".claude/skills/drizzle/push.md": {
+      "src": "869abd77c30466b214e118eace9b001d3492f5ccf60b39042c1a548cdf2fc47d",
+      "dst": "869abd77c30466b214e118eace9b001d3492f5ccf60b39042c1a548cdf2fc47d"
+    },
+    ".claude/skills/drizzle/responses-and-errors.md": {
+      "src": "d3cf07749a732d5cb217210170e600c130e1a280de0ef7c302d20268b49f42ce",
+      "dst": "d3cf07749a732d5cb217210170e600c130e1a280de0ef7c302d20268b49f42ce"
+    },
+    ".claude/skills/email-and-password-best-practices/SKILL.md": {
+      "src": "182a131d030c35e3430ae72548da17dfa9fc3096df813b066bbef7a24c7759dd",
+      "dst": "182a131d030c35e3430ae72548da17dfa9fc3096df813b066bbef7a24c7759dd"
+    },
+    ".claude/skills/fix-bug/SKILL.md": {
+      "src": "8d8d343fb3640bece11e09f0cf329e4d1707a34c9b91df5b37631a2dd958e82c",
+      "dst": "8d8d343fb3640bece11e09f0cf329e4d1707a34c9b91df5b37631a2dd958e82c"
+    },
+    ".claude/skills/measure-feature/SKILL.md": {
+      "src": "9d24ba7990ef545404d15d4c287d99fa33a62ac6c0c6d8feb7110588fac7dfb0",
+      "dst": "9d24ba7990ef545404d15d4c287d99fa33a62ac6c0c6d8feb7110588fac7dfb0"
+    },
+    ".claude/skills/new-feature/SKILL.md": {
+      "src": "1de257e60ee0901c3fbd8c742320a01036306e28af30252d88b8380835717fc5",
+      "dst": "1de257e60ee0901c3fbd8c742320a01036306e28af30252d88b8380835717fc5"
+    },
+    ".claude/skills/organization-best-practices/SKILL.md": {
+      "src": "25faaab9ec8da7358367a7e34b8e03a355c5448a8faa1810062f46709deb652c",
+      "dst": "25faaab9ec8da7358367a7e34b8e03a355c5448a8faa1810062f46709deb652c"
+    },
+    ".claude/skills/prepare-release/SKILL.md": {
+      "src": "b180ec0c5042b97093af3504cd9de8c636be8fd850a99471b7b5deecef8a0d65",
+      "dst": "b180ec0c5042b97093af3504cd9de8c636be8fd850a99471b7b5deecef8a0d65"
+    },
+    ".claude/skills/refactor/SKILL.md": {
+      "src": "eee68b51e1356f0f6c47af17f43f83b41c8499466777068d4afcca2ecd88739d",
+      "dst": "eee68b51e1356f0f6c47af17f43f83b41c8499466777068d4afcca2ecd88739d"
+    },
+    ".claude/skills/run-pipeline/SKILL.md": {
+      "src": "67fd7f4e48c71d4fb8a0ecf2671a16f2bbd17f79b4aaff2f5bcc3b0e7803f589",
+      "dst": "67fd7f4e48c71d4fb8a0ecf2671a16f2bbd17f79b4aaff2f5bcc3b0e7803f589"
+    },
+    ".claude/skills/run-qa/SKILL.md": {
+      "src": "932d68dd0831b59c00bb5638dd8795913efbaea317f2e3529672b91878cf6d2e",
+      "dst": "932d68dd0831b59c00bb5638dd8795913efbaea317f2e3529672b91878cf6d2e"
+    },
+    ".claude/skills/shadcn/SKILL.md": {
+      "src": "b5e71afe74be30d8c3bfb0897cdb9318f8495e0a6271fec374f20d771ab906f9",
+      "dst": "b5e71afe74be30d8c3bfb0897cdb9318f8495e0a6271fec374f20d771ab906f9"
+    },
+    ".claude/skills/shadcn/agents/openai.yml": {
+      "src": "35db91b1eef58b2abe01da9b88577de5a44e233b740cd93d692ddeeadd2afe4d",
+      "dst": "35db91b1eef58b2abe01da9b88577de5a44e233b740cd93d692ddeeadd2afe4d"
+    },
+    ".claude/skills/shadcn/assets/shadcn-small.png": {
+      "src": "0ecc62d682727f68fc4937eed19960c706714fa084d44f63028d611ae02bf3d7",
+      "dst": "0ecc62d682727f68fc4937eed19960c706714fa084d44f63028d611ae02bf3d7"
+    },
+    ".claude/skills/shadcn/assets/shadcn.png": {
+      "src": "7d60ad6fec4d89a0d44ba5a3c9283d2fea0047af5467f9227040e20d927d39b7",
+      "dst": "7d60ad6fec4d89a0d44ba5a3c9283d2fea0047af5467f9227040e20d927d39b7"
+    },
+    ".claude/skills/shadcn/assets/showcase/color-pair.tsx": {
+      "src": "6028f0b677912216822fdaf76ae6b8863c429916ed4a9626b73f4de4506f8ee4",
+      "dst": "6028f0b677912216822fdaf76ae6b8863c429916ed4a9626b73f4de4506f8ee4"
+    },
+    ".claude/skills/shadcn/assets/showcase/preview-states.css": {
+      "src": "8d9e3cec24dd01b11c5ba12196d0376a131797d9ad247ea624e66eb8bbf61b0e",
+      "dst": "8d9e3cec24dd01b11c5ba12196d0376a131797d9ad247ea624e66eb8bbf61b0e"
+    },
+    ".claude/skills/shadcn/assets/showcase/state-matrix.tsx": {
+      "src": "07794119fe05ff735358b3f8ca30a8297617ab64dfb3901dce4d89fe5f443458",
+      "dst": "07794119fe05ff735358b3f8ca30a8297617ab64dfb3901dce4d89fe5f443458"
+    },
+    ".claude/skills/shadcn/cli.md": {
+      "src": "a381e35bf36fe7bb851952c13707e01e82434fd7a4a4e53f6df26c6370838904",
+      "dst": "a381e35bf36fe7bb851952c13707e01e82434fd7a4a4e53f6df26c6370838904"
+    },
+    ".claude/skills/shadcn/customization.md": {
+      "src": "a19e81c78843df255e85755e52659268d793845add845b34ad8091f62bff3af9",
+      "dst": "a19e81c78843df255e85755e52659268d793845add845b34ad8091f62bff3af9"
+    },
+    ".claude/skills/shadcn/design-system-page.md": {
+      "src": "c541d661af159548744be3e27f79e7da710ab83f9afd448a4346f7ff1531d328",
+      "dst": "c541d661af159548744be3e27f79e7da710ab83f9afd448a4346f7ff1531d328"
+    },
+    ".claude/skills/shadcn/design-system.md": {
+      "src": "9ed11e93e7e80e34c8795d5ba82e5420ca905e8e9949fef79cbe9239184fd06b",
+      "dst": "9ed11e93e7e80e34c8795d5ba82e5420ca905e8e9949fef79cbe9239184fd06b"
+    },
+    ".claude/skills/shadcn/evals/evals.json": {
+      "src": "e82c747326a5c21e37a1c962274d36b1bfebb3e6602ee368b98e2dba5db18369",
+      "dst": "e82c747326a5c21e37a1c962274d36b1bfebb3e6602ee368b98e2dba5db18369"
+    },
+    ".claude/skills/shadcn/mcp.md": {
+      "src": "8d696b4e45b7d0e337367248513bd9acebe8f3bcfd7b748c775e5a337c8f38c8",
+      "dst": "8d696b4e45b7d0e337367248513bd9acebe8f3bcfd7b748c775e5a337c8f38c8"
+    },
+    ".claude/skills/shadcn/registry.md": {
+      "src": "4f239be36bd2b58e17047db1ca80ab7da00e15a8b73242e5e4d50d113c4caa05",
+      "dst": "4f239be36bd2b58e17047db1ca80ab7da00e15a8b73242e5e4d50d113c4caa05"
+    },
+    ".claude/skills/shadcn/rules/base-vs-radix.md": {
+      "src": "2b2deb47d004285220c1fc6b38bb2edc2d0ccbcdafd031b0b189d5d8ed0d1ba8",
+      "dst": "2b2deb47d004285220c1fc6b38bb2edc2d0ccbcdafd031b0b189d5d8ed0d1ba8"
+    },
+    ".claude/skills/shadcn/rules/chat.md": {
+      "src": "4b4610d487ddc9751f3cfe0c554a06560ac723fcc2460abad77a1d3c7c9a4b95",
+      "dst": "4b4610d487ddc9751f3cfe0c554a06560ac723fcc2460abad77a1d3c7c9a4b95"
+    },
+    ".claude/skills/shadcn/rules/composition.md": {
+      "src": "f282df828d83a91132a846ddb62eea149a7c7c94822e9ca88cfddf85af01aa41",
+      "dst": "f282df828d83a91132a846ddb62eea149a7c7c94822e9ca88cfddf85af01aa41"
+    },
+    ".claude/skills/shadcn/rules/forms.md": {
+      "src": "29593e14381e34626f8e0e9c15c59f3394b92a0623af6a6ec94585400123853c",
+      "dst": "29593e14381e34626f8e0e9c15c59f3394b92a0623af6a6ec94585400123853c"
+    },
+    ".claude/skills/shadcn/rules/icons.md": {
+      "src": "d4a58266648872d9ee07d0c2368843a1cb88b8253b7f528dd7bda9d68b6c2535",
+      "dst": "d4a58266648872d9ee07d0c2368843a1cb88b8253b7f528dd7bda9d68b6c2535"
+    },
+    ".claude/skills/shadcn/rules/styling.md": {
+      "src": "f88fbd72dff862805b786dc7d7e4c74c83030fc278c5b97c993e4e665001798c",
+      "dst": "f88fbd72dff862805b786dc7d7e4c74c83030fc278c5b97c993e4e665001798c"
+    },
+    ".claude/skills/shadcn/scripts/showcase-coverage.mjs": {
+      "src": "fb593e0806414d23b51354a46881f0b2873afc226bda0926a22f83cbd60af2fa",
+      "dst": "fb593e0806414d23b51354a46881f0b2873afc226bda0926a22f83cbd60af2fa"
+    },
+    ".claude/skills/two-factor-authentication-best-practices/SKILL.md": {
+      "src": "17c507b168a95753a328f9d1ee11cd64dc6fcdced21f4760d7826c2a4f9fc5ab",
+      "dst": "17c507b168a95753a328f9d1ee11cd64dc6fcdced21f4760d7826c2a4f9fc5ab"
+    },
+    ".claude/skills/verify-library-docs/SKILL.md": {
+      "src": "149757cf73c0d76860e3472b2deb50d5aa83b4fb4108b523c4c80940f99e14bf",
+      "dst": "149757cf73c0d76860e3472b2deb50d5aa83b4fb4108b523c4c80940f99e14bf"
+    },
+    ".claude/skills/write-architecture-review/SKILL.md": {
+      "src": "444abe8605dd97591f5cefe04ca62917e4c99cd6d68509664a47bb05fcec761a",
+      "dst": "444abe8605dd97591f5cefe04ca62917e4c99cd6d68509664a47bb05fcec761a"
+    },
+    ".claude/skills/write-feature-spec/SKILL.md": {
+      "src": "a22b771f13bc7c70194eb648a4414edbc95fdab669f772cec69a8cc70f9b54da",
+      "dst": "a22b771f13bc7c70194eb648a4414edbc95fdab669f772cec69a8cc70f9b54da"
+    },
+    ".claude/skills/write-idea/SKILL.md": {
+      "src": "4fe566919269f609a88f77afba3645186f4fa6467415859ff9ac985abca00c6d",
+      "dst": "4fe566919269f609a88f77afba3645186f4fa6467415859ff9ac985abca00c6d"
+    },
+    ".claude/skills/write-prd/SKILL.md": {
+      "src": "dcc276b33fe4e7a3bde0168fe59db6dd58c4a40ed4414a0040ac64b0d7fcb0a7",
+      "dst": "dcc276b33fe4e7a3bde0168fe59db6dd58c4a40ed4414a0040ac64b0d7fcb0a7"
+    },
+    ".claude/skills/write-prototype/SKILL.md": {
+      "src": "7963857309f6041e06fe753dabb7f2507e0264add743e13d2f3c389e24c95024",
+      "dst": "7963857309f6041e06fe753dabb7f2507e0264add743e13d2f3c389e24c95024"
+    },
+    ".claude/skills/write-research/SKILL.md": {
+      "src": "5d5b7157b5a44e917fe726b679d2336c404603249f1ac2865875f5c104a7e1ba",
+      "dst": "5d5b7157b5a44e917fe726b679d2336c404603249f1ac2865875f5c104a7e1ba"
+    },
+    ".claude/skills/write-tasks/SKILL.md": {
+      "src": "94bc6032d4af78c257ccd4df4a4154a7c2ff90f05da439576e88f91ef858bf68",
+      "dst": "94bc6032d4af78c257ccd4df4a4154a7c2ff90f05da439576e88f91ef858bf68"
+    },
+    "AGENTS.md": {
+      "src": "01c71a341db48667e3fb9bfe535ee5ac35e4c7df9da97d5fe2f441080e6d632c",
+      "dst": "01c71a341db48667e3fb9bfe535ee5ac35e4c7df9da97d5fe2f441080e6d632c"
+    },
+    "CLAUDE.md": {
+      "src": "a4bef5dd21a32c72245593a47cbdbe1d9dbc0675ecba2de36dc2986073625358",
+      "dst": "a4bef5dd21a32c72245593a47cbdbe1d9dbc0675ecba2de36dc2986073625358"
+    },
+    "install.sh": {
+      "src": "486e399a301715c980b0110247182b1d2463136fff0583815e938e78cbdc4165",
+      "dst": "486e399a301715c980b0110247182b1d2463136fff0583815e938e78cbdc4165"
+    },
+    "install.mjs": {
+      "src": "432e0a47aa631354fc66cb01c2febbb87b0f51300314a3458072aa19a5e67d8e",
+      "dst": "432e0a47aa631354fc66cb01c2febbb87b0f51300314a3458072aa19a5e67d8e"
+    },
+    "installer/context.mjs": {
+      "src": "80c53fbbe2eb98b95f1605c9db9ac7f5fa2f6f8f8c3fe53e80f19fce74b28f5e",
+      "dst": "80c53fbbe2eb98b95f1605c9db9ac7f5fa2f6f8f8c3fe53e80f19fce74b28f5e"
+    },
+    "installer/copy-docs.mjs": {
+      "src": "bc351cb671eee2829d73cae68924e6b1bcce52cd4281122c3c72b1b038ba491a",
+      "dst": "bc351cb671eee2829d73cae68924e6b1bcce52cd4281122c3c72b1b038ba491a"
+    },
+    "installer/files.mjs": {
+      "src": "e364bf9e431579ace4d33c99946b730be3824e7e49d5a6a4c3c64f8b71c740e0",
+      "dst": "e364bf9e431579ace4d33c99946b730be3824e7e49d5a6a4c3c64f8b71c740e0"
+    },
+    "installer/jsonc.mjs": {
+      "src": "2dfdb92cfa699dee32ce18bd58b06eb516974164b01b8914484bd0e952eacfae",
+      "dst": "2dfdb92cfa699dee32ce18bd58b06eb516974164b01b8914484bd0e952eacfae"
+    },
+    "installer/manifest.mjs": {
+      "src": "a9a051e825a8fdadb3dfd64f942a5f4becfdd84b002c12f2075156e6098c5bac",
+      "dst": "a9a051e825a8fdadb3dfd64f942a5f4becfdd84b002c12f2075156e6098c5bac"
+    },
+    "installer/patch-config.mjs": {
+      "src": "07f9a11aecbe408f57edfb6ccc5a3980ecb4d1ce29a35856ecf54abd2871bf97",
+      "dst": "07f9a11aecbe408f57edfb6ccc5a3980ecb4d1ce29a35856ecf54abd2871bf97"
+    },
+    "installer/pnpm.mjs": {
+      "src": "5ecfa0a69f9bbcddacd333f38c400ae57580c14c69634073718d170fa173abd4",
+      "dst": "5ecfa0a69f9bbcddacd333f38c400ae57580c14c69634073718d170fa173abd4"
+    },
+    "installer/quality-gates.mjs": {
+      "src": "fd9c662d03660326a8ea5a847489138d47363ba41d360e8db8c4a8b3e921209c",
+      "dst": "fd9c662d03660326a8ea5a847489138d47363ba41d360e8db8c4a8b3e921209c"
+    },
+    "installer/report.mjs": {
+      "src": "7c21fc00dd07858895309aba243eb72b72aa74ec1355566590da3907b73707b1",
+      "dst": "7c21fc00dd07858895309aba243eb72b72aa74ec1355566590da3907b73707b1"
+    },
+    "installer/shadcn.mjs": {
+      "src": "fb3c648e91f27069c344e0baf3642d2a79db85433f85c55e649f2494c23304e5",
+      "dst": "fb3c648e91f27069c344e0baf3642d2a79db85433f85c55e649f2494c23304e5"
+    },
+    "scripts/check-docs.mjs": {
+      "src": "0db5620563b15926f4d1418602dea5f84b53f916942806690dab3151ac9ca522",
+      "dst": "0db5620563b15926f4d1418602dea5f84b53f916942806690dab3151ac9ca522"
+    },
+    ".mcp.json": {
+      "src": "7def8e86e7423e71e0036d947c91b43ff30a8996a50fb87afc58fbca54f43d26",
+      "dst": "7def8e86e7423e71e0036d947c91b43ff30a8996a50fb87afc58fbca54f43d26"
+    },
+    "eslint.boundaries.js": {
+      "src": "f559637aa9e74bfd4093330363c6f3b8b3ec3f37305724fe0adb66ab013229fd",
+      "dst": "10d34d99418614f45a2157e9e3dfe83dc13779e9d0f5d76c12b4643e4bff0a1a"
+    },
+    "eslint.code-rules.js": {
+      "src": "4205e697fa70c63a5c7c2e30cea0d02da655b9ec11f7616a754dae6d780b51cf",
+      "dst": "9df179cbb5c0e0a7da88c9acddbfa858c854a8039b8bddac0ce087727a772466"
+    },
+    "eslint.no-suppress.js": {
+      "src": "0a54e180f6e28a28932442c5d06a537537095375025a251cd6f3304aa5dcc67f",
+      "dst": "9252e2c037a5dfa9b47d4d191cc611ae0843bc6d83ddaafd64a867da1feb2a8d"
+    },
+    "scripts/check-suppressions.mjs": {
+      "src": "065b8e235db3d4e13e187fad0442eed40fb73491e3cb802bb36f153d7fda08be",
+      "dst": "9fde064b345f55ec0acfc47182eac39fbc6782ee62e5a6d70a4786527dee9a2e"
+    },
+    "scripts/check-lint-integrity.mjs": {
+      "src": "af917bdab1885fa34a0770ce47b2368b4a81e93527894236bb645fc5384bf39a",
+      "dst": "08ace3703e3e6408022fa5fc0a73e037f41bfbe0058d372daadfb515da8c858b"
+    },
+    "scripts/check-ui.mjs": {
+      "src": "98ecd4eb76a4bf936bd11cb8546eaf2ecc879ca306cb774f528924fb1a648c87",
+      "dst": "7f1a61de99e87dc6a1588843009340e070a869e9ad3619f0492aeebee9ef24e3"
+    },
+    ".claude/hooks/no-suppress.mjs": {
+      "src": "d07768c17227e045470fd040c31ad8ae0852d64319bdd6c8de8c3f190993efc5",
+      "dst": "d07768c17227e045470fd040c31ad8ae0852d64319bdd6c8de8c3f190993efc5"
+    },
+    ".claude/hooks/format-and-lint.mjs": {
+      "src": "f1dfe93c38fd17ee7ddac2726f50ea0987dd7ea66160bb771fca46cb20a790cd",
+      "dst": "f1dfe93c38fd17ee7ddac2726f50ea0987dd7ea66160bb771fca46cb20a790cd"
+    },
+    ".claude/hooks/protect-ui-lock.mjs": {
+      "src": "23c44d7fbaad1081228212a07230f33f3b980cb6e21656e4eee5f776133136d6",
+      "dst": "23c44d7fbaad1081228212a07230f33f3b980cb6e21656e4eee5f776133136d6"
+    },
+    ".claude/hooks/protect-migrations.mjs": {
+      "src": "f2a749d2e9b645d6349c2a428b2be27df219b4997cedfcb87d242936c397b8c0",
+      "dst": "f2a749d2e9b645d6349c2a428b2be27df219b4997cedfcb87d242936c397b8c0"
+    },
+    "eslint.ai-docs.js": {
+      "src": "909d8691450cdef3d89d92f2b7da6833c4f314e8c6fc5cf1572ffcbb3c4ef903",
+      "dst": "2f3f716fcc0abd9e0ac3a89806b302ecc287c6f74f3e55332e341cecf92b250d"
+    },
+    ".github/CODEOWNERS": {
+      "src": "44e537e88a927891f5b961bc6bf79055501781b7de54c8f42b3026ebce317b23",
+      "dst": "44e537e88a927891f5b961bc6bf79055501781b7de54c8f42b3026ebce317b23"
+    }
+  },
+  "installedAt": "2026-11-07T01:13:40.551Z"
+}

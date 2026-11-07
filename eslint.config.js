@@ -1,6 +1,7 @@
 //  @ts-check
 
 import { tanstackConfig } from "@tanstack/eslint-config"
+import { aiDocsConfig } from "./eslint.ai-docs.js"
 
 export default [
   ...tanstackConfig,
@@ -18,4 +19,5 @@ export default [
   {
     ignores: ["eslint.config.js", ".prettierrc"],
   },
+  ...aiDocsConfig,
 ]
