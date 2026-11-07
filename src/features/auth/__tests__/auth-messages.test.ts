@@ -4,6 +4,7 @@ import {
   signUpFormErrors,
 } from "@/features/auth/components/auth-messages"
 import { signInMethodFor } from "@/features/auth/components/sign-in-method"
+import { runAuthCall } from "@/features/auth/hooks/auth-client"
 
 const HTTP_UNAUTHORIZED = 401
 const HTTP_BAD_REQUEST = 400
@@ -77,6 +78,36 @@ describe("signInMethodFor (ADR 0039, Q6)", () => {
     expect(signInMethodFor("BUDI")).toEqual({
       kind: "username",
       username: "BUDI",
+    })
+  })
+})
+
+describe("runAuthCall (review T2 S4)", () => {
+  it("kegagalan jaringan menjadi ok: false dengan status 0, yang menjadi banner umum", async () => {
+    const result = await runAuthCall(() =>
+      Promise.reject(new Error("network down"))
+    )
+    expect(result).toEqual({ ok: false, code: undefined, status: 0 })
+    expect(signUpFormErrors(undefined, 0).form).toBe(
+      "Pendaftaran gagal. Coba lagi."
+    )
+    expect(signInErrorText(undefined, 0)).toBe("Login gagal. Coba lagi.")
+  })
+
+  it("error dari server tetap membawa code dan status", async () => {
+    const result = await runAuthCall(() =>
+      Promise.resolve({
+        error: {
+          code: "INVALID_USERNAME_OR_PASSWORD",
+          status: 401,
+          statusText: "Unauthorized",
+        },
+      })
+    )
+    expect(result).toEqual({
+      ok: false,
+      code: "INVALID_USERNAME_OR_PASSWORD",
+      status: 401,
     })
   })
 })

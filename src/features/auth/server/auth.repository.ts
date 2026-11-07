@@ -18,23 +18,40 @@ import { AUTH_ERROR } from "@/features/auth/errors"
 const SIGN_UP_EMAIL_PATH = "/sign-up/email"
 const SIGN_IN_USERNAME_PATH = "/sign-in/username"
 
-// The username plugin treats `username` as optional on sign-up; R1 makes it required (ADR 0039).
 const signUpUsernameSchema = z.object({ username: z.string().trim().min(1) })
 
-const beforeAuthEndpoints = createAuthMiddleware(async (ctx) => {
-  // better-auth 1.7.18 runs formCsrfMiddleware on /sign-in/email but not on the username
-  // plugin's /sign-in/username; run the same middleware here (ADR 0046).
-  if (ctx.path === SIGN_IN_USERNAME_PATH) {
-    await formCsrfMiddleware(ctx)
-    return
-  }
-  if (ctx.path !== SIGN_UP_EMAIL_PATH) return
-  if (signUpUsernameSchema.safeParse(ctx.body).success) return
+// better-auth 1.7.18 runs formCsrfMiddleware on /sign-in/email but not on the username plugin's
+// /sign-in/username, so we run the same exported middleware for that path (ADR 0046, point 2).
+async function protectUsernameSignIn(
+  ctx: Parameters<typeof formCsrfMiddleware>[0]
+): Promise<void> {
+  await formCsrfMiddleware(ctx)
+}
+
+// The username plugin treats `username` as optional on sign-up; R1 makes it required (ADR 0039).
+function requireUsername(body: unknown): void {
+  if (signUpUsernameSchema.safeParse(body).success) return
   throw new APIError("BAD_REQUEST", {
     code: AUTH_ERROR.USERNAME_REQUIRED,
     message: "Username is required",
   })
+}
+
+const beforeAuthEndpoints = createAuthMiddleware(async (ctx) => {
+  if (ctx.path === SIGN_IN_USERNAME_PATH) await protectUsernameSignIn(ctx)
+  if (ctx.path === SIGN_UP_EMAIL_PATH) requireUsername(ctx.body)
 })
+
+// Only level and message reach pino. Better Auth passes the raw driver error as extra arguments (its
+// `detail` held an email on a unique violation), and below "warn" some messages embed the email
+// themselves (better-auth 1.7.18 api/routes/sign-up.mjs: "Sign-up attempt for existing email: …"),
+// so the level stays at "warn" (ADR 0046, point 3; logging.md; security.md rule 13).
+function forwardBetterAuthLog(
+  level: "debug" | "info" | "warn" | "error",
+  message: string
+): void {
+  logger[level]({ source: "better-auth" }, message)
+}
 
 export const authOptions = {
   baseURL: serverEnv.BETTER_AUTH_URL,
@@ -47,12 +64,11 @@ export const authOptions = {
     // production behavior (ADR 0046, better-auth.md rule 9).
     disableOriginCheck: false,
   },
-  // Only level and message reach the log: Better Auth passes the raw driver error as extra arguments,
-  // and its `detail` holds the email on a unique violation (logging.md, security.md rule 13).
   logger: {
-    log: (level, message) => {
-      logger[level]({ source: "better-auth" }, message)
-    },
+    level: "warn",
+    // The extra arguments (raw errors) are dropped on purpose.
+    log: (level, message, ..._details: ReadonlyArray<unknown>) =>
+      forwardBetterAuthLog(level, message),
   },
   emailAndPassword: { enabled: true },
   user: {

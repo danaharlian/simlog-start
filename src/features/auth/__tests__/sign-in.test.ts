@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { accounts, sessions, users } from "@/features/auth/db/schema"
 import { auth, authOptions } from "@/features/auth/server/auth.repository"
 import { db } from "@/shared/db/client"
+import { logger } from "@/shared/server/logger.server"
 
 const BASE_URL = "http://localhost:3000/api/auth"
 const SAME_ORIGIN = "http://localhost:3000"
@@ -142,23 +143,42 @@ describe("rate limit (AC21, NFR1)", () => {
   })
 })
 
+// pino writes to fd 1 directly, so the tests spy on the shared pino logger itself (review T2 B1).
+function captureLogs(): Array<string> {
+  const written: Array<string> = []
+  const record = (...args: ReadonlyArray<unknown>) => {
+    written.push(JSON.stringify(args))
+  }
+  for (const level of ["debug", "info", "warn", "error"] as const) {
+    vi.spyOn(logger, level).mockImplementation(record)
+  }
+  for (const method of ["log", "info", "warn", "error", "debug"] as const) {
+    vi.spyOn(console, method).mockImplementation(record)
+  }
+  return written
+}
+
+describe("Better Auth logs (ADR 0046, point 3)", () => {
+  it("logger Better Auth meneruskan pesan ke pino tanpa argumen tambahan", () => {
+    const written = captureLogs()
+    authOptions.logger.log("error", "Failed to create user", {
+      detail: "Key (email)=(rahasia.log@contoh.id) already exists.",
+    })
+    expect(written).toHaveLength(1)
+    expect(written[0]).toContain("Failed to create user")
+    expect(written[0]).not.toContain("rahasia.log@contoh.id")
+  })
+
+  it("level logger Better Auth tetap warn (pesan info memuat email)", () => {
+    expect(authOptions.logger.level).toBe("warn")
+  })
+})
+
 describe("passwords stay out of logs and storage (AC24, NFR2)", () => {
   it("log yang ditangkap tidak memuat password; accounts.password bukan teks asli", async () => {
-    const written: Array<string> = []
-    const capture = (...args: ReadonlyArray<unknown>) => {
-      written.push(
-        args
-          .map((arg) => (typeof arg === "string" ? arg : JSON.stringify(arg)))
-          .join(" ")
-      )
-    }
-    for (const method of ["log", "info", "warn", "error", "debug"] as const) {
-      vi.spyOn(console, method).mockImplementation(capture)
-    }
-    vi.spyOn(process.stdout, "write").mockImplementation((chunk) => {
-      written.push(String(chunk))
-      return true
-    })
+    const written = captureLogs()
+    // Positive control: the capture sees what Better Auth sends to the logger.
+    authOptions.logger.log("warn", "capture-probe")
     const account = await createAccount()
     await post(auth.handler, "/sign-in/username", {
       username: account.username,
@@ -170,6 +190,7 @@ describe("passwords stay out of logs and storage (AC24, NFR2)", () => {
     })
     vi.restoreAllMocks()
 
+    expect(written.some((line) => line.includes("capture-probe"))).toBe(true)
     expect(
       written.some(
         (line) => line.includes(PASSWORD) || line.includes("salah-sekali")
@@ -228,23 +249,41 @@ describe("cross-site requests to /api/auth (better-auth.md rule 9, ADR 0046)", (
     ).toBe(HTTP_OK)
   })
 
-  it("sign-in: Origin asing 403, same origin 200", async () => {
+  it("sign-in username dan email: Origin asing, Origin null, cross-site navigation 403; same origin 200", async () => {
     const account = await createAccount()
-    const body = { username: account.username, password: PASSWORD }
-    expect(
-      (
-        await post(auth.handler, "/sign-in/username", body, {
-          origin: "https://evil.example",
-        })
-      ).status
-    ).toBe(HTTP_FORBIDDEN)
-    expect(
-      (
-        await post(auth.handler, "/sign-in/username", body, {
-          origin: SAME_ORIGIN,
-        })
-      ).status
-    ).toBe(HTTP_OK)
+    const navigation = {
+      "sec-fetch-site": "cross-site",
+      "sec-fetch-mode": "navigate",
+      "sec-fetch-dest": "document",
+    }
+    const cases = [
+      {
+        path: "/sign-in/username",
+        body: { username: account.username, password: PASSWORD },
+      },
+      {
+        path: "/sign-in/email",
+        body: { email: account.email, password: PASSWORD },
+      },
+    ]
+    for (const { path, body } of cases) {
+      expect(
+        (
+          await post(auth.handler, path, body, {
+            origin: "https://evil.example",
+          })
+        ).status
+      ).toBe(HTTP_FORBIDDEN)
+      expect(
+        (await post(auth.handler, path, body, { origin: "null" })).status
+      ).toBe(HTTP_FORBIDDEN)
+      expect((await post(auth.handler, path, body, navigation)).status).toBe(
+        HTTP_FORBIDDEN
+      )
+      expect(
+        (await post(auth.handler, path, body, { origin: SAME_ORIGIN })).status
+      ).toBe(HTTP_OK)
+    }
   })
 
   it("sign-out dengan cookie: Origin asing 403, tanpa Origin 403", async () => {

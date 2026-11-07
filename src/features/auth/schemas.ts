@@ -52,23 +52,32 @@ export const registerSchema = z
       .max(NAME_MAX_LENGTH, "Nama maksimal 100 karakter"),
     username: usernameSchema,
     email: z
-      .email("Email tidak sah")
-      .max(EMAIL_MAX_LENGTH, "Email terlalu panjang"),
+      .string()
+      .trim()
+      .max(EMAIL_MAX_LENGTH, "Email terlalu panjang")
+      .pipe(z.email("Email tidak sah")),
     password: passwordSchema,
-    confirmPassword: z.string().max(PASSWORD_MAX_LENGTH),
+    confirmPassword: z
+      .string()
+      .max(PASSWORD_MAX_LENGTH, "Password maksimal 128 karakter"),
   })
   .refine((value) => value.password === value.confirmPassword, {
     message: "Konfirmasi password tidak sama",
     path: ["confirmPassword"],
   })
 export type RegisterInput = z.infer<typeof registerSchema>
+export type RegisterFormValues = z.input<typeof registerSchema>
 
 export const loginSchema = z.object({
   identifier: z
     .string()
     .trim()
     .min(1, "Username atau email wajib diisi")
-    .max(EMAIL_MAX_LENGTH),
-  password: z.string().min(1, "Password wajib diisi").max(PASSWORD_MAX_LENGTH),
+    .max(EMAIL_MAX_LENGTH, "Username atau email terlalu panjang"),
+  password: z
+    .string()
+    .min(1, "Password wajib diisi")
+    .max(PASSWORD_MAX_LENGTH, "Password maksimal 128 karakter"),
 })
 export type LoginInput = z.infer<typeof loginSchema>
+export type LoginFormValues = z.input<typeof loginSchema>

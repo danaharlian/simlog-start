@@ -20,12 +20,14 @@ type AppTextFieldProps = {
   readonly label: string
   readonly type?: "text" | "email" | "password"
   readonly autoComplete?: string
+  readonly required?: boolean
 }
 
 export function AppTextField({
   label,
   type = "text",
   autoComplete,
+  required = false,
 }: AppTextFieldProps) {
   const field = useFieldContext<string>()
   const inputId = useId()
@@ -44,6 +46,7 @@ export function AppTextField({
         value={field.state.value}
         onBlur={field.handleBlur}
         onChange={(event) => field.handleChange(event.target.value)}
+        aria-required={required}
         aria-invalid={isInvalid}
         aria-describedby={isInvalid ? errorId : undefined}
       />

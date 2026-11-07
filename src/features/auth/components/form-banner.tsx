@@ -1,9 +1,12 @@
 import { Alert, AlertDescription } from "@/shared/ui/alert"
 
-export function FormBanner({ message }: { readonly message: unknown }) {
-  if (typeof message !== "string") return null
+type FormBannerProps = { readonly message: string | undefined }
+
+// Alert already carries role="alert".
+export function FormBanner({ message }: FormBannerProps) {
+  if (message === undefined) return null
   return (
-    <Alert variant="destructive" role="alert">
+    <Alert variant="destructive">
       <AlertDescription>{message}</AlertDescription>
     </Alert>
   )

@@ -261,6 +261,9 @@ T2 membuat `/login` dan `/register` bisa dibuka lewat URL, tanpa tautan. T3 meng
 | 2026-11-08 | T2: `src/features/auth/server/auth.repository.ts` (modify): `advanced.disableOriginCheck: false` dan ekspor `authOptions` untuk instance tes rate limit | Catatan PR gate T1 (ADR 0046); rate limit hanya aktif di production, jadi AC21 dites dengan instance dari opsi yang sama ditambah `rateLimit.enabled` |
 | 2026-11-08 | T2: `src/features/auth/components/form-banner.tsx` (create): banner error form untuk login dan register | Dipakai dua form; komponen kecil terpisah (`components.md`) |
 | 2026-11-08 | T2: `formCsrfMiddleware` pada `/sign-in/username` dan logger Better Auth ke pino tanpa argumen tambahan (ADR 0046 point 2 dan 3) | Ditemukan saat membangun T2: endpoint username tanpa CSRF, dan email masuk log saat race |
+| 2026-11-08 | T2: `public/bdh.avif` (create) dan `src/routes/_status/status.tsx` (modify: tanpa loader, `onSignedOut` dari route) | Gambar R23 masuk bersama form yang memakainya; review T2 S10 dan S6 |
+| 2026-11-08 | T2: `src/shared/db/errors.ts` (`readPgError`) tidak dibuat di T2; dibuat oleh task pertama yang menangkap error constraint sendiri | Register bersamaan ditangani Better Auth (kode `FAILED_TO_CREATE_USER` atau `USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL`), jadi T2 tidak membaca `23505`; review T2 S9 |
+| 2026-11-08 | T2: server error ke kolom, banner form, dan fokus ke error pertama diperiksa manual di QA (bersama AC25, AC26, NFR5), bukan tes DOM | Repo belum punya Testing Library atau lingkungan DOM; menambahkannya butuh ADR (`versions.md` action item 4); review T2 S7. Pemetaan kode ke kolom dites di `auth-messages.test.ts` |
 | 2026-11-08 | T1: tes env di `src/shared/config/env.server.test.ts` (bukan `__tests__/` fitur) | Tes itu menguji modul `shared`, jadi diletakkan di sebelah kodenya (`folder-structure.md`, Naming: tests) |
 
 ## Gate review

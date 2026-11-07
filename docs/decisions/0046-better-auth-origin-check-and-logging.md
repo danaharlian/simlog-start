@@ -1,8 +1,8 @@
 # 0046 Better Auth hardening: origin check under tests, CSRF on username sign-in, and its logger
 
-- Status: accepted
+- Status: proposed
 - Date: 2026-11-08
-- Deciders: Dana Harliansyah (Tech Lead), via chat, 2026-11-08, at the PR gate of `specs/auth` T1: "PR #2 approve with notes: … tes Origin otomatis + ADR 0046 di T2 …". Points 2 and 3 were found while building T2 and are listed for the T2 PR gate.
+- Deciders: pending. Point 1 was asked for at the PR gate of `specs/auth` T1 (Dana Harliansyah, Tech Lead, via chat, 2026-11-08: "PR #2 approve with notes: … tes Origin otomatis + ADR 0046 di T2 …"). Points 2 and 3 were found while building T2. The whole ADR is decided at the T2 PR gate.
 - Amends: `docs/04-stack/better-auth.md` rule 9 ("Never set `advanced.disableOriginCheck`")
 
 ## Context
@@ -21,23 +21,28 @@ All three facts below were read in the installed `better-auth` 1.7.18 source and
 3. **Better Auth's logger writes personal data.**
    - On a unique-violation race at sign-up, Better Auth logs "Failed to create user" and passes the `DrizzleQueryError` as an extra argument. Its `detail` held `Key (email)=(…@contoh.id) already exists.`
    - `logging.md` and `security.md` rule 13 forbid personal data in logs.
+   - Below `warn`, some messages hold the email in the text itself: `api/routes/sign-up.mjs` logs ``Sign-up attempt for existing email: ${email}`` at `info`. Better Auth's own logger level defaults to `warn` (`@better-auth/core` `env/logger.mjs`), which filters it today.
    - The `logger.log(level, message, ...args)` option (`@better-auth/core` `env/logger.d.mts`) receives every log call.
 
 ## Decision
 
 1. **Set `advanced.disableOriginCheck: false` explicitly, and never `true`.** It is the production default stated out loud, so tests run with the same check as production. Rule 9 now reads: never set `disableCSRFCheck`, and set `disableOriginCheck` only to `false`.
-2. **Run `formCsrfMiddleware` on `/sign-in/username`** from our `hooks.before` (`features/auth/server/auth.repository.ts`). We reuse Better Auth's own middleware and write no origin logic of our own (`better-auth.md` rule 8). Remove it once a Better Auth release adds the middleware to that endpoint; the test that a foreign `Origin` gets 403 on `/sign-in/username` shows when.
-3. **Route Better Auth's logs to pino with the level and message only.** The extra arguments, where the driver error and its `detail` travel, are dropped. A failure that needs the error object is logged by our own code, which logs ids and never personal data.
+2. **Run `formCsrfMiddleware` on `/sign-in/username`** from our `hooks.before` (`features/auth/server/auth.repository.ts`). We reuse Better Auth's own middleware and write no origin logic of our own (`better-auth.md` rule 8). Remove it once a Better Auth release adds the middleware to that endpoint. On each upgrade, read `plugins/username/index.mjs` for `use: [formCsrfMiddleware]` on `/sign-in/username`: the 403 test cannot show this, because it passes either way.
+3. **Route Better Auth's logs to pino with the level and message only, and keep Better Auth's level at `warn` explicitly.** The extra arguments, where the driver error and its `detail` travel, are dropped. Messages below `warn` can hold an email in the text, so the level is set, not left to the default. A failure that needs the error object is logged by our own code, which logs ids and never personal data.
 
 ## Consequences
 
 - Tests in `features/auth/__tests__/sign-in.test.ts` cover the rule 9 table:
   - sign-up: foreign `Origin`, `Origin: null`, and cross-site navigation get 403; the same origin gets 200;
-  - sign-in on the username path: a foreign `Origin` gets 403;
+  - sign-in on the username and email paths: a foreign `Origin`, `Origin: null`, and cross-site navigation get 403; the same origin gets 200;
   - sign-out with a cookie: a foreign `Origin` or no `Origin` gets 403.
 - Any test that sends a cookie must also send the app's `Origin`, as a browser does.
 - Better Auth's internal error details no longer reach the log. Debugging such a failure needs a local reproduction.
-- Follow-up on each Better Auth upgrade: check whether `/sign-in/username` gained `formCsrfMiddleware`, and whether the logger still passes errors as extra arguments.
+- Follow-up on each Better Auth upgrade:
+  - check whether `/sign-in/username` gained `formCsrfMiddleware`;
+  - check whether the logger still passes errors as extra arguments;
+  - check whether any message at `warn` or above now embeds personal data.
+- `sign-in.test.ts` spies on the pino logger, which writes to fd 1 and not through `console`, and checks that an extra argument holding an email never reaches it. A mutation that forwards the arguments makes that test fail (checked 2026-11-08).
 
 ## Not verified
 

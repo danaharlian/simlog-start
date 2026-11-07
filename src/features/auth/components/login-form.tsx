@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router"
 import { useRef } from "react"
 import { focusFirstInvalidControl, useAppForm } from "@/shared/ui/app-form"
 import { FieldDescription, FieldGroup } from "@/shared/ui/field"
@@ -7,15 +7,23 @@ import { AuthSplitLayout } from "@/features/auth/components/auth-split-layout"
 import { FormBanner } from "@/features/auth/components/form-banner"
 import { useSignIn } from "@/features/auth/hooks/use-sign-in"
 import { loginSchema } from "@/features/auth/schemas"
+import type { LoginFormValues } from "@/features/auth/schemas"
 
-export function LoginForm() {
+const EMPTY_LOGIN_VALUES = {
+  identifier: "",
+  password: "",
+} satisfies LoginFormValues
+
+type LoginFormProps = { readonly onSignedIn: () => Promise<void> | void }
+
+export function LoginForm({ onSignedIn }: LoginFormProps) {
   const signIn = useSignIn()
-  const navigate = useNavigate()
   const formRef = useRef<HTMLFormElement>(null)
   const form = useAppForm({
-    defaultValues: { identifier: "", password: "" },
+    defaultValues: EMPTY_LOGIN_VALUES,
     validators: {
-      onChange: loginSchema,
+      // onBlur: a rule on every keystroke is noise (tanstack-form.md, rule 4); submit validates again.
+      onBlur: loginSchema,
       onSubmitAsync: async ({ value }) => {
         const result = await signIn.mutateAsync(loginSchema.parse(value))
         if (!result.ok)
@@ -23,7 +31,7 @@ export function LoginForm() {
             form: signInErrorText(result.code, result.status),
             fields: {},
           }
-        await navigate({ to: "/" })
+        await onSignedIn()
         return undefined
       },
     },
@@ -49,7 +57,11 @@ export function LoginForm() {
             </p>
           </div>
           <form.Subscribe selector={(state) => state.errorMap.onSubmit}>
-            {(error) => <FormBanner message={error} />}
+            {(error) => (
+              <FormBanner
+                message={typeof error === "string" ? error : undefined}
+              />
+            )}
           </form.Subscribe>
           <form.AppField
             name="identifier"
@@ -57,6 +69,7 @@ export function LoginForm() {
               <field.AppTextField
                 label="Username atau email"
                 autoComplete="username"
+                required
               />
             )}
           />
@@ -67,6 +80,7 @@ export function LoginForm() {
                 label="Password"
                 type="password"
                 autoComplete="current-password"
+                required
               />
             )}
           />

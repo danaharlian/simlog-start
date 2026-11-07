@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router"
 import { useRef } from "react"
 import { focusFirstInvalidControl, useAppForm } from "@/shared/ui/app-form"
 import { FieldDescription, FieldGroup } from "@/shared/ui/field"
@@ -7,6 +7,7 @@ import { AuthSplitLayout } from "@/features/auth/components/auth-split-layout"
 import { FormBanner } from "@/features/auth/components/form-banner"
 import { useSignUp } from "@/features/auth/hooks/use-sign-up"
 import { registerSchema } from "@/features/auth/schemas"
+import type { RegisterFormValues } from "@/features/auth/schemas"
 
 const EMPTY_REGISTER_VALUES = {
   name: "",
@@ -14,20 +15,22 @@ const EMPTY_REGISTER_VALUES = {
   email: "",
   password: "",
   confirmPassword: "",
-}
+} satisfies RegisterFormValues
 
-export function RegisterForm() {
+type RegisterFormProps = { readonly onRegistered: () => Promise<void> | void }
+
+export function RegisterForm({ onRegistered }: RegisterFormProps) {
   const signUp = useSignUp()
-  const navigate = useNavigate()
   const formRef = useRef<HTMLFormElement>(null)
   const form = useAppForm({
     defaultValues: EMPTY_REGISTER_VALUES,
     validators: {
-      onChange: registerSchema,
+      // onBlur: a rule on every keystroke is noise (tanstack-form.md, rule 4); submit validates again.
+      onBlur: registerSchema,
       onSubmitAsync: async ({ value }) => {
         const result = await signUp.mutateAsync(registerSchema.parse(value))
         if (!result.ok) return signUpFormErrors(result.code, result.status)
-        await navigate({ to: "/" })
+        await onRegistered()
         return undefined
       },
     },
@@ -53,18 +56,26 @@ export function RegisterForm() {
             </p>
           </div>
           <form.Subscribe selector={(state) => state.errorMap.onSubmit}>
-            {(error) => <FormBanner message={error} />}
+            {(error) => (
+              <FormBanner
+                message={typeof error === "string" ? error : undefined}
+              />
+            )}
           </form.Subscribe>
           <form.AppField
             name="name"
             children={(field) => (
-              <field.AppTextField label="Nama" autoComplete="name" />
+              <field.AppTextField label="Nama" autoComplete="name" required />
             )}
           />
           <form.AppField
             name="username"
             children={(field) => (
-              <field.AppTextField label="Username" autoComplete="username" />
+              <field.AppTextField
+                label="Username"
+                autoComplete="username"
+                required
+              />
             )}
           />
           <form.AppField
@@ -74,6 +85,7 @@ export function RegisterForm() {
                 label="Email"
                 type="email"
                 autoComplete="email"
+                required
               />
             )}
           />
@@ -84,6 +96,7 @@ export function RegisterForm() {
                 label="Password"
                 type="password"
                 autoComplete="new-password"
+                required
               />
             )}
           />
@@ -94,6 +107,7 @@ export function RegisterForm() {
                 label="Konfirmasi password"
                 type="password"
                 autoComplete="new-password"
+                required
               />
             )}
           />

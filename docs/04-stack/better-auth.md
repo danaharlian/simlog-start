@@ -1,7 +1,7 @@
 ---
 applies_to: "better-auth 1.7.18 (installed, exact pin); docs: Better Auth MCP `latest` (the 1.7 line)"
 last_verified: 2026-11-08
-verified_against: "better-auth.com docs: integrations/tanstack, installation, adapters/drizzle, concepts/cli (via Context7 /websites/better-auth); npm registry (latest 1.7.10); reference/security and reference/options pages and a run of auth.handler on 1.7.14 (2026-10-31); integrations/tanstack through the Better Auth MCP server and `auth@1.7.15` `dist/index.mjs` (2026-11-01); installed better-auth 1.7.18 run against PostgreSQL (Prisma Postgres) in specs/auth T1: `auth@1.7.18 generate`, sign-up through `auth.handler`, `getSession`, `hooks.before` (2026-11-08)"
+verified_against: "better-auth.com docs: integrations/tanstack, installation, adapters/drizzle, concepts/cli (via Context7 /websites/better-auth); npm registry (latest 1.7.10); reference/security and reference/options pages and a run of auth.handler on 1.7.14 (2026-10-31); integrations/tanstack through the Better Auth MCP server and `auth@1.7.15` `dist/index.mjs` (2026-11-01); installed better-auth 1.7.18 run against PostgreSQL (Prisma Postgres) in specs/auth T1: `auth@1.7.18 generate`, sign-up through `auth.handler`, `getSession`, `hooks.before` (2026-11-08); better-auth 1.7.18 origin-check, sign-in, username plugin, logger sources read and tested in specs/auth T2 (2026-11-08)"
 ---
 
 # Better Auth
@@ -37,7 +37,7 @@ verified_against: "better-auth.com docs: integrations/tanstack, installation, ad
    - **`/sign-in/username` has no CSRF middleware in 1.7.18** (the email path has `formCsrfMiddleware`). `features/auth` runs `formCsrfMiddleware` on it from `hooks.before` (ADR 0046). Re-check on every upgrade.
    - Keep the table above as an integration test against `/api/auth/*`, and re-run it on every Better Auth upgrade.
    - **Under Vitest:** Better Auth 1.7.18 sets `skipOriginCheck` to `true` when `NODE_ENV` is `test` unless `advanced.disableOriginCheck` is set; with `false` (ADR 0046) the table above runs in `features/auth/__tests__/sign-in.test.ts`.
-10. **Logs:** Better Auth's `logger.log` receives the raw driver error as extra arguments, and its `detail` can hold an email. Route it to pino with the level and message only (ADR 0046).
+10. **Logs:** Better Auth's `logger.log` receives the raw driver error as extra arguments, and its `detail` can hold an email; below `warn`, some messages hold the email in the text. Route it to pino with the level and message only, and set its level to `warn` explicitly (ADR 0046).
 11. Test: sign-up, sign-in, sign-out, session expiry, unauthenticated access to every protected server function, and cross-tenant access.
 
 ## Pitfalls

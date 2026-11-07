@@ -1,12 +1,10 @@
 import type { ReactNode } from "react"
 import { Card, CardContent } from "@/shared/ui/card"
 
+type AuthSplitLayoutProps = { readonly children: ReactNode }
+
 // Layout of the login-04 block: form on one side, image on the other from md up (R23).
-export function AuthSplitLayout({
-  children,
-}: {
-  readonly children: ReactNode
-}) {
+export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-4xl">

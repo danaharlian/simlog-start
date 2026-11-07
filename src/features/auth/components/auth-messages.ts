@@ -15,9 +15,12 @@ const SIGN_IN_FAILED = "Login gagal. Coba lagi."
 const SIGN_UP_FAILED = "Pendaftaran gagal. Coba lagi."
 
 // R8: one text for every failed sign-in, whichever field was wrong.
+// A malformed email or username on sign-in also gets this text, so the wrong field never shows (R8).
 const WRONG_CREDENTIAL_CODES = new Set([
   "INVALID_EMAIL_OR_PASSWORD",
   "INVALID_USERNAME_OR_PASSWORD",
+  "INVALID_EMAIL",
+  "INVALID_USERNAME",
 ])
 
 const SIGN_UP_FIELD_ERRORS: Readonly<
@@ -34,6 +37,7 @@ const SIGN_UP_FIELD_ERRORS: Readonly<
   },
   INVALID_USERNAME: { field: "username", message: "Username tidak sah" },
   USERNAME_TOO_SHORT: { field: "username", message: "Username tidak sah" },
+  USERNAME_TOO_LONG: { field: "username", message: "Username tidak sah" },
   [AUTH_ERROR.USERNAME_REQUIRED]: {
     field: "username",
     message: "Username wajib diisi",

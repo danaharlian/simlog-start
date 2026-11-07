@@ -28,3 +28,15 @@ export function toAuthCallResult(error: unknown): AuthCallResult {
     ? { ok: false, code: parsed.data.code, status: parsed.data.status }
     : { ok: false, code: undefined, status: 0 }
 }
+
+// A network failure rejects instead of resolving with { error }; it becomes the generic message (review T2 S4).
+export async function runAuthCall(
+  call: () => Promise<{ readonly error: unknown }>
+): Promise<AuthCallResult> {
+  try {
+    const { error } = await call()
+    return toAuthCallResult(error)
+  } catch {
+    return { ok: false, code: undefined, status: 0 }
+  }
+}

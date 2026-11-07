@@ -5,6 +5,7 @@ import { z } from "zod"
 import { accounts, sessions, users } from "@/features/auth/db/schema"
 import { auth } from "@/features/auth/server/auth.repository"
 import { db } from "@/shared/db/client"
+import { logger } from "@/shared/server/logger.server"
 
 const SIGN_UP_URL = "http://localhost:3000/api/auth/sign-up/email"
 const HTTP_OK = 200
@@ -142,10 +143,11 @@ describe("sign-up through auth.handler (T1)", () => {
       ...validBody(uniqueSuffix()),
       email: body.email.toUpperCase(),
     })
-    const sameUsername = await signUp({
+    const usernameCollision = {
       ...validBody(uniqueSuffix()),
       username: body.username.toUpperCase(),
-    })
+    }
+    const sameUsername = await signUp(usernameCollision)
     expect(await sameEmail.json()).toMatchObject({
       code: "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",
     })
@@ -157,18 +159,24 @@ describe("sign-up through auth.handler (T1)", () => {
       .from(users)
       .where(eq(users.email, body.email))
     expect(rows).toHaveLength(1)
+    const collisionRows = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, usernameCollision.email))
+    expect(collisionRows).toHaveLength(0)
   })
 
   it("dua register bersamaan dengan email sama: satu berhasil, email tidak masuk log", async () => {
     const suffix = uniqueSuffix()
     const first = validBody(suffix)
     const second = { ...validBody(uniqueSuffix()), email: first.email }
+    // Spy on the shared pino logger: pino writes to fd 1, not through console (review T2 B1).
     const written: Array<string> = []
-    vi.spyOn(console, "error").mockImplementation(
-      (...args: ReadonlyArray<unknown>) => {
-        written.push(args.map(String).join(" "))
-      }
-    )
+    const record = (...args: ReadonlyArray<unknown>) => {
+      written.push(JSON.stringify(args))
+    }
+    vi.spyOn(logger, "error").mockImplementation(record)
+    vi.spyOn(console, "error").mockImplementation(record)
     const responses = await Promise.all([signUp(first), signUp(second)])
     vi.restoreAllMocks()
     expect(written.some((line) => line.includes(first.email))).toBe(false)
@@ -188,5 +196,8 @@ describe("sign-up through auth.handler (T1)", () => {
       "FAILED_TO_CREATE_USER",
       "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",
     ]).toContain(code)
+    // Positive control: a loss at the unique index is logged, and the line carries no email.
+    if (code === "FAILED_TO_CREATE_USER")
+      expect(written.length).toBeGreaterThan(0)
   })
 })
