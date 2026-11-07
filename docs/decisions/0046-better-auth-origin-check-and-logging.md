@@ -1,8 +1,8 @@
 # 0046 Better Auth hardening: origin check under tests, CSRF on username sign-in, and its logger
 
-- Status: proposed
+- Status: accepted
 - Date: 2026-11-08
-- Deciders: pending. Point 1 was asked for at the PR gate of `specs/auth` T1 (Dana Harliansyah, Tech Lead, via chat, 2026-11-08: "PR #2 approve with notes: … tes Origin otomatis + ADR 0046 di T2 …"). Points 2 and 3 were found while building T2. The whole ADR is decided at the T2 PR gate.
+- Deciders: Dana Harliansyah (Tech Lead), via chat, 2026-11-08, at the PR gate of `specs/auth` T2: “PR #3 approve. ADR 0046 accepted. Konfirmasi koreksi spec section 4.” (point 1 was asked for at the T1 PR gate)
 - Amends: `docs/04-stack/better-auth.md` rule 9 ("Never set `advanced.disableOriginCheck`")
 
 ## Context

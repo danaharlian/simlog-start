@@ -48,8 +48,8 @@
 
 ### Round 1: 2026-11-08
 - **PR:** https://github.com/danaharlian/simlog-start/pull/3 · **Commit reviewed:** `f5ce237`
-- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, 2026-11-08 · human review: pending (Dana Harliansyah)
-- **Verdict:** request changes (subagent)
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, 2026-11-08 · human review: Dana Harliansyah (Tech Lead), 2026-11-08, via chat
+- **Verdict:** request changes (subagent, on `f5ce237`); approve (Dana Harliansyah, on `0dd48b6`)
 
 | ID | File:line | Review pass | Severity | Finding | Resolution | Status |
 |---|---|---|---|---|---|---|
@@ -69,6 +69,6 @@
 
 **Unverified:** fokus ke error pertama, pembaca layar, dan layout gambar (AC25, AC26, NFR5) diperiksa manual di QA. Perilaku `createAuthClient()` tanpa `baseURL` saat SSR: hook hanya dipanggil dari event handler di client (**Inferred**).
 
-**Decisions made in review:** ADR 0046 (ketiga poin) dan baris change log spec section 4 menunggu keputusan reviewer di PR gate T2.
+**Decisions made in review:** ADR 0046 (ketiga poin) accepted; koreksi spec section 4 (hasil register bersamaan) disetujui di Spec gate round 4.
 
-**Outcome:** blocking findings resolved: yes · PR gate passed: not yet (menunggu Dana Harliansyah)
+**Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #3 approve. ADR 0046 accepted. Konfirmasi koreksi spec section 4."

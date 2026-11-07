@@ -442,7 +442,7 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 
 | Date | Change | Reason | Re-approved by |
 |---|---|---|---|
-| 2026-11-08 | Section 4: hasil `TODO(verify)` register bersamaan diisi | Diverifikasi di T2 (`sign-up.test.ts`) | pending: dikonfirmasi reviewer di PR gate T2 |
+| 2026-11-08 | Section 4: hasil `TODO(verify)` register bersamaan diisi | Diverifikasi di T2 (`sign-up.test.ts`) | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 4) |
 | 2026-11-08 | Section 2 (S3) dan 6: kode `USERNAME_REQUIRED` menjadi `AUTH_USERNAME_REQUIRED` | Temuan review T1 R1-15: kode milik fitur diberi prefiks (`error-handling.md`); kode bawaan Better Auth tetap | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
 | 2026-11-08 | Section 4: `sessions.updated_at` dan `accounts.updated_at` tanpa default (koreksi teks agar sesuai output CLI dan migration T1) | Temuan review T1 R1-12 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
 | 2026-11-08 | Section 7: loader `/status` memanggil `currentUserQueryOptions()` tanpa `staleTime: 'static'` (pengecualian dari `tanstack-query.md` rule 4 untuk query pengguna saat ini) | Temuan review T1 R1-4: `'static'` membuat status lama tampil dulu, melawan R21 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
@@ -467,3 +467,4 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 | 1 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "06-feature-spec auth: approve, jawaban section 15 sesuai rekomendasi. 07-tasks auth: approve with notes, jawaban sesuai rekomendasi, terapkan 3 catatan, T1 tetap satu" |
 | 2 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "06-feature-spec auth: setujui perubahan section 3 (auth.repository.ts, session.service.ts, session.functions.ts)". Menyetujui change log 2026-11-08 (nama file di section 3) |
 | 3 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "PR #1 approve. PR #2 approve with notes: rename ke AUTH_USERNAME_REQUIRED sebelum merge, tes Origin otomatis + ADR 0046 di T2, cek Cache-Control RPC di T2. Setujui koreksi spec section 4 dan 7.". Menyetujui change log 2026-11-08: section 4 (`updated_at`), section 7 (loader `/status`), dan kode `AUTH_USERNAME_REQUIRED` |
+| 4 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "PR #3 approve. ADR 0046 accepted. Konfirmasi koreksi spec section 4." Menyetujui change log 2026-11-08: hasil register bersamaan di section 4 |
