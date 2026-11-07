@@ -117,11 +117,11 @@ describe("sign-up through auth.handler (T1)", () => {
     expect(Math.abs(createdAt - Date.now())).toBeLessThan(ONE_MINUTE_MS)
   })
 
-  it("register tanpa username ditolak dengan USERNAME_REQUIRED", async () => {
+  it("register tanpa username ditolak dengan AUTH_USERNAME_REQUIRED", async () => {
     const { username: _omitted, ...body } = validBody(uniqueSuffix())
     const response = await signUp(body)
     const payload: unknown = await response.json()
-    expect(payload).toMatchObject({ code: "USERNAME_REQUIRED" })
+    expect(payload).toMatchObject({ code: "AUTH_USERNAME_REQUIRED" })
     expect(await findUserByEmail(body.email)).toBeUndefined()
   })
 

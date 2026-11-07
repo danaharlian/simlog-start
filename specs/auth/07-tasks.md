@@ -63,7 +63,7 @@ Urutan mengikuti risiko, kecuali T5 dan T6 yang menunggu T4 karena aksinya ada d
     - output CLI dengan `usePlural` dan `generateId: "uuid"` bisa di-generate dan di-migrate (ADR 0043) → output `pnpm db:generate` dan `pnpm db:migrate:test` di PR; `sign-up.test.ts`: "id pengguna baru berbentuk uuid"
     - Better Auth menulis string ke kolom enum, dan `input: false` mengisi default (ADR 0038, 0043) → `sign-up.test.ts`: "akun baru berstatus pending dan berrole user"
     - `timestamptz` terbaca benar (ADR 0043) → `sign-up.test.ts`: "createdAt akun baru berada dalam satu menit dari waktu tes"
-    - bentuk `ctx.path` dan `ctx.body` di `hooks.before` (spec section 13) → `sign-up.test.ts`: "register tanpa username ditolak dengan USERNAME_REQUIRED"
+    - bentuk `ctx.path` dan `ctx.body` di `hooks.before` (spec section 13) → `sign-up.test.ts`: "register tanpa username ditolak dengan AUTH_USERNAME_REQUIRED"
     - validator username menolak `@`, dasar satu kolom login (`02-research.md` Q6, Inferred) → `sign-up.test.ts`: "username yang berisi @ ditolak INVALID_USERNAME"
     - `getSession` lewat `getRequestHeaders` membaca status segar karena cookie cache mati (D10) → `accounts.service.test.ts`: "getCurrentUserDto melihat status yang diubah langsung di database"
     - `test.env` Vitest berlaku sebelum `env.server.ts` dibaca (ADR 0044) → `env.test.ts`: "serverEnv.DATABASE_URL adalah TEST_DATABASE_URL"
@@ -253,6 +253,9 @@ T2 membuat `/login` dan `/register` bisa dibuka lewat URL, tanpa tautan. T3 meng
 | 2026-11-08 | T1: tes baru `__tests__/session.service.test.ts` (jalur sesi, `/update-user`, `statusChangedAt`); tes AC16 di `accounts.service.test.ts` diganti nama; tes "akun baru berstatus pending dan berrole user" tergabung di tes AC1 | Review T1 R1-1, R1-6, R1-11 |
 | 2026-11-08 | T1: `vitest.config.ts` menyetel `TZ=Asia/Jakarta` untuk tes | Review T1 R1-14: bug timestamp tanpa zona hanya terlihat di luar UTC |
 | 2026-11-08 | T1: pemeriksaan Origin `/api/auth` (`better-auth.md` rule 9) dibuktikan dengan `curl` di dev server, bukan Vitest | Better Auth 1.7.18 melewati origin check saat `NODE_ENV=test`; review T1 R1-7 |
+| 2026-11-08 | T2: `advanced.disableOriginCheck: false` di `server/auth.repository.ts` (masuk file list T2) dan ADR 0046 yang meluruskan `better-auth.md` rule 9; tes otomatis tabel rule 9 (sign-up, sign-in, sign-out: Origin asing, `Origin: null`, cross-site navigation, same origin) di `sign-in.test.ts` | Catatan PR gate T1: Better Auth melewati origin check saat `NODE_ENV=test`, jadi tes Vitest tidak membuktikan rule 9 |
+| 2026-11-08 | T2: cek `Cache-Control: private, no-store` pada panggilan RPC server function dari client | Catatan PR gate T1: di T1 hanya respons SSR yang dicek (Inferred untuk RPC) |
+| 2026-11-08 | T1: kode `USERNAME_REQUIRED` menjadi `AUTH_USERNAME_REQUIRED` | Catatan PR gate T1 (R1-15) |
 | 2026-11-08 | T1: tes env di `src/shared/config/env.server.test.ts` (bukan `__tests__/` fitur) | Tes itu menguji modul `shared`, jadi diletakkan di sebelah kodenya (`folder-structure.md`, Naming: tests) |
 
 ## Gate review
