@@ -1,16 +1,22 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { AccountStatusView, currentUserQueryOptions } from "@/features/auth"
 
+// No loader: the _status guard's beforeLoad already filled the cache, so the user is read once (review T2 S10).
 export const Route = createFileRoute("/_status/status")({
   head: () => ({ meta: [{ title: "Status akun" }] }),
-  // No staleTime override: the current user must be fresh on every navigation (R21, spec section 7).
-  loader: ({ context }) => context.queryClient.query(currentUserQueryOptions()),
   component: StatusPage,
 })
 
 function StatusPage() {
+  const navigate = useNavigate()
   const { data: user } = useSuspenseQuery(currentUserQueryOptions())
-  if (!user) return <p className="p-6">Anda belum masuk.</p>
-  return <AccountStatusView status={user.status} />
+  // The _status guard already sent a visitor without a session to /login.
+  if (user === null) return null
+  return (
+    <AccountStatusView
+      status={user.status}
+      onSignedOut={() => navigate({ to: "/login" })}
+    />
+  )
 }

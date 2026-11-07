@@ -1,9 +1,11 @@
 import { randomUUID } from "node:crypto"
 import { eq } from "drizzle-orm"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
+import { z } from "zod"
 import { accounts, sessions, users } from "@/features/auth/db/schema"
 import { auth } from "@/features/auth/server/auth.repository"
 import { db } from "@/shared/db/client"
+import { logger } from "@/shared/server/logger.server"
 
 const SIGN_UP_URL = "http://localhost:3000/api/auth/sign-up/email"
 const HTTP_OK = 200
@@ -132,5 +134,70 @@ describe("sign-up through auth.handler (T1)", () => {
     const payload: unknown = await response.json()
     expect(payload).toMatchObject({ code: "INVALID_USERNAME" })
     expect(await findUserByEmail(body.email)).toBeUndefined()
+  })
+
+  it("register dengan email atau username beda huruf ditolak, jumlah akun tetap (AC3)", async () => {
+    const body = validBody(uniqueSuffix())
+    await signUp(body)
+    const sameEmail = await signUp({
+      ...validBody(uniqueSuffix()),
+      email: body.email.toUpperCase(),
+    })
+    const usernameCollision = {
+      ...validBody(uniqueSuffix()),
+      username: body.username.toUpperCase(),
+    }
+    const sameUsername = await signUp(usernameCollision)
+    expect(await sameEmail.json()).toMatchObject({
+      code: "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",
+    })
+    expect(await sameUsername.json()).toMatchObject({
+      code: "USERNAME_IS_ALREADY_TAKEN",
+    })
+    const rows = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, body.email))
+    expect(rows).toHaveLength(1)
+    const collisionRows = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, usernameCollision.email))
+    expect(collisionRows).toHaveLength(0)
+  })
+
+  it("dua register bersamaan dengan email sama: satu berhasil, email tidak masuk log", async () => {
+    const suffix = uniqueSuffix()
+    const first = validBody(suffix)
+    const second = { ...validBody(uniqueSuffix()), email: first.email }
+    // Spy on the shared pino logger: pino writes to fd 1, not through console (review T2 B1).
+    const written: Array<string> = []
+    const record = (...args: ReadonlyArray<unknown>) => {
+      written.push(JSON.stringify(args))
+    }
+    vi.spyOn(logger, "error").mockImplementation(record)
+    vi.spyOn(console, "error").mockImplementation(record)
+    const responses = await Promise.all([signUp(first), signUp(second)])
+    vi.restoreAllMocks()
+    expect(written.some((line) => line.includes(first.email))).toBe(false)
+    const statuses = responses.map((response) => response.status).sort()
+    expect(statuses.filter((status) => status === HTTP_OK)).toHaveLength(1)
+    const rows = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, first.email))
+    expect(rows).toHaveLength(1)
+    // Spec section 4: the loser fails at Better Auth's pre-check (USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL) or,
+    // when both pass it, at the unique index (FAILED_TO_CREATE_USER). Both map to a sign-up error in the UI.
+    const loser = responses.find((response) => response.status !== HTTP_OK)
+    const loserBody: unknown = await loser?.json()
+    const { code } = z.object({ code: z.string() }).parse(loserBody)
+    expect([
+      "FAILED_TO_CREATE_USER",
+      "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",
+    ]).toContain(code)
+    // Positive control: a loss at the unique index is logged, and the line carries no email.
+    if (code === "FAILED_TO_CREATE_USER")
+      expect(written.length).toBeGreaterThan(0)
   })
 })

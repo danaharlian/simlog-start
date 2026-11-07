@@ -43,3 +43,32 @@
 - Koreksi spec section 4 dan 7, dan kode `AUTH_USERNAME_REQUIRED`: disetujui di Spec gate round 3 (`06-feature-spec.md`).
 
 **Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #1 approve. PR #2 approve with notes: rename ke AUTH_USERNAME_REQUIRED sebelum merge, tes Origin otomatis + ADR 0046 di T2, cek Cache-Control RPC di T2. Setujui koreksi spec section 4 dan 7." Catatan "rename sebelum merge" diterapkan di `f9368a9`.
+
+## T2: Register, login, logout, dan pengalihan tamu
+
+### Round 1: 2026-11-08
+- **PR:** https://github.com/danaharlian/simlog-start/pull/3 · **Commit reviewed:** `f5ce237`
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, 2026-11-08 · human review: Dana Harliansyah (Tech Lead), 2026-11-08, via chat
+- **Verdict:** request changes (subagent, on `f5ce237`); approve (Dana Harliansyah, on `0dd48b6`)
+
+| ID | File:line | Review pass | Severity | Finding | Resolution | Status |
+|---|---|---|---|---|---|---|
+| R1-B1 | `__tests__/sign-in.test.ts:145`, `sign-up.test.ts:167` | tests, security | Blocking | Tes log menyadap `console` dan `process.stdout.write`, padahal pino menulis langsung ke fd 1; tes bisa hijau walau email bocor | Fixed in `831dfaa`: tes menyadap `logger` pino bersama, dengan positive control; mutasi yang meneruskan argumen tambahan membuat tes gagal (dicek 2026-11-08) | resolved |
+| R1-B2 | `docs/decisions/0046-…md:3` | governance | Blocking | ADR 0046 `accepted` untuk poin yang belum diputuskan manusia | Fixed in `831dfaa`: `Status: proposed`, dipindah ke bagian Proposed; diputuskan di PR gate T2 | resolved (keputusan reviewer) |
+| R1-S1 | `server/auth.repository.ts:52` | security | Non-blocking | Pesan `info` Better Auth memuat email; aman hanya karena level bawaan `warn` | Fixed in `831dfaa`: `level: "warn"` eksplisit, komentar merujuk `sign-up.mjs`; teks ADR dikoreksi | resolved |
+| R1-S2 | `__tests__/sign-in.test.ts:231` | security, tests | Non-blocking | Tabel rule 9 untuk sign-in tidak lengkap; `/sign-in/email` tanpa tes | Fixed in `831dfaa`: empat kasus untuk `/sign-in/username` dan `/sign-in/email` | resolved |
+| R1-S3 | ADR 0046 | docs | Non-blocking | Pemicu penghapusan workaround tidak bisa terpicu | Fixed in `831dfaa`: cek `plugins/username/index.mjs` pada upgrade | resolved |
+| R1-S4 | `hooks/use-sign-*.ts` | UI errors | Non-blocking | Kegagalan jaringan tidak menampilkan apa pun | Fixed in `831dfaa`: `runAuthCall` (tes ditulis dulu, gagal pada stub) | resolved |
+| R1-S5 | `components/account-status-view.tsx` | UI errors | Non-blocking | Gagal keluar dan gagal "Periksa lagi" diam | Fixed in `831dfaa`: banner pesan | resolved |
+| R1-S6 | `login-form.tsx`, `register-form.tsx`, `use-sign-out.ts` | components | Non-blocking | Komponen fitur memilih tujuan navigasi | Fixed in `831dfaa`: `onSignedIn`, `onRegistered`, `onSignedOut` dari route | resolved |
+| R1-S7 | form login dan register | tests | Non-blocking | Tidak ada tes server error ke kolom, banner, dan fokus | Declined untuk otomatis: belum ada lingkungan DOM (butuh ADR). Dicatat sebagai manual check QA di change log `07-tasks.md` | resolved (pengecualian dicatat) |
+| R1-S8 | `07-tasks.md`, `08-review-log.md` | evidence | Non-blocking | Tidak ada bukti `Cache-Control` pada RPC | Bukti sudah ada di deskripsi PR #3 (tidak dibaca reviewer). Diulang setelah `831dfaa` dengan curl ke `/_serverFn/…`: `cache-control: private, no-store`, `vary: Cookie` | resolved |
+| R1-S9 | `07-tasks.md:248`, spec section 4 | scope, spec | Non-blocking | `readPgError` dipindah ke T2 tanpa dibuat; perubahan spec section 4 butuh persetujuan | Fixed in `831dfaa`: baris change log; spec section 4 menunggu konfirmasi reviewer | resolved (keputusan reviewer) |
+| R1-S10 | `routes/_status/status.tsx:8` | data fetching | Non-blocking | `getCurrentUser` dipanggil dua kali per navigasi | Fixed in `831dfaa`: loader dihapus; guard mengisi cache | resolved |
+| R1-N | beberapa file | nits | Non-blocking | Pesan `max` Inggris, email tanpa trim, default tak bertipe, validasi per ketikan, `aria-required`, nama tipe props, `role="alert"` ganda, `h1` hilang, `USERNAME_TOO_LONG`, identitas tidak sah di login, AC3 tanpa cek baris kedua, file di luar daftar | Fixed in `831dfaa`. Tidak dikerjakan: `className` di wrapper (belum ada pemakai, YAGNI) dan letak `sign-in-method.ts` (lolos lint, pola mapper di `components/`) | resolved |
+
+**Unverified:** fokus ke error pertama, pembaca layar, dan layout gambar (AC25, AC26, NFR5) diperiksa manual di QA. Perilaku `createAuthClient()` tanpa `baseURL` saat SSR: hook hanya dipanggil dari event handler di client (**Inferred**).
+
+**Decisions made in review:** ADR 0046 (ketiga poin) accepted; koreksi spec section 4 (hasil register bersamaan) disetujui di Spec gate round 4.
+
+**Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #3 approve. ADR 0046 accepted. Konfirmasi koreksi spec section 4."

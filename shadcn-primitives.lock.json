@@ -1,7 +1,25 @@
 {
   "primitives": {
+    "alert.tsx": {
+      "sha256": "f253568242c1c69b343f12474002fdbe229f603158171c59e21c491ab79f2e6e"
+    },
     "button.tsx": {
       "sha256": "313353436d0fcc8e44ab470adb614b9fd013d28626f624328ea0d66d41a6c81b"
+    },
+    "card.tsx": {
+      "sha256": "8ad3a18d36bda0598dc0e9aa96ea22854944d5443ee4946f1d173815e115375f"
+    },
+    "field.tsx": {
+      "sha256": "fc7994bed4ec4ba7341f0c8af8a60dfe8efd0d8316d197b303354082e8f98a9c"
+    },
+    "input.tsx": {
+      "sha256": "dab990dfefa0ba78854ab6602ad074270dba9d7d1262184d9bfbb62bd990903b"
+    },
+    "label.tsx": {
+      "sha256": "86232709f634da7f357a8aaec0e815f3f562604bb67202c88997fae97659b450"
+    },
+    "separator.tsx": {
+      "sha256": "9a80ff8c110e0c55489509f4f82ebcc929c0174b59544047147b7134f86a54e7"
     }
   },
   "own": {}

@@ -1,3 +1,8 @@
 export { AccountStatusView } from "@/features/auth/components/account-status-view"
+export { resolveAccessRedirect } from "@/features/auth/components/access-redirect"
+export type { AccessArea } from "@/features/auth/components/access-redirect"
+export { LoginForm } from "@/features/auth/components/login-form"
+export { RegisterForm } from "@/features/auth/components/register-form"
+export { useSignOut } from "@/features/auth/hooks/use-sign-out"
 export { authScope, currentUserQueryOptions } from "@/features/auth/queries"
 export type { AccountStatus, CurrentUser, Role } from "@/features/auth/schemas"
