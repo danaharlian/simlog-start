@@ -1,7 +1,7 @@
 ---
-applies_to: "better-auth 1.7.7 (installed); Context7 index lists only 1.6.x, cross-check better-auth.com"
-last_verified: 2026-11-01
-verified_against: "better-auth.com docs: integrations/tanstack, installation, adapters/drizzle, concepts/cli (via Context7 /websites/better-auth); npm registry (latest 1.7.10); reference/security and reference/options pages and a run of auth.handler on 1.7.14 (2026-10-31); integrations/tanstack through the Better Auth MCP server and `auth@1.7.15` `dist/index.mjs` (2026-11-01)"
+applies_to: "better-auth 1.7.18 (installed, exact pin); docs: Better Auth MCP `latest` (the 1.7 line)"
+last_verified: 2026-11-08
+verified_against: "better-auth.com docs: integrations/tanstack, installation, adapters/drizzle, concepts/cli (via Context7 /websites/better-auth); npm registry (latest 1.7.10); reference/security and reference/options pages and a run of auth.handler on 1.7.14 (2026-10-31); integrations/tanstack through the Better Auth MCP server and `auth@1.7.15` `dist/index.mjs` (2026-11-01); installed better-auth 1.7.18 run against PostgreSQL (Prisma Postgres) in specs/auth T1: `auth@1.7.18 generate`, sign-up through `auth.handler`, `getSession`, `hooks.before` (2026-11-08)"
 ---
 
 # Better Auth
@@ -19,14 +19,15 @@ verified_against: "better-auth.com docs: integrations/tanstack, installation, ad
 - CLI schema generation: `auth generate` with `--adapter drizzle` (requires `--dialect`) writes `schema.ts` at the project root by default; use `--output` to choose the file, and `--config` for our `auth.ts` path. Run it with `pnpm dlx auth@<installed better-auth version>`: the `auth` package is released with the same version number and depends on that exact `better-auth` (`auth@1.7.15`).
 - `auth migrate` refuses the Drizzle adapter and tells you to use `auth generate` (read in `auth@1.7.15`, not run).
 - Start 1.0 removed its built-in `useSession`. Do not use it.
+- **Observed on 1.7.18 with `drizzle-orm` 1.0.0-rc.5 (specs/auth T1, 2026-11-08):** `pnpm dlx auth@1.7.18 generate --config <auth file> --output <schema file>` resolves the `@/` alias, and loads the config, so the env module needs values (placeholders work for `generate`). With `usePlural: true` and `advanced.database.generateId: "uuid"` it writes plural tables and `uuid` ids with `gen_random_uuid()`. Its `relations()` block does not compile on Drizzle v1 (ADR 0040). Better Auth writes `user.additionalFields` strings into PostgreSQL enum columns, `input: false` ignores a value sent on sign-up, and an `APIError` thrown in `hooks.before` with `code` reaches the client as `{ code }` in the JSON body.
 
 ## Rules
 
 1. **`auth` is a feature** (`features/auth`). It owns the auth tables (generated names; confirm after running the CLI) and exposes a small public API (`getCurrentUser`, `requireUser`, types). Other features never query auth tables.
-2. **One server-side `auth` instance** in `features/auth/server/auth.ts` (server-only). One `authClient` for the browser in `features/auth/client.ts`.
+2. **One server-side `auth` instance** in `features/auth/server/auth.repository.ts` (server-only; the repository category is the only one that may import the feature's tables, `check:gates`). One `authClient` for the browser in `features/auth/hooks/auth-client.ts` (a file at the feature root matches no boundary category). ADR 0041.
 3. **Mount the handler as a server route** (`src/routes/api/auth/$.ts`) that only forwards to `auth.handler`. No logic there.
-4. **Server functions get the user from shared middleware** (`shared/server/require-auth`) that reads the session from the request headers. Verify the exact `auth.api.getSession` call and header handling in the docs before writing it. Route `beforeLoad` redirects are UX only (`docs/03-standards/security.md`).
-5. **Schema flow:** run the CLI → review output → place it in `features/auth/db/schema.ts` → `drizzle-kit generate` → review SQL (`add-db-table` skill). Never hand-edit generated auth tables without regenerating.
+4. **Server functions get the user from the auth feature's middleware** (`features/auth/server/session.functions.ts`, which calls `session.service.ts`) that reads the session from the request headers; `shared` cannot import the `auth` instance (ADR 0041). Verify the exact `auth.api.getSession` call and header handling in the docs before writing it. Route `beforeLoad` redirects are UX only (`docs/03-standards/security.md`).
+5. **Schema flow:** run the CLI → review output → place it in `features/auth/db/schema.ts` → `drizzle-kit generate` → review SQL (`add-db-table` skill). Only the edits ADR 0040 and ADR 0043 allow (no relations block; `timestamptz`, `database.md` index names, enums, `NOT NULL`), each listed in `features/auth/README.md`. On a Better Auth upgrade, regenerate and compare against that list.
 6. **Secrets and URLs** go through the env module (`docs/03-standards/environment.md`). The docs name `BETTER_AUTH_SECRET` (at least 32 characters; `openssl rand -base64 32`) and `BETTER_AUTH_URL` (read 2026-10-31 through Context7, whose index stops at 1.6.x: confirm on the installed version when wiring).
 7. **Authorization is separate from authentication.** Roles and permissions are decided per feature in services. Scope is **email and password only** (ADR 0007, R). Social login and the organizations, roles, and 2FA plugins each need an ADR before use. Their skills are installed so the path is easy to find (`docs/05-agent-tooling/skills.md`); an installed skill does not adopt a plugin.
 8. **Security-critical dependency:** pin the version, read the changelog before upgrading, and upgrade through a branch with the auth tests passing. Do not write custom password hashing, session tokens, or cookie code.

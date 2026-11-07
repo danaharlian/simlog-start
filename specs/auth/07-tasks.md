@@ -16,7 +16,7 @@ Tasks gate digabung dengan Spec gate (`06-feature-spec.md`, header `Tasks gate`)
 
 | ID | Task (user-visible outcome) | Risk (and why) | Depends on | AC and NFR covered | Estimate | PR | Status |
 |---|---|---|---|---|---|---|---|
-| T1 | Akun yang dibuat lewat `/api/auth/sign-up/email` tersimpan di PostgreSQL, dan `/status` menampilkan "menunggu persetujuan" dari database | high: Better Auth 1.7.18 + Drizzle 1.0.0-rc.5 + `pg` + Start + Prisma Postgres belum pernah jalan bersama; edit ADR 0043; ADR 0044 | none | AC1 (sisi server), AC4, AC16 (pembacaan status segar) | | | todo |
+| T1 | Akun yang dibuat lewat `/api/auth/sign-up/email` tersimpan di PostgreSQL, dan `/status` menampilkan "menunggu persetujuan" dari database | high: Better Auth 1.7.18 + Drizzle 1.0.0-rc.5 + `pg` + Start + Prisma Postgres belum pernah jalan bersama; edit ADR 0043; ADR 0044 | none | AC1 (sisi server), AC4, AC16 (pembacaan status segar) | | | in progress |
 | T2 | Pengunjung bisa register dan login lewat form `login-04` dengan username atau email, logout dari `/status`, dan pengalihan tamu dan status berjalan | medium: satu kolom login dua endpoint; pesan error yang sama; rate limit; enumerasi | T1 | AC1 (UI), AC2, AC3, AC5, AC6 (dari `/status`), AC7, AC9, AC11, AC21, AC24, AC25, AC26, NFR1, NFR2, NFR5 | | | todo |
 | T3 | Pengguna aktif masuk ke dashboard `/` dengan sidebar `sidebar-07`; tanpa sesi ke `/login`, belum aktif ke `/status` | low: UI shell dan pengalihan; `resolveAccessRedirect` sudah ada | T2 | AC6 (dari dashboard), AC8, AC10 (untuk `/`), AC12 (role `user`) | | | todo |
 | T4 | Superadmin melihat daftar akun di `/users` dengan saringan status; pengguna biasa ditolak | medium: otorisasi pertama di server function; DTO tanpa kolom sensitif | T3 | AC10 (untuk `/users`), AC12 (menu superadmin), AC13, AC14, NFR3, NFR6 | | | todo |
@@ -50,7 +50,7 @@ Urutan mengikuti risiko, kecuali T5 dan T6 yang menunggu T4 karena aksinya ada d
   | `src/shared/errors/index.ts` | create |
   | `src/shared/server/logger.server.ts`, `with-error-boundary.ts` | create |
   | `src/features/auth/db/schema.ts`, `schemas.ts`, `errors.ts`, `queries.ts`, `index.ts`, `index.server.ts`, `README.md` | create |
-  | `src/features/auth/server/auth.ts`, `auth.middleware.ts`, `auth-handler.ts`, `accounts.repository.ts`, `accounts.service.ts`, `accounts.functions.ts` | create |
+  | `src/features/auth/server/auth.repository.ts`, `session.service.ts`, `session.functions.ts`, `accounts.repository.ts`, `accounts.service.ts`, `accounts.functions.ts` | create |
   | `src/features/auth/components/account-status-view.tsx` | create |
   | `src/routes/_status.tsx`, `src/routes/_status/status.tsx`, `src/routes/api/auth/$.ts` | create |
   | `src/routeTree.gen.ts` | generated |
@@ -139,7 +139,7 @@ Urutan mengikuti risiko, kecuali T5 dan T6 yang menunggu T4 karena aksinya ada d
   | `src/shared/ui/table.tsx`, `badge.tsx`, `select.tsx` | create (CLI) |
   | `shadcn-primitives.lock.json` | modify lewat `check-ui.mjs --accept <file>` (sama dengan T2) |
   | `src/features/auth/schemas.ts`, `errors.ts`, `queries.ts`, `index.ts`, `README.md` | modify |
-  | `src/features/auth/server/auth.middleware.ts`, `accounts.repository.ts`, `accounts.service.ts`, `accounts.functions.ts` | modify |
+  | `src/features/auth/server/session.functions.ts`, `session.service.ts`, `accounts.repository.ts`, `accounts.service.ts`, `accounts.functions.ts` | modify |
   | `src/features/auth/components/user-management-view.tsx`, `accounts-table.tsx` | create |
   | `src/routes/_app/users.tsx` | create |
   | `src/routes/_app.tsx` | modify |
@@ -244,6 +244,11 @@ T2 membuat `/login` dan `/register` bisa dibuka lewat URL, tanpa tautan. T3 meng
 | 2026-11-08 | T1: `.gitignore` masuk file list (`!.env.example`) | Catatan Gate review round 1: `.gitignore` baris 6 (`.env*`) mengabaikan `.env.example` (`git check-ignore`) |
 | 2026-11-08 | T2–T5: baris lock primitive dengan mekanisme `check-ui.mjs --accept <file>` | Catatan Gate review round 1: T3–T5 juga menambah primitive (`tailwind-shadcn.md`) |
 | 2026-11-08 | T1, T2, T4: `src/routeTree.gen.ts` sebagai file generated | Catatan Gate review round 1: ketiga task menambah route |
+| 2026-11-08 | T1: `src/routes/__root.tsx` masuk file list (modify: `createRootRouteWithContext` dengan `queryClient`) | Router context untuk `queryClient` (`tanstack-query.md`) didaftarkan di root route; tidak tercantum di layer breakdown spec |
+| 2026-11-08 | T1: `src/shared/errors/index.ts` dan `src/shared/db/errors.ts` pindah ke task yang pertama memakainya (T2 untuk `readPgError`, T4 untuk `Result`) | T1 tidak punya kegagalan yang diharapkan; membuatnya sekarang berarti kode tanpa pemakai |
+| 2026-11-08 | T1 dan T4: `auth.ts`, `auth.middleware.ts`, `auth-handler.ts` menjadi `auth.repository.ts`, `session.functions.ts`, `session.service.ts` | Perubahan section 3 spec, disetujui di Spec gate round 2 (`check:gates`) |
+| 2026-11-08 | T1: `@tanstack/react-query` dipasang `^5.106.1`, bukan 5.107.1 (spec section 2) | 5.107.1 masih di dalam `minimumReleaseAge` pnpm; pnpm menambah pengecualian sendiri di `pnpm-workspace.yaml`, dan pengecualian itu dibatalkan |
+| 2026-11-08 | T1: tes env di `src/shared/config/env.server.test.ts` (bukan `__tests__/` fitur) | Tes itu menguji modul `shared`, jadi diletakkan di sebelah kodenya (`folder-structure.md`, Naming: tests) |
 
 ## Gate review
 

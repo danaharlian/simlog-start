@@ -120,14 +120,14 @@ Ownership, D1 to D13, public API, events, dan security sudah diputuskan di `05-a
 | Table | `features/auth/db/schema.ts` | create | `users`, `sessions`, `accounts`, `verifications`, enum `account_status`, `user_role` (section 4) |
 | Schemas | `features/auth/schemas.ts` | create | section 5; `accountStatuses`, `roles` |
 | Errors | `features/auth/errors.ts` | create | kode di section 6 |
-| Auth config | `features/auth/server/auth.ts` | create | instance `betterAuth` (section 13): adapter, `usePlural`, `generateId`, `emailAndPassword`, `user.additionalFields`, `hooks.before`, `disabledPaths`, plugin `username`, `tanstackStartCookies` terakhir |
-| Middleware | `features/auth/server/auth.middleware.ts` | create | `withSession`, `requireActiveSuperadmin` (ADR 0041). Middleware untuk pengguna aktif biasa ditambahkan saat ada server function yang membutuhkannya |
+| Auth config (repository) | `features/auth/server/auth.repository.ts` | create | instance `betterAuth` (section 13): adapter, `usePlural`, `generateId`, `emailAndPassword`, `user.additionalFields`, `hooks.before`, `disabledPaths`, plugin `username`, `tanstackStartCookies` terakhir |
+| Middleware (function) | `features/auth/server/session.functions.ts` | create | `withSession`, `requireActiveSuperadmin` (ADR 0041), memanggil `session.service.ts`. Middleware untuk pengguna aktif biasa ditambahkan saat ada server function yang membutuhkannya |
 | Repository | `features/auth/server/accounts.repository.ts` | create | `findCurrentUser`, `listAccounts`, `lockAccountsForChange`, `updateAccountStatus`, `updateAccountRole`, `findUserIdByEmail` |
 | Rules | `features/auth/server/accounts.rules.ts` | create | `decideStatusChange`, `decideRoleChange`: transisi yang sah, larangan diri sendiri, syarat target aktif untuk diangkat |
 | Service | `features/auth/server/accounts.service.ts` | create | `getCurrentUserDto`, `listAccountsForAdmin`, `changeAccountStatus`, `changeAccountRole` (transaksi, section 4) |
 | Service | `features/auth/server/seed.service.ts` | create | `seedAccounts` lewat `auth.api.signUpEmail`, lalu update status dan role |
 | Server function | `features/auth/server/accounts.functions.ts` | create | section 6 |
-| Server route handler | `features/auth/server/auth-handler.ts` | create | `authHandler(request)` meneruskan ke `auth.handler` |
+| Session service | `features/auth/server/session.service.ts` | create | `handleAuthRequest(request)` (diekspor sebagai `authHandler`) meneruskan ke `auth.handler`; `readSessionUserId(headers)` memanggil `auth.api.getSession` |
 | Query options and keys | `features/auth/queries.ts` | create | `authScope`, `authKeys`, `currentUserQueryOptions`, `accountsQueryOptions` |
 | Hooks | `features/auth/hooks/auth-client.ts` | create | `createAuthClient` dari `better-auth/react`, `usernameClient`, `inferAdditionalFields` (S6) |
 | Hooks | `features/auth/hooks/use-sign-in.ts`, `use-sign-up.ts`, `use-sign-out.ts`, `use-change-account-status.ts`, `use-change-account-role.ts` | create | `useMutation`; invalidasi saat sukses |
@@ -440,6 +440,7 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 
 | Date | Change | Reason | Re-approved by |
 |---|---|---|---|
+| 2026-11-08 | Section 3: `server/auth.ts` → `server/auth.repository.ts`; `server/auth.middleware.ts` → `server/session.functions.ts`; `server/auth-handler.ts` → `server/session.service.ts` | `check:gates` di T1: file di `server/` harus cocok dengan kategori boundary (`*.functions.ts`, `*.service.ts`, `*.repository.ts`, `*.rules.ts`, `*.listeners.ts`); perilaku dan public API tetap | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 2) |
 
 ## 15. Spec gate review
 
@@ -458,3 +459,4 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 | Round | Date | Reviewer | Verdict | Findings, or notes and their owner |
 |---|---|---|---|---|
 | 1 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "06-feature-spec auth: approve, jawaban section 15 sesuai rekomendasi. 07-tasks auth: approve with notes, jawaban sesuai rekomendasi, terapkan 3 catatan, T1 tetap satu" |
+| 2 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "06-feature-spec auth: setujui perubahan section 3 (auth.repository.ts, session.service.ts, session.functions.ts)". Menyetujui change log 2026-11-08 (nama file di section 3) |
