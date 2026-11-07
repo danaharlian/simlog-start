@@ -33,7 +33,7 @@ The command needs `DATABASE_URL`, `BETTER_AUTH_SECRET`, and `BETTER_AUTH_URL` se
 4. Index names `sessions_user_id_idx`, `accounts_user_id_idx` (the CLI wrote `sessions_userId_idx`, `accounts_userId_idx`).
 5. `users.status` and `users.role` use the enums `account_status` and `user_role`, and are `NOT NULL`. `users.username` is `NOT NULL`.
 6. Added index `users_status_created_at_idx` (`status`, `created_at`) for the account list (spec section 4).
-7. Single quotes and no `/* @__PURE__ */` comments (formatting only).
+7. Quotes and `/* @__PURE__ */` comments normalized by Prettier (formatting only).
 
 Property names, which Better Auth reads, are unchanged.
 

@@ -248,6 +248,11 @@ T2 membuat `/login` dan `/register` bisa dibuka lewat URL, tanpa tautan. T3 meng
 | 2026-11-08 | T1: `src/shared/errors/index.ts` dan `src/shared/db/errors.ts` pindah ke task yang pertama memakainya (T2 untuk `readPgError`, T4 untuk `Result`) | T1 tidak punya kegagalan yang diharapkan; membuatnya sekarang berarti kode tanpa pemakai |
 | 2026-11-08 | T1 dan T4: `auth.ts`, `auth.middleware.ts`, `auth-handler.ts` menjadi `auth.repository.ts`, `session.functions.ts`, `session.service.ts` | Perubahan section 3 spec, disetujui di Spec gate round 2 (`check:gates`) |
 | 2026-11-08 | T1: `@tanstack/react-query` dipasang `^5.106.1`, bukan 5.107.1 (spec section 2) | 5.107.1 masih di dalam `minimumReleaseAge` pnpm; pnpm menambah pengecualian sendiri di `pnpm-workspace.yaml`, dan pengecualian itu dibatalkan |
+| 2026-11-08 | T1: `docs/decisions/0041-auth-middleware-in-the-auth-feature.md` diubah (point 4 dan baris Amended) | Spec gate round 2 menyetujui nama file; review T1 R1-8 |
+| 2026-11-08 | T1: `src/shared/db/columns.ts` dihapus; dibuat oleh task pertama yang punya tabel non-auth | Review T1 R1-9: tanpa pemakai (YAGNI), sama dengan `shared/errors` |
+| 2026-11-08 | T1: tes baru `__tests__/session.service.test.ts` (jalur sesi, `/update-user`, `statusChangedAt`); tes AC16 di `accounts.service.test.ts` diganti nama; tes "akun baru berstatus pending dan berrole user" tergabung di tes AC1 | Review T1 R1-1, R1-6, R1-11 |
+| 2026-11-08 | T1: `vitest.config.ts` menyetel `TZ=Asia/Jakarta` untuk tes | Review T1 R1-14: bug timestamp tanpa zona hanya terlihat di luar UTC |
+| 2026-11-08 | T1: pemeriksaan Origin `/api/auth` (`better-auth.md` rule 9) dibuktikan dengan `curl` di dev server, bukan Vitest | Better Auth 1.7.18 melewati origin check saat `NODE_ENV=test`; review T1 R1-7 |
 | 2026-11-08 | T1: tes env di `src/shared/config/env.server.test.ts` (bukan `__tests__/` fitur) | Tes itu menguji modul `shared`, jadi diletakkan di sebelah kodenya (`folder-structure.md`, Naming: tests) |
 
 ## Gate review

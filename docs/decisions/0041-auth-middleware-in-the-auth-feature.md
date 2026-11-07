@@ -1,6 +1,7 @@
 # 0041 Auth middleware lives in the auth feature
 
 - Status: accepted
+- Amended: 2026-11-08, point 4 (file names), approved by Dana Harliansyah (Product Owner, Tech Lead) at the Spec gate of `specs/auth/06-feature-spec.md`, round 2, via chat
 - Date: 2026-11-08
 - Deciders: Dana Harliansyah (Software Architect), via chat, 2026-11-08: “05-architecture-review auth: approve with notes, jawaban section 9 sesuai rekomendasi, D8 pilih tsx, ADR 0038–0042 accepted”
 

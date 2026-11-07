@@ -19,7 +19,7 @@ verified_against: "better-auth.com docs: integrations/tanstack, installation, ad
 - CLI schema generation: `auth generate` with `--adapter drizzle` (requires `--dialect`) writes `schema.ts` at the project root by default; use `--output` to choose the file, and `--config` for our `auth.ts` path. Run it with `pnpm dlx auth@<installed better-auth version>`: the `auth` package is released with the same version number and depends on that exact `better-auth` (`auth@1.7.15`).
 - `auth migrate` refuses the Drizzle adapter and tells you to use `auth generate` (read in `auth@1.7.15`, not run).
 - Start 1.0 removed its built-in `useSession`. Do not use it.
-- **Observed on 1.7.18 with `drizzle-orm` 1.0.0-rc.5 (specs/auth T1, 2026-11-08):** `pnpm dlx auth@1.7.18 generate --config <auth file> --output <schema file>` resolves the `@/` alias, and loads the config, so the env module needs values (placeholders work for `generate`). With `usePlural: true` and `advanced.database.generateId: "uuid"` it writes plural tables and `uuid` ids with `gen_random_uuid()`. Its `relations()` block does not compile on Drizzle v1 (ADR 0040). Better Auth writes `user.additionalFields` strings into PostgreSQL enum columns, `input: false` ignores a value sent on sign-up, and an `APIError` thrown in `hooks.before` with `code` reaches the client as `{ code }` in the JSON body.
+- **Observed on 1.7.18 with `drizzle-orm` 1.0.0-rc.5 (specs/auth T1, 2026-11-08):** `pnpm dlx auth@1.7.18 generate --config <auth file> --output <schema file>` resolves the `@/` alias, and loads the config, so the env module needs values (placeholders work for `generate`). With `usePlural: true` and `advanced.database.generateId: "uuid"` it writes plural tables and `uuid` ids with `gen_random_uuid()`. Its `relations()` block does not compile on Drizzle v1 (ADR 0040). Better Auth writes `user.additionalFields` strings into PostgreSQL enum columns, an `input: false` field with a `defaultValue` takes the default on sign-up whatever the body says, while one without a default (or any `input: false` field on `/update-user`) rejects a sent value with `400`, and an `APIError` thrown in `hooks.before` with `code` reaches the client as `{ code }` in the JSON body.
 
 ## Rules
 
@@ -35,6 +35,7 @@ verified_against: "better-auth.com docs: integrations/tanstack, installation, ad
    - `baseURL` must equal the public origin, or real logins are rejected. Keep `trustedOrigins` minimal, with no `localhost` in production.
    - **Never set `advanced.disableCSRFCheck` or `advanced.disableOriginCheck`.** The second also turns CSRF protection off.
    - Keep the table above as an integration test against `/api/auth/*`, and re-run it on every Better Auth upgrade.
+   - **Not under Vitest as configured:** Better Auth 1.7.18 sets `skipOriginCheck` to `true` when `NODE_ENV` is `test` (`context/create-context.mjs`), unless `advanced.disableOriginCheck` is set, which this rule forbids. Under Vitest a foreign `Origin` therefore gets 200. Checked on the dev server instead (specs/auth T1, 2026-11-08): sign-up with a foreign `Origin` 403, cross-site navigation 403, same origin 200.
 10. Test: sign-up, sign-in, sign-out, session expiry, unauthenticated access to every protected server function, and cross-tenant access.
 
 ## Pitfalls

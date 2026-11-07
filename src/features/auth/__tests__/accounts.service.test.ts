@@ -26,7 +26,7 @@ describe("getCurrentUserDto (T1)", () => {
     expect(dto).toMatchObject({ id: userId, status: "pending", role: "user" })
   })
 
-  it("getCurrentUserDto melihat status yang diubah langsung di database (AC16)", async () => {
+  it("getCurrentUserDto membaca status terbaru dari baris users", async () => {
     const userId = await createPendingUser()
     await db.update(users).set({ status: "active" }).where(eq(users.id, userId))
     const dto = await getCurrentUserDto(userId)

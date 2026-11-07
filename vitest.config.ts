@@ -16,7 +16,8 @@ export default defineConfig({
   resolve: { tsconfigPaths: true },
   test: {
     environment: "node",
-    env: { DATABASE_URL: testDatabaseUrl },
+    // A non-UTC zone makes a timestamp-without-zone bug visible in the createdAt test (ADR 0043).
+    env: { DATABASE_URL: testDatabaseUrl, TZ: "Asia/Jakarta" },
     // Lets a test check that serverEnv saw the override without reading process.env.
     provide: { testDatabaseUrl },
   },

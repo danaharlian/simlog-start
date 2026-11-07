@@ -4,11 +4,8 @@ import { AccountStatusView, currentUserQueryOptions } from "@/features/auth"
 
 export const Route = createFileRoute("/_status/status")({
   head: () => ({ meta: [{ title: "Status akun" }] }),
-  loader: ({ context }) =>
-    context.queryClient.query({
-      ...currentUserQueryOptions(),
-      staleTime: "static",
-    }),
+  // No staleTime override: the current user must be fresh on every navigation (R21, spec section 7).
+  loader: ({ context }) => context.queryClient.query(currentUserQueryOptions()),
   component: StatusPage,
 })
 

@@ -48,6 +48,8 @@ export const auth = betterAuth({
       statusChangedAt: { type: "date", required: false, input: false },
     },
   },
+  // Explicit, not the default: a cached session would hide a status change until it expires (R21, D10).
+  session: { cookieCache: { enabled: false } },
   hooks: { before: requireUsernameOnSignUp },
   disabledPaths: ["/is-username-available"],
   // tanstackStartCookies must stay last (docs/04-stack/better-auth.md).

@@ -165,13 +165,15 @@ Ownership, D1 to D13, public API, events, dan security sudah diputuskan di `05-a
 | `sessions` | `token` | `text` | no | | unique `sessions_token_key` |
 | `sessions` | `expires_at` | `timestamptz` | no | | |
 | `sessions` | `ip_address`, `user_agent` | `text` | yes (bawaan) | | |
-| `sessions` | `created_at`, `updated_at` | `timestamptz` | no | `now()` | |
+| `sessions` | `created_at` | `timestamptz` | no | `now()` | |
+| `sessions` | `updated_at` | `timestamptz` | no | none (Better Auth sets it, as the CLI output has it) | |
 | `accounts` | `id` | `uuid` | no | `gen_random_uuid()` | PK |
 | `accounts` | `user_id` | `uuid` | no | | FK `users.id` `ON DELETE CASCADE` |
 | `accounts` | `account_id`, `provider_id` | `text` | no | | |
 | `accounts` | `password` | `text` | yes (bawaan; terisi untuk `credential`) | | hash scrypt |
 | `accounts` | kolom token OAuth bawaan | `text`, `timestamptz` | yes | | tidak dipakai (tanpa OAuth) |
-| `accounts` | `created_at`, `updated_at` | `timestamptz` | no | `now()` | |
+| `accounts` | `created_at` | `timestamptz` | no | `now()` | |
+| `accounts` | `updated_at` | `timestamptz` | no | none (Better Auth sets it, as the CLI output has it) | |
 | `verifications` | `id`, `identifier`, `value`, `expires_at`, `created_at`, `updated_at` | sesuai output CLI, timestamp `timestamptz` | no | | tabel bawaan; tidak dipakai flow cut ini |
 
 `status`, `role`, dan `status_changed_at` didaftarkan sebagai `user.additionalFields` dengan `input: false` (ADR 0038). Tipe Better Auth untuk `status` dan `role` adalah `string`, dan kolomnya enum PostgreSQL. `TODO(verify)` di T1: Better Auth menulis string itu ke kolom enum tanpa error, dan `generateId: "uuid"` dengan `usePlural: true` menghasilkan kolom `uuid` dari CLI (kalau tidak, diubah lewat edit S2).
@@ -440,6 +442,8 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 
 | Date | Change | Reason | Re-approved by |
 |---|---|---|---|
+| 2026-11-08 | Section 4: `sessions.updated_at` dan `accounts.updated_at` tanpa default (koreksi teks agar sesuai output CLI dan migration T1) | Temuan review T1 R1-12 | pending: dikonfirmasi reviewer di PR gate T1 |
+| 2026-11-08 | Section 7: loader `/status` memanggil `currentUserQueryOptions()` tanpa `staleTime: 'static'` (pengecualian dari `tanstack-query.md` rule 4 untuk query pengguna saat ini) | Temuan review T1 R1-4: `'static'` membuat status lama tampil dulu, melawan R21 | pending: dikonfirmasi reviewer di PR gate T1 |
 | 2026-11-08 | Section 3: `server/auth.ts` → `server/auth.repository.ts`; `server/auth.middleware.ts` → `server/session.functions.ts`; `server/auth-handler.ts` → `server/session.service.ts` | `check:gates` di T1: file di `server/` harus cocok dengan kategori boundary (`*.functions.ts`, `*.service.ts`, `*.repository.ts`, `*.rules.ts`, `*.listeners.ts`); perilaku dan public API tetap | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 2) |
 
 ## 15. Spec gate review

@@ -3,6 +3,7 @@ import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
+  useRouter,
 } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { TanStackDevtools } from "@tanstack/react-devtools"
@@ -37,9 +38,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         <p>The requested page could not be found.</p>
       </main>
     ),
+    // Unexpected failures only; the message is generic so no server detail reaches the page (error-handling.md).
+    errorComponent: RootError,
     shellComponent: RootDocument,
   }
 )
+
+function RootError() {
+  const router = useRouter()
+  return (
+    <main className="container mx-auto p-4 pt-16" role="alert">
+      <h1>Terjadi kesalahan</h1>
+      <p>Halaman tidak bisa dimuat. Coba lagi.</p>
+      <button
+        type="button"
+        className="underline"
+        onClick={() => void router.invalidate()}
+      >
+        Coba lagi
+      </button>
+    </main>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
