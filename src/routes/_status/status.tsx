@@ -11,6 +11,6 @@ export const Route = createFileRoute("/_status/status")({
 
 function StatusPage() {
   const { data: user } = useSuspenseQuery(currentUserQueryOptions())
-  if (!user) return <p className="p-6">Anda belum masuk.</p>
-  return <AccountStatusView status={user.status} />
+  // The _status guard already sent a visitor without a session to /login.
+  return user === null ? null : <AccountStatusView status={user.status} />
 }

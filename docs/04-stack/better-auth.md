@@ -33,10 +33,12 @@ verified_against: "better-auth.com docs: integrations/tanstack, installation, ad
 8. **Security-critical dependency:** pin the version, read the changelog before upgrading, and upgrade through a branch with the auth tests passing. Do not write custom password hashing, session tokens, or cookie code.
 9. **Cross-site protection on the auth route comes from Better Auth, not from Start.** Start's CSRF middleware with the documented `serverFn` filter does not cover this server route (`docs/04-stack/tanstack-start.md`); do not add it there. Better Auth checks origin and Fetch Metadata itself (security reference, read 2026-10-31). **Checked on 1.7.14 by calling `auth.handler` with crafted headers (memory adapter):** sign-in returned 403 for a foreign `Origin`, `Origin: null`, cross-site Fetch Metadata, and a cross-site navigation; 200 with the same origin and with no headers (documented, for server-to-server clients). Sign-out with a cookie returned 403 for a foreign or missing `Origin`. Session cookie: `HttpOnly`, `SameSite=Lax`. Not checked: a real browser, through the Start route, or form-encoded requests.
    - `baseURL` must equal the public origin, or real logins are rejected. Keep `trustedOrigins` minimal, with no `localhost` in production.
-   - **Never set `advanced.disableCSRFCheck` or `advanced.disableOriginCheck`.** The second also turns CSRF protection off.
+   - **Never set `advanced.disableCSRFCheck`. Set `advanced.disableOriginCheck` only to `false`** (ADR 0046): `true` also turns CSRF protection off, and leaving it unset turns the origin check off whenever `NODE_ENV` is `test`.
+   - **`/sign-in/username` has no CSRF middleware in 1.7.18** (the email path has `formCsrfMiddleware`). `features/auth` runs `formCsrfMiddleware` on it from `hooks.before` (ADR 0046). Re-check on every upgrade.
    - Keep the table above as an integration test against `/api/auth/*`, and re-run it on every Better Auth upgrade.
-   - **Not under Vitest as configured:** Better Auth 1.7.18 sets `skipOriginCheck` to `true` when `NODE_ENV` is `test` (`context/create-context.mjs`), unless `advanced.disableOriginCheck` is set, which this rule forbids. Under Vitest a foreign `Origin` therefore gets 200. Checked on the dev server instead (specs/auth T1, 2026-11-08): sign-up with a foreign `Origin` 403, cross-site navigation 403, same origin 200.
-10. Test: sign-up, sign-in, sign-out, session expiry, unauthenticated access to every protected server function, and cross-tenant access.
+   - **Under Vitest:** Better Auth 1.7.18 sets `skipOriginCheck` to `true` when `NODE_ENV` is `test` unless `advanced.disableOriginCheck` is set; with `false` (ADR 0046) the table above runs in `features/auth/__tests__/sign-in.test.ts`.
+10. **Logs:** Better Auth's `logger.log` receives the raw driver error as extra arguments, and its `detail` can hold an email. Route it to pino with the level and message only (ADR 0046).
+11. Test: sign-up, sign-in, sign-out, session expiry, unauthenticated access to every protected server function, and cross-tenant access.
 
 ## Pitfalls
 

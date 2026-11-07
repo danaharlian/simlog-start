@@ -198,7 +198,7 @@ Ownership, D1 to D13, public API, events, dan security sudah diputuskan di `05-a
 | Dua superadmin mengubah status akun yang sama (EC14) | Transaksi: `lockAccountsForChange` mengunci baris aktor dan target dengan `.for('update')`, urut `id` (`drizzle-concurrency.md` rule 3); `decideStatusChange` membandingkan status terkunci dengan `expectedStatus` dari client | Satu `ok`; yang lain `conflict` `ACCOUNT_STATUS_CHANGED`; status tersimpan = hasil yang menang |
 | Dua superadmin saling mencabut role (EC16) | Transaksi yang sama: baris aktor terkunci dan diperiksa masih `superadmin` dan `active` sebelum write; target tidak boleh aktor sendiri | Satu `ok`; yang lain `forbidden` `NOT_ACTIVE_SUPERADMIN`; tepat satu superadmin aktif tersisa |
 | Superadmin yang baru dicabut mengirim aksi (EC17) | Pemeriksaan aktor di baris terkunci (bukan hanya di middleware) | `forbidden` `NOT_ACTIVE_SUPERADMIN`; data tidak berubah |
-| Register bersamaan dengan email atau username yang sama | Unique `users_email_key`, `users_username_key` | Satu berhasil; yang lain ditolak Better Auth (`USER_ALREADY_EXISTS*` atau `USERNAME_IS_ALREADY_TAKEN`), atau `23505` yang diubah menjadi pesan yang sama. `TODO(verify)` di T2: kode yang keluar pada balapan nyata |
+| Register bersamaan dengan email atau username yang sama | Unique `users_email_key`, `users_username_key` | Satu berhasil; yang lain ditolak Better Auth (`USER_ALREADY_EXISTS*` atau `USERNAME_IS_ALREADY_TAKEN`), atau `23505` yang diubah menjadi pesan yang sama. Terverifikasi di T2: yang kalah mendapat `USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL` (pre-check Better Auth) atau `FAILED_TO_CREATE_USER` (unique index); keduanya menjadi error register di UI |
 | Seed dijalankan dua kali bersamaan | Unique email; seed melewati email yang ada | Tidak ada akun ganda |
 
 Invariant R20 ("minimal satu superadmin aktif") dijaga oleh dua aturan: tidak ada yang bisa menonaktifkan atau mencabut dirinya sendiri, dan aktor harus superadmin aktif di baris yang terkunci. Dengan dua aturan itu, superadmin terakhir yang aktif tidak bisa dihapus oleh siapa pun.
@@ -442,6 +442,7 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 
 | Date | Change | Reason | Re-approved by |
 |---|---|---|---|
+| 2026-11-08 | Section 4: hasil `TODO(verify)` register bersamaan diisi | Diverifikasi di T2 (`sign-up.test.ts`) | pending: dikonfirmasi reviewer di PR gate T2 |
 | 2026-11-08 | Section 2 (S3) dan 6: kode `USERNAME_REQUIRED` menjadi `AUTH_USERNAME_REQUIRED` | Temuan review T1 R1-15: kode milik fitur diberi prefiks (`error-handling.md`); kode bawaan Better Auth tetap | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
 | 2026-11-08 | Section 4: `sessions.updated_at` dan `accounts.updated_at` tanpa default (koreksi teks agar sesuai output CLI dan migration T1) | Temuan review T1 R1-12 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
 | 2026-11-08 | Section 7: loader `/status` memanggil `currentUserQueryOptions()` tanpa `staleTime: 'static'` (pengecualian dari `tanstack-query.md` rule 4 untuk query pengguna saat ini) | Temuan review T1 R1-4: `'static'` membuat status lama tampil dulu, melawan R21 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |

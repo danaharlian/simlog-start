@@ -4,14 +4,19 @@ Accounts, sessions, account status, and roles for simlog. Sign-up and sign-in ru
 
 ## Public API
 
-| Export                                 | Entry             | Kind                                   | Since |
-| -------------------------------------- | ----------------- | -------------------------------------- | ----- |
-| `AccountStatusView`                    | `index.ts`        | component                              | T1    |
-| `currentUserQueryOptions`, `authScope` | `index.ts`        | query options, constant                | T1    |
-| `CurrentUser`, `AccountStatus`, `Role` | `index.ts`        | type                                   | T1    |
-| `authHandler`                          | `index.server.ts` | handler for `src/routes/api/auth/$.ts` | T1    |
+| Export                                 | Entry             | Kind                                               | Since |
+| -------------------------------------- | ----------------- | -------------------------------------------------- | ----- |
+| `AccountStatusView`                    | `index.ts`        | component                                          | T1    |
+| `currentUserQueryOptions`, `authScope` | `index.ts`        | query options, constant                            | T1    |
+| `CurrentUser`, `AccountStatus`, `Role` | `index.ts`        | type                                               | T1    |
+| `LoginForm`, `RegisterForm`            | `index.ts`        | component                                          | T2    |
+| `useSignOut`                           | `index.ts`        | hook                                               | T2    |
+| `resolveAccessRedirect`, `AccessArea`  | `index.ts`        | function, type (for `beforeLoad` in layout routes) | T2    |
+| `authHandler`                          | `index.server.ts` | handler for `src/routes/api/auth/$.ts`             | T1    |
 
-Server functions: `getCurrentUser` (GET, `withSession`; returns `CurrentUser | null`).
+Server functions: `getCurrentUser` (GET, `withSession`; returns `CurrentUser | null`; `Cache-Control: private, no-store`).
+
+Better Auth hardening (ADR 0046): `disableOriginCheck: false`, `formCsrfMiddleware` on `/sign-in/username`, and Better Auth's logs routed to pino with the message only.
 
 ## Owned tables
 

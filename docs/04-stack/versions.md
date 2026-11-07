@@ -23,7 +23,7 @@ verified_against: "the owner's package.json from `pnpm dlx shadcn@latest init -t
 | `@tanstack/react-router-devtools`, `@tanstack/react-devtools`, `@tanstack/devtools-vite` | `latest` | 1.167.2 / 0.10.13 / 0.8.5 | **installer** replaces `latest`; dev-only |
 | `@tanstack/router-cli` | ^1.167.45 | 1.167.46 | Provides `tsr generate` (script `generate-routes`) |
 | `@tanstack/react-query` | ^5.106.1 | 5.107.1 (2026-11-08) | v5 line. Installed in `specs/auth` T1 at 5.106.1: 5.107.1 was inside pnpm's `minimumReleaseAge` window, and pnpm wrote a `minimumReleaseAgeExclude` entry for it on its own; that entry was reverted, not kept. Never accept such an entry without a person's decision. `ensureQueryData`/`fetchQuery`/`prefetchQuery` are deprecated: see `tanstack-query.md` |
-| `@tanstack/react-form` | ^1.33.5 | 1.33.5 | |
+| `@tanstack/react-form` | ^1.33.5 | 1.33.5 | Installed in `specs/auth` T2 (2026-11-08). |
 | `@tanstack/react-table` | ^9.3.1 | 9.3.1 | **v9** (ADR 0008): a different major from v8. Read `tanstack-table.md` |
 | `@tanstack/react-store` | ^0.11.2 | 0.11.2 | Dependency of Table v9 (atoms and `useSelector`). Declared directly in the app |
 | `@tanstack/react-virtual` | ^3.14.22 | 3.14.23 | For long lists; rules in `tanstack-table.md` |
