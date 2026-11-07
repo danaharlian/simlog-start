@@ -1,6 +1,7 @@
 # 0041 Auth middleware lives in the auth feature
 
 - Status: accepted
+- Amended: 2026-11-08, point 4 (file names), approved by Dana Harliansyah (Product Owner, Tech Lead) at the Spec gate of `specs/auth/06-feature-spec.md`, round 2, via chat
 - Date: 2026-11-08
 - Deciders: Dana Harliansyah (Software Architect), via chat, 2026-11-08: “05-architecture-review auth: approve with notes, jawaban section 9 sesuai rekomendasi, D8 pilih tsx, ADR 0038–0042 accepted”
 
@@ -18,6 +19,7 @@
 1. The middleware that requires a signed-in user, an active user, and an active superadmin lives in `features/auth/server/`.
 2. It is exported from `features/auth/index.server.ts` only when a second feature needs it. Today only `auth`'s own server functions use it.
 3. `better-auth.md` rule 4 and the `skills.md` row are updated to name `features/auth` instead of `shared/server/require-auth`.
+4. File names follow the boundary categories that `check:gates` enforces (found in `specs/auth` T1, 2026-11-08): the `betterAuth` instance is `server/auth.repository.ts`, the session reader and request handler are `server/session.service.ts`, and the middleware is `server/session.functions.ts`.
 
 ## Consequences
 

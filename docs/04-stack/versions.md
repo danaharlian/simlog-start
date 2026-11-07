@@ -22,7 +22,7 @@ verified_against: "the owner's package.json from `pnpm dlx shadcn@latest init -t
 | `@tanstack/react-router` | `latest` | 1.170.46 | Same. Move together with Start |
 | `@tanstack/react-router-devtools`, `@tanstack/react-devtools`, `@tanstack/devtools-vite` | `latest` | 1.167.2 / 0.10.13 / 0.8.5 | **installer** replaces `latest`; dev-only |
 | `@tanstack/router-cli` | ^1.167.45 | 1.167.46 | Provides `tsr generate` (script `generate-routes`) |
-| `@tanstack/react-query` | ^5.104.5 | 5.105.0 | v5 line. `ensureQueryData`/`fetchQuery`/`prefetchQuery` are deprecated: see `tanstack-query.md` |
+| `@tanstack/react-query` | ^5.106.1 | 5.107.1 (2026-11-08) | v5 line. Installed in `specs/auth` T1 at 5.106.1: 5.107.1 was inside pnpm's `minimumReleaseAge` window, and pnpm wrote a `minimumReleaseAgeExclude` entry for it on its own; that entry was reverted, not kept. Never accept such an entry without a person's decision. `ensureQueryData`/`fetchQuery`/`prefetchQuery` are deprecated: see `tanstack-query.md` |
 | `@tanstack/react-form` | ^1.33.5 | 1.33.5 | |
 | `@tanstack/react-table` | ^9.3.1 | 9.3.1 | **v9** (ADR 0008): a different major from v8. Read `tanstack-table.md` |
 | `@tanstack/react-store` | ^0.11.2 | 0.11.2 | Dependency of Table v9 (atoms and `useSelector`). Declared directly in the app |
@@ -30,9 +30,10 @@ verified_against: "the owner's package.json from `pnpm dlx shadcn@latest init -t
 | `@tanstack/charts` | ^1.1.0 | 1.1.0 | In the template. **No stack doc and not verified**: read the installed types before use |
 | `@tanstack/eslint-config` | `latest` | 0.4.0 | **installer** replaces `latest`. Sets `parserOptions.project: true` (matters for `eslint.no-suppress.js`) |
 | `zod` | ^4.6.7 | 4.6.7 | v4 line |
-| `better-auth` | ^1.7.13 | 1.7.14 | Security-critical; upgrade via branch. Email and password only (ADR 0007, R). See `better-auth.md`. On a bump, check the docs version in `mcp.md` and re-read the Better Auth skills (`skills.md`) |
+| `better-auth` | 1.7.18 (exact) | 1.7.18 (2026-11-08) | Security-critical: exact pin (`better-auth.md`, rule 8); upgrade via branch. Plugin `username` (ADR 0039). Email and password only (ADR 0007, R). See `better-auth.md`. On a bump, check the docs version in `mcp.md` and re-read the Better Auth skills (`skills.md`) |
 | `drizzle-orm` / `drizzle-kit` | `1.0.0-rc.5` (exact) | 0.45.4 `latest`, 1.0.0-rc.5 `rc` | **Release candidate** (ADR 0008). Keep both on the same exact version. See `drizzle-postgres.md`. The MCP server runs this install; on a bump, refresh skill `drizzle` (`docs/05-agent-tooling/skills.md`) and change `DRIZZLE_VERSION` in `test-real-app.sh` |
-| `pg` / `@types/pg` | ^8.23.1 / ^8.23.1 | 8.23.1 | node-postgres driver. Pool options: `drizzle-postgres.md` |
+| `pg` / `@types/pg` | ^8.23.1 / ^8.23.1 | 8.23.1 | node-postgres driver. `sslmode=verify-full` in the URL worked against Prisma Postgres (`specs/auth` T1, 2026-11-08). Pool options: `drizzle-postgres.md` |
+| `@tanstack/react-router-ssr-query` | 1.167.3 (exact) | 1.167.3 (2026-11-08) | Router and Query SSR integration (ADR 0045). Moves together with `@tanstack/react-router` |
 | `pino` | ^10.4.0 | 10.4.0 | Logging. v10 line (the old scaffold had 9.4.0). pino ships its own types: no `@types/pino` |
 | `vite` | ^8 | 8.3.5 | Required by Start |
 | `@vitejs/plugin-react` | ^6 | 6.1.2 | Must come after `tanstackStart()` in `vite.config.ts` |
@@ -61,12 +62,12 @@ Not added: `@tanstack/eslint-plugin-query` (5.105.0) and `@tanstack/eslint-plugi
 
 ## Action items (what `install.sh` does not do)
 
-1. **Create `.env.example`** and the Zod env module before adding auth or the database client.
+1. ~~**Create `.env.example`** and the Zod env module before adding auth or the database client.~~ Done in `specs/auth` T1 (2026-11-08); `.gitignore` keeps `!.env.example`.
 2. **Check the shadcn move.** `install.sh` sets the `components.json` aliases and moves `src/components`, `src/lib`, and `src/hooks` into `src/shared/` (`ui`, `lib`, `hooks`), rewriting imports. Look at the diff once. A file it could not move (destination exists) or a CSS or config path that still names an old folder is listed in its output. `src/shared/lib/utils.ts` must exist before `shadcn add`: generated components import `cn` from it.
 3. **Add the TanStack ESLint plugins** `@tanstack/eslint-plugin-query` and `@tanstack/eslint-plugin-router`, after confirming rule names in their docs. `@tanstack/eslint-config` does not list them as dependencies (verified from npm).
 4. **Add test libraries** when the first UI test is written (no Testing Library, DOM environment, or Playwright yet). Choose versions via `verify-library-docs`. Vitest with the TanStack Start Vite plugin was only checked with a plain unit test. A separate fixture without Start ran form tests under Vitest 5.0.5 with jsdom 30.1.3 and `@testing-library/react` 16.3.3 (ADR 0011); that shows they work together, not that they are chosen.
 5. **Set explicit `pg` pool options** in `shared/db/client.ts` (`drizzle-postgres.md`, rule 4).
-6. **Add Drizzle scripts**: `db:generate` → `drizzle-kit generate`, `db:migrate` → `drizzle-kit migrate`, `db:migrate:test` → `DB_TARGET=test drizzle-kit migrate`, and `drizzle.config.ts` (its full text, which loads `.env` and picks the database, is in `environment.md`; the `schema` glob is in `drizzle-postgres.md`). The owner's `package.json` has no `db:*` scripts yet. Both commands ran on a real PostgreSQL 18.4 in a fixture (ADR 0014); run them again against your own server version.
+6. ~~**Add Drizzle scripts**~~ (done in `specs/auth` T1, 2026-11-08; `migrate` ran against Prisma Postgres): `db:generate` → `drizzle-kit generate`, `db:migrate` → `drizzle-kit migrate`, `db:migrate:test` → `DB_TARGET=test drizzle-kit migrate`, and `drizzle.config.ts` (its full text, which loads `.env` and picks the database, is in `environment.md`; the `schema` glob is in `drizzle-postgres.md`). The owner's `package.json` has no `db:*` scripts yet. Both commands ran on a real PostgreSQL 18.4 in a fixture (ADR 0014); run them again against your own server version.
 7. **Commit `src/routeTree.gen.ts`** (decision L). It is not in the template's `.gitignore`; keep it that way. The installer ignores it for lint through `eslint.ai-docs.js` and for format through `.prettierignore`. The first `build` rewrites the scaffold's copy in the generator's own style: commit that once.
 8. **Turn on "Require review from Code Owners"** in the repository's branch protection (a GitHub setting no script can set) and put the real owner in `.github/CODEOWNERS` (`install.sh --owner @org/team`).
 

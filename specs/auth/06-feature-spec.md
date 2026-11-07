@@ -67,7 +67,7 @@ Ownership, D1 to D13, public API, events, dan security sudah diputuskan di `05-a
 |---|---|---|---|---|
 | S1 Nama tabel dan id | Output CLI apa adanya (tunggal, `text` id) atau opsi Better Auth | `usePlural: true` (tabel `users`, `sessions`, `accounts`, `verifications`) dan `advanced.database.generateId: "uuid"` | Mengikuti `database.md` (plural, uuid) lewat opsi yang ada di types, bukan lewat edit | [0043](../../docs/decisions/0043-better-auth-tables-follow-database-conventions.md) |
 | S2 Edit tabel hasil CLI | Hanya edit yang diizinkan ADR 0040, atau ditambah tipe dan nama | Ditambah: timestamp `withTimezone: true`, nama index dan unique sesuai `database.md`, enum `account_status` dan `user_role`, `NOT NULL` pada `username`, `status`, `role` | Timestamp tanpa zona dibaca `pg` sebagai waktu lokal server; `database.md` melarangnya | 0043 (memperluas ADR 0040 point 3) |
-| S3 Username wajib di server | `hooks.before` pada `/sign-up/email`, `databaseHooks.user.create.before`, atau hanya `NOT NULL` | `hooks.before` pada path `/sign-up/email` menolak body tanpa `username` dengan `APIError` kode `USERNAME_REQUIRED`; `NOT NULL` sebagai lapisan terakhir | Pesan yang jelas untuk client; `NOT NULL` menangkap jalur lain | 0039 |
+| S3 Username wajib di server | `hooks.before` pada `/sign-up/email`, `databaseHooks.user.create.before`, atau hanya `NOT NULL` | `hooks.before` pada path `/sign-up/email` menolak body tanpa `username` dengan `APIError` kode `AUTH_USERNAME_REQUIRED`; `NOT NULL` sebagai lapisan terakhir | Pesan yang jelas untuk client; `NOT NULL` menangkap jalur lain | 0039 |
 | S4 Rate limit | Aturan bawaan atau `customRules` | Aturan bawaan: semua path `/sign-in*` dan `/sign-up*` 3 request per 10 detik, aktif di production; penyimpanan memori (D11) | Sudah memenuhi NFR1 tanpa konfigurasi (section 13) | none |
 | S5 `/is-username-available` | Biarkan atau `disabledPaths` | Dimatikan lewat `disabledPaths` | UI tidak memakainya; mengurangi permukaan enumerasi (PRD Q6) | none |
 | S6 Letak `authClient` | `features/auth/client.ts` (`better-auth.md` rule 2) atau di folder standar | `features/auth/hooks/auth-client.ts` | `check:gates` menolak file fitur di luar folder standar (`folder-structure.md`); `better-auth.md` rule 2 diperbarui di T2 | none (koreksi lokasi file, dicatat di change log `better-auth.md`) |
@@ -120,14 +120,14 @@ Ownership, D1 to D13, public API, events, dan security sudah diputuskan di `05-a
 | Table | `features/auth/db/schema.ts` | create | `users`, `sessions`, `accounts`, `verifications`, enum `account_status`, `user_role` (section 4) |
 | Schemas | `features/auth/schemas.ts` | create | section 5; `accountStatuses`, `roles` |
 | Errors | `features/auth/errors.ts` | create | kode di section 6 |
-| Auth config | `features/auth/server/auth.ts` | create | instance `betterAuth` (section 13): adapter, `usePlural`, `generateId`, `emailAndPassword`, `user.additionalFields`, `hooks.before`, `disabledPaths`, plugin `username`, `tanstackStartCookies` terakhir |
-| Middleware | `features/auth/server/auth.middleware.ts` | create | `withSession`, `requireActiveSuperadmin` (ADR 0041). Middleware untuk pengguna aktif biasa ditambahkan saat ada server function yang membutuhkannya |
+| Auth config (repository) | `features/auth/server/auth.repository.ts` | create | instance `betterAuth` (section 13): adapter, `usePlural`, `generateId`, `emailAndPassword`, `user.additionalFields`, `hooks.before`, `disabledPaths`, plugin `username`, `tanstackStartCookies` terakhir |
+| Middleware (function) | `features/auth/server/session.functions.ts` | create | `withSession`, `requireActiveSuperadmin` (ADR 0041), memanggil `session.service.ts`. Middleware untuk pengguna aktif biasa ditambahkan saat ada server function yang membutuhkannya |
 | Repository | `features/auth/server/accounts.repository.ts` | create | `findCurrentUser`, `listAccounts`, `lockAccountsForChange`, `updateAccountStatus`, `updateAccountRole`, `findUserIdByEmail` |
 | Rules | `features/auth/server/accounts.rules.ts` | create | `decideStatusChange`, `decideRoleChange`: transisi yang sah, larangan diri sendiri, syarat target aktif untuk diangkat |
 | Service | `features/auth/server/accounts.service.ts` | create | `getCurrentUserDto`, `listAccountsForAdmin`, `changeAccountStatus`, `changeAccountRole` (transaksi, section 4) |
 | Service | `features/auth/server/seed.service.ts` | create | `seedAccounts` lewat `auth.api.signUpEmail`, lalu update status dan role |
 | Server function | `features/auth/server/accounts.functions.ts` | create | section 6 |
-| Server route handler | `features/auth/server/auth-handler.ts` | create | `authHandler(request)` meneruskan ke `auth.handler` |
+| Session service | `features/auth/server/session.service.ts` | create | `handleAuthRequest(request)` (diekspor sebagai `authHandler`) meneruskan ke `auth.handler`; `readSessionUserId(headers)` memanggil `auth.api.getSession` |
 | Query options and keys | `features/auth/queries.ts` | create | `authScope`, `authKeys`, `currentUserQueryOptions`, `accountsQueryOptions` |
 | Hooks | `features/auth/hooks/auth-client.ts` | create | `createAuthClient` dari `better-auth/react`, `usernameClient`, `inferAdditionalFields` (S6) |
 | Hooks | `features/auth/hooks/use-sign-in.ts`, `use-sign-up.ts`, `use-sign-out.ts`, `use-change-account-status.ts`, `use-change-account-role.ts` | create | `useMutation`; invalidasi saat sukses |
@@ -165,13 +165,15 @@ Ownership, D1 to D13, public API, events, dan security sudah diputuskan di `05-a
 | `sessions` | `token` | `text` | no | | unique `sessions_token_key` |
 | `sessions` | `expires_at` | `timestamptz` | no | | |
 | `sessions` | `ip_address`, `user_agent` | `text` | yes (bawaan) | | |
-| `sessions` | `created_at`, `updated_at` | `timestamptz` | no | `now()` | |
+| `sessions` | `created_at` | `timestamptz` | no | `now()` | |
+| `sessions` | `updated_at` | `timestamptz` | no | none (Better Auth sets it, as the CLI output has it) | |
 | `accounts` | `id` | `uuid` | no | `gen_random_uuid()` | PK |
 | `accounts` | `user_id` | `uuid` | no | | FK `users.id` `ON DELETE CASCADE` |
 | `accounts` | `account_id`, `provider_id` | `text` | no | | |
 | `accounts` | `password` | `text` | yes (bawaan; terisi untuk `credential`) | | hash scrypt |
 | `accounts` | kolom token OAuth bawaan | `text`, `timestamptz` | yes | | tidak dipakai (tanpa OAuth) |
-| `accounts` | `created_at`, `updated_at` | `timestamptz` | no | `now()` | |
+| `accounts` | `created_at` | `timestamptz` | no | `now()` | |
+| `accounts` | `updated_at` | `timestamptz` | no | none (Better Auth sets it, as the CLI output has it) | |
 | `verifications` | `id`, `identifier`, `value`, `expires_at`, `created_at`, `updated_at` | sesuai output CLI, timestamp `timestamptz` | no | | tabel bawaan; tidak dipakai flow cut ini |
 
 `status`, `role`, dan `status_changed_at` didaftarkan sebagai `user.additionalFields` dengan `input: false` (ADR 0038). Tipe Better Auth untuk `status` dan `role` adalah `string`, dan kolomnya enum PostgreSQL. `TODO(verify)` di T1: Better Auth menulis string itu ke kolom enum tanpa error, dan `generateId: "uuid"` dengan `usePlural: true` menghasilkan kolom `uuid` dari CLI (kalau tidak, diubah lewat edit S2).
@@ -236,7 +238,7 @@ Batas numerik diberi nama konstan (lint magic number).
 |---|---|---|---|---|
 | Email sudah dipakai | EC1 | dari Better Auth | `USER_ALREADY_EXISTS`, `USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL` | "Email sudah dipakai" di kolom email |
 | Username sudah dipakai | EC2 | dari Better Auth | `USERNAME_IS_ALREADY_TAKEN` | "Username sudah dipakai" di kolom username |
-| Username tidak sah atau kosong di server | EC3 | dari Better Auth / hook | `INVALID_USERNAME`, `USERNAME_TOO_SHORT`, `USERNAME_REQUIRED` | pesan di kolom username |
+| Username tidak sah atau kosong di server | EC3 | dari Better Auth / hook | `INVALID_USERNAME`, `USERNAME_TOO_SHORT`, `AUTH_USERNAME_REQUIRED` | pesan di kolom username |
 | Login gagal | EC6 | dari Better Auth | `INVALID_EMAIL_OR_PASSWORD`, `INVALID_USERNAME_OR_PASSWORD` | satu teks yang sama (R8) |
 | Terlalu banyak percobaan | EC7 | HTTP 429 | n/a | banner "Terlalu banyak percobaan, coba lagi nanti" |
 | Tanpa sesi saat memanggil fungsi yang butuh sesi | EC9, EC19 | `unauthorized` | `AUTH_REQUIRED` | `beforeLoad` sudah mengalihkan; bila tetap terjadi, navigasi ke `/login` |
@@ -440,6 +442,10 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 
 | Date | Change | Reason | Re-approved by |
 |---|---|---|---|
+| 2026-11-08 | Section 2 (S3) dan 6: kode `USERNAME_REQUIRED` menjadi `AUTH_USERNAME_REQUIRED` | Temuan review T1 R1-15: kode milik fitur diberi prefiks (`error-handling.md`); kode bawaan Better Auth tetap | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
+| 2026-11-08 | Section 4: `sessions.updated_at` dan `accounts.updated_at` tanpa default (koreksi teks agar sesuai output CLI dan migration T1) | Temuan review T1 R1-12 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
+| 2026-11-08 | Section 7: loader `/status` memanggil `currentUserQueryOptions()` tanpa `staleTime: 'static'` (pengecualian dari `tanstack-query.md` rule 4 untuk query pengguna saat ini) | Temuan review T1 R1-4: `'static'` membuat status lama tampil dulu, melawan R21 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
+| 2026-11-08 | Section 3: `server/auth.ts` → `server/auth.repository.ts`; `server/auth.middleware.ts` → `server/session.functions.ts`; `server/auth-handler.ts` → `server/session.service.ts` | `check:gates` di T1: file di `server/` harus cocok dengan kategori boundary (`*.functions.ts`, `*.service.ts`, `*.repository.ts`, `*.rules.ts`, `*.listeners.ts`); perilaku dan public API tetap | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 2) |
 
 ## 15. Spec gate review
 
@@ -458,3 +464,5 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 | Round | Date | Reviewer | Verdict | Findings, or notes and their owner |
 |---|---|---|---|---|
 | 1 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "06-feature-spec auth: approve, jawaban section 15 sesuai rekomendasi. 07-tasks auth: approve with notes, jawaban sesuai rekomendasi, terapkan 3 catatan, T1 tetap satu" |
+| 2 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "06-feature-spec auth: setujui perubahan section 3 (auth.repository.ts, session.service.ts, session.functions.ts)". Menyetujui change log 2026-11-08 (nama file di section 3) |
+| 3 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "PR #1 approve. PR #2 approve with notes: rename ke AUTH_USERNAME_REQUIRED sebelum merge, tes Origin otomatis + ADR 0046 di T2, cek Cache-Control RPC di T2. Setujui koreksi spec section 4 dan 7.". Menyetujui change log 2026-11-08: section 4 (`updated_at`), section 7 (loader `/status`), dan kode `AUTH_USERNAME_REQUIRED` |

@@ -185,7 +185,7 @@ The skills apply, except where they say the following:
 | A `sendEmail` helper; Redis, `rateLimit.storage: "secondary-storage"`, `waitUntil` | No email provider or Redis in our stack: each needs an ADR. A Node container (ADR 0007): choose rate limit storage in the spec |
 | `disableCSRFCheck: false` in a sample; wildcard or computed `trustedOrigins` | Never set it, to any value (`better-auth.md`, rule 9). A short explicit list |
 | `ipAddressHeaders`, `trustedProxyHeaders`, and cookie cache `jwe` in the full sample | Only when the spec says why: the proxy is a deploy decision, and a cached session outlives its revocation until `maxAge` (**Inferred**) |
-| `useSession()` or `auth.api.getSession` wherever needed | The `features/auth` public API, and `shared/server/require-auth` in server functions (`better-auth.md`, rules 1 and 4) |
+| `useSession()` or `auth.api.getSession` wherever needed | The `features/auth` public API, and the middleware in `features/auth/server/session.functions.ts` in server functions (`better-auth.md`, rules 1 and 4; ADR 0041) |
 | `auth.api.requestPasswordReset` on the server | `authClient`, as for sign-in (`better-auth.md`) |
 | `console.log`, `auditLog`, `user.email`, and `throw new Error` in hooks; renaming auth tables | pino, with no private data (`logging.md`); errors per `error-handling.md`. A rename is a spec decision, and rule 5 still applies |
 | `auth init`, `auth upgrade`, `auth mcp`, and the `ai`, `login`, and `create-admin` commands | Not used by an agent. `generate` is the only one in our flow |

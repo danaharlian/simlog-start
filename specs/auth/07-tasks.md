@@ -16,7 +16,7 @@ Tasks gate digabung dengan Spec gate (`06-feature-spec.md`, header `Tasks gate`)
 
 | ID | Task (user-visible outcome) | Risk (and why) | Depends on | AC and NFR covered | Estimate | PR | Status |
 |---|---|---|---|---|---|---|---|
-| T1 | Akun yang dibuat lewat `/api/auth/sign-up/email` tersimpan di PostgreSQL, dan `/status` menampilkan "menunggu persetujuan" dari database | high: Better Auth 1.7.18 + Drizzle 1.0.0-rc.5 + `pg` + Start + Prisma Postgres belum pernah jalan bersama; edit ADR 0043; ADR 0044 | none | AC1 (sisi server), AC4, AC16 (pembacaan status segar) | | | todo |
+| T1 | Akun yang dibuat lewat `/api/auth/sign-up/email` tersimpan di PostgreSQL, dan `/status` menampilkan "menunggu persetujuan" dari database | high: Better Auth 1.7.18 + Drizzle 1.0.0-rc.5 + `pg` + Start + Prisma Postgres belum pernah jalan bersama; edit ADR 0043; ADR 0044 | none | AC1 (sisi server), AC4, AC16 (pembacaan status segar) | | [#2](https://github.com/danaharlian/simlog-start/pull/2) | in review |
 | T2 | Pengunjung bisa register dan login lewat form `login-04` dengan username atau email, logout dari `/status`, dan pengalihan tamu dan status berjalan | medium: satu kolom login dua endpoint; pesan error yang sama; rate limit; enumerasi | T1 | AC1 (UI), AC2, AC3, AC5, AC6 (dari `/status`), AC7, AC9, AC11, AC21, AC24, AC25, AC26, NFR1, NFR2, NFR5 | | | todo |
 | T3 | Pengguna aktif masuk ke dashboard `/` dengan sidebar `sidebar-07`; tanpa sesi ke `/login`, belum aktif ke `/status` | low: UI shell dan pengalihan; `resolveAccessRedirect` sudah ada | T2 | AC6 (dari dashboard), AC8, AC10 (untuk `/`), AC12 (role `user`) | | | todo |
 | T4 | Superadmin melihat daftar akun di `/users` dengan saringan status; pengguna biasa ditolak | medium: otorisasi pertama di server function; DTO tanpa kolom sensitif | T3 | AC10 (untuk `/users`), AC12 (menu superadmin), AC13, AC14, NFR3, NFR6 | | | todo |
@@ -50,7 +50,7 @@ Urutan mengikuti risiko, kecuali T5 dan T6 yang menunggu T4 karena aksinya ada d
   | `src/shared/errors/index.ts` | create |
   | `src/shared/server/logger.server.ts`, `with-error-boundary.ts` | create |
   | `src/features/auth/db/schema.ts`, `schemas.ts`, `errors.ts`, `queries.ts`, `index.ts`, `index.server.ts`, `README.md` | create |
-  | `src/features/auth/server/auth.ts`, `auth.middleware.ts`, `auth-handler.ts`, `accounts.repository.ts`, `accounts.service.ts`, `accounts.functions.ts` | create |
+  | `src/features/auth/server/auth.repository.ts`, `session.service.ts`, `session.functions.ts`, `accounts.repository.ts`, `accounts.service.ts`, `accounts.functions.ts` | create |
   | `src/features/auth/components/account-status-view.tsx` | create |
   | `src/routes/_status.tsx`, `src/routes/_status/status.tsx`, `src/routes/api/auth/$.ts` | create |
   | `src/routeTree.gen.ts` | generated |
@@ -63,7 +63,7 @@ Urutan mengikuti risiko, kecuali T5 dan T6 yang menunggu T4 karena aksinya ada d
     - output CLI dengan `usePlural` dan `generateId: "uuid"` bisa di-generate dan di-migrate (ADR 0043) → output `pnpm db:generate` dan `pnpm db:migrate:test` di PR; `sign-up.test.ts`: "id pengguna baru berbentuk uuid"
     - Better Auth menulis string ke kolom enum, dan `input: false` mengisi default (ADR 0038, 0043) → `sign-up.test.ts`: "akun baru berstatus pending dan berrole user"
     - `timestamptz` terbaca benar (ADR 0043) → `sign-up.test.ts`: "createdAt akun baru berada dalam satu menit dari waktu tes"
-    - bentuk `ctx.path` dan `ctx.body` di `hooks.before` (spec section 13) → `sign-up.test.ts`: "register tanpa username ditolak dengan USERNAME_REQUIRED"
+    - bentuk `ctx.path` dan `ctx.body` di `hooks.before` (spec section 13) → `sign-up.test.ts`: "register tanpa username ditolak dengan AUTH_USERNAME_REQUIRED"
     - validator username menolak `@`, dasar satu kolom login (`02-research.md` Q6, Inferred) → `sign-up.test.ts`: "username yang berisi @ ditolak INVALID_USERNAME"
     - `getSession` lewat `getRequestHeaders` membaca status segar karena cookie cache mati (D10) → `accounts.service.test.ts`: "getCurrentUserDto melihat status yang diubah langsung di database"
     - `test.env` Vitest berlaku sebelum `env.server.ts` dibaca (ADR 0044) → `env.test.ts`: "serverEnv.DATABASE_URL adalah TEST_DATABASE_URL"
@@ -139,7 +139,7 @@ Urutan mengikuti risiko, kecuali T5 dan T6 yang menunggu T4 karena aksinya ada d
   | `src/shared/ui/table.tsx`, `badge.tsx`, `select.tsx` | create (CLI) |
   | `shadcn-primitives.lock.json` | modify lewat `check-ui.mjs --accept <file>` (sama dengan T2) |
   | `src/features/auth/schemas.ts`, `errors.ts`, `queries.ts`, `index.ts`, `README.md` | modify |
-  | `src/features/auth/server/auth.middleware.ts`, `accounts.repository.ts`, `accounts.service.ts`, `accounts.functions.ts` | modify |
+  | `src/features/auth/server/session.functions.ts`, `session.service.ts`, `accounts.repository.ts`, `accounts.service.ts`, `accounts.functions.ts` | modify |
   | `src/features/auth/components/user-management-view.tsx`, `accounts-table.tsx` | create |
   | `src/routes/_app/users.tsx` | create |
   | `src/routes/_app.tsx` | modify |
@@ -244,6 +244,19 @@ T2 membuat `/login` dan `/register` bisa dibuka lewat URL, tanpa tautan. T3 meng
 | 2026-11-08 | T1: `.gitignore` masuk file list (`!.env.example`) | Catatan Gate review round 1: `.gitignore` baris 6 (`.env*`) mengabaikan `.env.example` (`git check-ignore`) |
 | 2026-11-08 | T2–T5: baris lock primitive dengan mekanisme `check-ui.mjs --accept <file>` | Catatan Gate review round 1: T3–T5 juga menambah primitive (`tailwind-shadcn.md`) |
 | 2026-11-08 | T1, T2, T4: `src/routeTree.gen.ts` sebagai file generated | Catatan Gate review round 1: ketiga task menambah route |
+| 2026-11-08 | T1: `src/routes/__root.tsx` masuk file list (modify: `createRootRouteWithContext` dengan `queryClient`) | Router context untuk `queryClient` (`tanstack-query.md`) didaftarkan di root route; tidak tercantum di layer breakdown spec |
+| 2026-11-08 | T1: `src/shared/errors/index.ts` dan `src/shared/db/errors.ts` pindah ke task yang pertama memakainya (T2 untuk `readPgError`, T4 untuk `Result`) | T1 tidak punya kegagalan yang diharapkan; membuatnya sekarang berarti kode tanpa pemakai |
+| 2026-11-08 | T1 dan T4: `auth.ts`, `auth.middleware.ts`, `auth-handler.ts` menjadi `auth.repository.ts`, `session.functions.ts`, `session.service.ts` | Perubahan section 3 spec, disetujui di Spec gate round 2 (`check:gates`) |
+| 2026-11-08 | T1: `@tanstack/react-query` dipasang `^5.106.1`, bukan 5.107.1 (spec section 2) | 5.107.1 masih di dalam `minimumReleaseAge` pnpm; pnpm menambah pengecualian sendiri di `pnpm-workspace.yaml`, dan pengecualian itu dibatalkan |
+| 2026-11-08 | T1: `docs/decisions/0041-auth-middleware-in-the-auth-feature.md` diubah (point 4 dan baris Amended) | Spec gate round 2 menyetujui nama file; review T1 R1-8 |
+| 2026-11-08 | T1: `src/shared/db/columns.ts` dihapus; dibuat oleh task pertama yang punya tabel non-auth | Review T1 R1-9: tanpa pemakai (YAGNI), sama dengan `shared/errors` |
+| 2026-11-08 | T1: tes baru `__tests__/session.service.test.ts` (jalur sesi, `/update-user`, `statusChangedAt`); tes AC16 di `accounts.service.test.ts` diganti nama; tes "akun baru berstatus pending dan berrole user" tergabung di tes AC1 | Review T1 R1-1, R1-6, R1-11 |
+| 2026-11-08 | T1: `vitest.config.ts` menyetel `TZ=Asia/Jakarta` untuk tes | Review T1 R1-14: bug timestamp tanpa zona hanya terlihat di luar UTC |
+| 2026-11-08 | T1: pemeriksaan Origin `/api/auth` (`better-auth.md` rule 9) dibuktikan dengan `curl` di dev server, bukan Vitest | Better Auth 1.7.18 melewati origin check saat `NODE_ENV=test`; review T1 R1-7 |
+| 2026-11-08 | T2: `advanced.disableOriginCheck: false` di `server/auth.repository.ts` (masuk file list T2) dan ADR 0046 yang meluruskan `better-auth.md` rule 9; tes otomatis tabel rule 9 (sign-up, sign-in, sign-out: Origin asing, `Origin: null`, cross-site navigation, same origin) di `sign-in.test.ts` | Catatan PR gate T1: Better Auth melewati origin check saat `NODE_ENV=test`, jadi tes Vitest tidak membuktikan rule 9 |
+| 2026-11-08 | T2: cek `Cache-Control: private, no-store` pada panggilan RPC server function dari client | Catatan PR gate T1: di T1 hanya respons SSR yang dicek (Inferred untuk RPC) |
+| 2026-11-08 | T1: kode `USERNAME_REQUIRED` menjadi `AUTH_USERNAME_REQUIRED` | Catatan PR gate T1 (R1-15) |
+| 2026-11-08 | T1: tes env di `src/shared/config/env.server.test.ts` (bukan `__tests__/` fitur) | Tes itu menguji modul `shared`, jadi diletakkan di sebelah kodenya (`folder-structure.md`, Naming: tests) |
 
 ## Gate review
 

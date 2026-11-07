@@ -11,7 +11,7 @@ Every variable the app or its tooling reads. Update this table in the same PR as
 | Variable | Required | Read by | Notes |
 |---|---|---|---|
 | `DATABASE_URL` | yes | `serverEnv` (`shared/db/client.ts`), `drizzle.config.ts` | PostgreSQL URL. The dev database locally; the staging or production database on the host |
-| `TEST_DATABASE_URL` | for integration tests and `db:migrate:test` | `drizzle.config.ts` with `DB_TARGET=test`; tests: decision AH | The test database only, never the dev or production one. Not in `serverEnv`: the app does not read it |
+| `TEST_DATABASE_URL` | for integration tests and `db:migrate:test` | `drizzle.config.ts` with `DB_TARGET=test`; `vitest.config.ts`, which copies it into `DATABASE_URL` for tests and refuses the dev URL (ADR 0044) | The test database only, never the dev or production one. Not in `serverEnv`: the app does not read it |
 | `DB_TARGET` | no | `drizzle.config.ts` | Unset, or `test`. Set by a script or the shell, never in `.env` |
 | `BETTER_AUTH_SECRET` | yes | `serverEnv` (Better Auth) | At least 32 characters (`better-auth.md`, rule 6) |
 | `BETTER_AUTH_URL` | yes | `serverEnv` (Better Auth) | The public origin (`http://localhost:3000` in dev) |
