@@ -28,7 +28,7 @@ You are the dispatcher, not a phase. You read the state, pick the next phase, ru
    | All present artifacts are `approved` or `done` | Start the first missing artifact the tier requires (table below). |
 
 6. **Check the prerequisite** in the status table (section 8) before you start. Not met: stop and report which artifact is blocking and why.
-7. **Tier M, phases 2 and 3.** Skip `02-research.md` only when the idea lists no unknown about the stack, a library, or data. Skip `03-prototype.md` (any tier) when no hypothesis is risky. Each reason goes into the PRD's `Research:` and `Prototype:` lines. When unsure, ask. Tier L never skips research or the architecture review.
+7. **Tier M, phases 2 and 3.** Skip `02-research.md` only when the idea lists no unknown about the stack, a library, or data; libraries not yet used together in `src/` are an unknown. Skip `03-prototype.md` (any tier) only when no trigger in `02-research.md` section 5 is hit, or a human decided to skip it. Each reason goes into the PRD's `Research:` and `Prototype:` lines. When unsure, ask. Tier L never skips research or the architecture review.
 8. **Run the phase skill**, then stop and report. You may chain phases only when **no gate or human decision sits between them**: in tier M, the PRD, the feature spec, then the task breakdown (all end at `in review`, one Spec gate); in any tier, the feature spec then the task breakdown when the spec says `Tasks gate: merged with this gate`. Nothing else.
 9. **Change request on an approved artifact.** Record it in that artifact's change log, set it back to `in review`, update the downstream artifacts in the same change, and stop at the gate again.
 

@@ -13,6 +13,7 @@
 Rules:
 - One task = one reviewable PR = a **vertical** cut (database to UI) that leaves `main` releasable. Never a task per layer ("all tables", "all functions"): a layer on its own proves nothing to a user.
 - Order by **risk, riskiest first** (the task that tests the biggest unknown goes first), unless a dependency forces another order (say why in "Depends on").
+- The first task proves, with one named test each, every assumption no code has proven yet: a finding labelled **Inferred** in `02-research.md` that the spec relies on, and a hypothesis from its section 5 that no prototype tested. List them in T1's "Tests written first" as `assumption → test name`. A false one stops the build; the spec changes first.
 - Size: target at most 400 changed lines, excluding generated files and migrations (`docs/03-standards/git-and-commits.md`). Bigger means split.
 - Each task lists the acceptance criteria it covers, including permission rules, the tests that prove them, and the files it may change. The file list covers everything the task's description asks for.
 - Dependencies are written once, in the overview table. No second diagram: two copies come to disagree.
@@ -71,6 +72,7 @@ Filled by the reviewer (`docs/01-workflow/sdlc-pipeline.md`, section 4). Every t
 |---|---|
 | Does every in-scope PRD item, spec row, and AC land in a task? | |
 | Is each task a vertical cut with a user-visible outcome, riskiest first? | |
+| Does T1 name a test for each assumption no code has proven yet (Inferred research findings the spec relies on, untested section 5 hypotheses)? | |
 | Does each file list cover its task's description? | |
 | Does each task with a permission rule name it in its tests and "Done when"? | |
 | Is every public export promised upstream delivered by a named task? | |

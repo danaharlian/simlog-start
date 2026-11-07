@@ -42,6 +42,16 @@ Use `docs/templates/adr.md`. Number sequentially `NNNN-title.md`. Status: `propo
 - [0034 Lint for size limits and magic numbers, named principles, and an installer split by stage](0034-size-limits-magic-numbers-installer-split.md)
 - [0035 Fresh cross-feature queries after a mutation](0035-cross-feature-query-freshness.md)
 - [0036 Format and lint each file an agent edits](0036-format-and-lint-hook.md)
+- [0037 Prototype triggers and a first task that proves open assumptions](0037-prototype-triggers.md)
+- [0038 Account status and the superadmin role without the Better Auth admin plugin](0038-auth-account-status-and-roles.md)
+- [0039 Better Auth username plugin](0039-better-auth-username-plugin.md)
+- [0040 Better Auth schema on Drizzle 1.0 RC: tables without relations](0040-better-auth-schema-on-drizzle-v1.md)
+- [0041 Auth middleware lives in the auth feature](0041-auth-middleware-in-the-auth-feature.md)
+- [0042 Seed runner: tsx (closes open decision AB)](0042-seed-runner.md)
+- [0043 Better Auth tables follow the database conventions](0043-better-auth-tables-follow-database-conventions.md)
+- [0044 Integration tests reach the test database through the Vitest config (closes open decision AH)](0044-integration-tests-reach-the-test-database.md)
+- [0045 Add @tanstack/react-router-ssr-query](0045-router-ssr-query-integration.md)
+
 
 ## Resolved
 
@@ -118,6 +128,8 @@ Scaffold: `pnpm dlx shadcn@latest init -t start` (checked 2026-10-15 in the shad
 | Display locale and time zone | **`id-ID` and `Asia/Jakarta`, through `shared/lib/format.ts` only; stored instants stay UTC** | owner decision; ADR 0032 |
 | Env files and databases | **One file, `.env`; a separate database per environment, test included; `drizzle.config.ts` loads `.env` with `process.loadEnvFile` and picks the test database with `DB_TARGET=test`** | owner approval; ADR 0033 |
 | Cross-feature query freshness | **A query that joins another feature's data declares `meta.dependsOn` with the owner's scope; mutation hooks invalidate with `invalidateFeature` from `shared/lib/query-scope.ts`, only when `data.ok`** | owner approval; ADR 0035 |
+| Test database access (AH) | **`vitest.config.ts` sets `test.env.DATABASE_URL` from `TEST_DATABASE_URL` and refuses the dev URL** | owner decision; ADR 0044 |
+| Seed runner (AB) | **`tsx` as a dev dependency, script `db:seed`** | owner decision; ADR 0042 |
 | Agents and `.env` | **The installer merges `Read` deny rules for `.env` and its local and mode variants into `.claude/settings.json`; `.env.example` stays readable** | owner approval; ADR 0033 |
 
 ## Open decisions
@@ -126,9 +138,7 @@ Scaffold: `pnpm dlx shadcn@latest init -t start` (checked 2026-10-15 in the shad
 |---|---|---|---|
 | S | Placement and naming of adapters for external services (email, payments, storage) | needs a `boundaries/files` category so layer rules apply | `design-principles.md` |
 | X | Performance budgets and how to measure them | Page load, API latency, bundle size: default targets and tooling. The owner's QA template has rows for them; no tooling is installed | `testing.md`, `templates/qa.md` |
-| AB | Seed runner | A TypeScript seed needs a runner with alias support; `tsx` would need an ADR | ADR 0014, `database.md` |
 | AC | Content Security Policy for a real app | A nonce setup works on a bare page; allowed style, font, and image sources, and component-library inline styles, are not checked | ADR 0015, `tanstack-start.md` |
 | AE | A check for a missing later artifact | Warn when a feature stops before `12-measure.md`; needs a rule for features paused on purpose | ADR 0016 |
 | AG | What one stored minor unit of IDR is, and `formatMoney` | `Intl` shows IDR with 0 fraction digits; `typescript.md` rule 13 asks for integer minor units. Decide with the first money column | ADR 0032, `components.md` |
-| AH | How a test reaches the test database | Lint rejects `process.env` under `src/`, and `serverEnv` reads `DATABASE_URL`. Options: Vitest's `test.env` set from `TEST_DATABASE_URL` in the config, a test-only env module, or a test script that sets `DATABASE_URL`. None verified on Vitest 5 | ADR 0033, `environment.md`, `testing.md` |
 | AD | Env check before the container takes traffic | A request middleware fails at the first request; a startup check depends on the hosting setup (F) | ADR 0015, `environment.md` |

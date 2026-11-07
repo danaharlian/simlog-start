@@ -13,7 +13,7 @@ Pipeline phase 2. Input: `specs/<slug>/01-idea.md`. Output: `specs/<slug>/02-res
 2. For every library the feature would use, read `package.json` and the lockfile for the **installed version** (never memory), then follow skill `verify-library-docs`. Fill the libraries table, including whether the installed `.d.ts` marks an API `@deprecated`.
 3. A library that is not installed, or a feature marked alpha, beta, or RC, is an ADR need and a stop-and-ask item. Record it; do not work around it.
 4. Where more than one approach is viable, list options with evidence and pros and cons, and state a leaning. Do not choose; the architecture review (tier M: the feature spec) does.
-5. Name the riskiest hypothesis the docs cannot settle, if any, in section 5. It goes to skill `write-prototype`; do not build it here.
+5. Answer every prototype trigger in section 5 (P1 to P4) with yes or no and its evidence. For P1, search `src/` for a file that already uses the libraries together; none found is a yes. Unsure is a yes. Write one hypothesis per yes. They go to skill `write-prototype`; do not build them here.
 6. Re-check the tier: any new L trigger goes back to the human.
 7. In the libraries table, fill the Context7 ID column when you used Context7 (resolve it once; later phases reuse it). Every finding has a source URL (or installed type), a level, and a label. No source, no claim. Fill "Docs consulted" so it can be copied into PRs.
 8. End with what the PRD must take into account, and the **decisions later phases must make**.

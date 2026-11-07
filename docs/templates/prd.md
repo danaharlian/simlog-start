@@ -3,7 +3,7 @@
 - Slug: `<feature-slug>` (folder `specs/<feature-slug>/`, file `04-prd.md`)
 - Idea: `01-idea.md` (decision: proceed)
 - Research: `02-research.md` | skipped: <reason; tier M only, when there are no unknowns>
-- Prototype: `03-prototype.md` | skipped: <reason: no risky hypothesis>
+- Prototype: `03-prototype.md` | skipped: <the triggers in `02-research.md` section 5 were checked and none is hit; or who decided to skip a hit trigger, and when>
 - Status: draft | in review | approved | dropped
 - Gate: PRD gate | Spec gate (tier M: approved together with the feature spec)
 - Tier: S | M | L (from `01-idea.md`)

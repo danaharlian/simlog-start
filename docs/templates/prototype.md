@@ -9,7 +9,7 @@
 - Seen by: <product owner or the person who must judge it>, <date>
 - Date: YYYY-MM-DD
 
-Run this phase only for a risky hypothesis: something research could not settle, or a flow nobody can judge from text. Otherwise skip it and say why in the PRD's `Prototype:` line. Tier M minimum: sections 1, 2, 3. Write "n/a" in the rest.
+Run this phase when a trigger in `02-research.md` section 5 is hit (unsure counts as hit). Otherwise skip it and say why in the PRD's `Prototype:` line. Tier M minimum: sections 1, 2, 3. Write "n/a" in the rest.
 
 The code is throwaway. It is never merged; phase 8 rewrites what is needed, to the standards. The prototype informs the PRD and does not decide it.
 
