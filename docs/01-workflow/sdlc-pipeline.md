@@ -11,8 +11,8 @@ Weight follows **size and risk**. State the tier in the `Tier:` line of `01-idea
 | Tier | When | Phases run |
 |---|---|---|
 | **S** | Bug fix with an obvious test, copy or small UI tweak, dependency patch bump with green CI, a refactor inside one feature that changes no behavior (skill `refactor`), a small config change (never a gate file; a new env var also goes in `.env.example` and the secret stores). **No trigger below.** | Issue with acceptance criteria (`templates/issue.md`) → 8 (one PR) → 9 (relevant tests, light) → 10 (normal deploy). 11 only if the agent was corrected. |
-| **M** | New behavior inside **one** feature, or any S-sized change that hits a risk trigger. | 1 (short) → 2 if there are unknowns → 3 if a hypothesis is risky → 4 (short) → 6 (short) → 7 → **Spec gate** (covers 4, 6, and 7) → 8 → 9 → 10 → 11 (brief) → 12 |
-| **L** | Any L trigger below. | All phases except 3 when no hypothesis is risky. Each gate separately, ADRs, rehearsed rollback. |
+| **M** | New behavior inside **one** feature, or any S-sized change that hits a risk trigger. | 1 (short) → 2 if there are unknowns → 3 if a prototype trigger is hit → 4 (short) → 6 (short) → 7 → **Spec gate** (covers 4, 6, and 7) → 8 → 9 → 10 → 11 (brief) → 12 |
+| **L** | Any L trigger below. | All phases except 3 when no prototype trigger is hit. Each gate separately, ADRs, rehearsed rollback. |
 
 **Risk triggers** (any one raises S to at least M, with a human reviewing that risk area): auth, permissions, sessions; personal or payment data; a migration or backfill; a new dependency; a change to a contract other code relies on; a performance-sensitive path; an operation that cannot be undone.
 
@@ -23,8 +23,8 @@ Weight follows **size and risk**. State the tier in the `Tier:` line of `01-idea
 | # | Phase | Output (`specs/<slug>/`) | Driver | Gate |
 |---|---|---|---|---|
 | 1 | Idea | `01-idea.md` from `templates/idea.md`: the **problem** (not the solution), who has it and the evidence, short discovery notes, tier and triggers, the decision to go on | Human + agent | |
-| 2 | Research | `02-research.md` from `templates/research.md`: unknowns answered with sources, library table with versions, options with evidence, whether a prototype is needed, tier re-check, what the PRD must take into account | Agent | |
-| 3 | Prototype | `03-prototype.md` from `templates/prototype.md`, only for a risky hypothesis: a throwaway `spike/<slug>` branch, the result with evidence, and for UI the flow and layout a product owner has seen | Agent + human | |
+| 2 | Research | `02-research.md` from `templates/research.md`: unknowns answered with sources, library table with versions, options with evidence, the prototype triggers answered, tier re-check, what the PRD must take into account | Agent | |
+| 3 | Prototype | `03-prototype.md` from `templates/prototype.md`, only when a prototype trigger in research section 5 is hit: a throwaway `spike/<slug>` branch, the result with evidence, and for UI the flow and layout a product owner has seen | Agent + human | |
 | 4 | PRD | `04-prd.md` from `templates/prd.md` (skill `write-prd`): stories, functional and non-functional requirements, permissions and data, edge cases, success metric with baseline, target, window and owner, release and rollback expectations, **acceptance criteria as Given/When/Then** | Agent | **PRD gate** |
 | 5 | Architecture Review | `05-architecture-review.md` from `templates/architecture-review.md`, tier L: ownership and boundary, public API, cross-feature calls and events, data impact, security, ADRs | Agent | **Architecture gate** |
 | 6 | Feature Spec | `06-feature-spec.md` from `templates/feature-spec.md`: layer breakdown (files per layer), data model with indexes, contracts, schemas, errors, queries and cache, test strategy mapped to the acceptance criteria, rollout and rollback plan | Agent | **Spec gate** |
@@ -40,9 +40,9 @@ Each phase has a skill (map in `docs/05-agent-tooling/skills.md`); skill `run-pi
 ```mermaid
 flowchart TD
   I1["1 Idea"] --> R2["2 Research"]
-  R2 --> X3["3 Prototype, if a hypothesis is risky"]
+  R2 --> X3["3 Prototype, if a trigger is hit"]
   X3 --> P4["4 PRD"]
-  R2 -. "no risky hypothesis" .-> P4
+  R2 -. "no trigger hit" .-> P4
   P4 --> G1{{"PRD gate"}}
   G1 --> A5["5 Architecture Review"]
   A5 --> G2{{"Architecture gate"}}
@@ -70,6 +70,8 @@ flowchart TD
 ```
 
 Tier S takes the dotted path from the issue. Tier M has no Architecture gate and no separate PRD or Tasks gate: PRD, feature spec, and task breakdown are approved together at the Spec gate. Tier L runs every box; only the prototype is conditional.
+
+**What runs code before phase 8.** Phases 1, 2, 4, 5, 6, and 7 are documents; only the prototype runs code. Research checks each API alone and cannot show that the parts work together, so the prototype decision is a checklist, not a judgement (research section 5, rule 2). An assumption that still has no running proof is tested first in phase 8, by task 1 (rule 5).
 
 **Research comes first, and it is not the last check.** It answers what the PRD needs to be realistic. A question the PRD raises later is added to `02-research.md` as a dated row, and the file stays `done`. Exact library APIs are still verified in the feature spec (section 13) and at each call (rule zero).
 
@@ -135,10 +137,10 @@ An agent never approves its own work, and never sets `approved` without an expli
 ## 5. Rules
 
 1. **Research (2)** answers unknowns; it does not design (later phases decide). It records every source with URL and version. No source, no claim. If it finds a new L trigger, the tier is updated in `01-idea.md`, and in every artifact's `Tier:` line, and re-confirmed first.
-2. **Prototype (3)** is throwaway and tests one hypothesis. Do not merge its code; rewrite it in phase 8 to the standards. When it is skipped, the PRD's `Prototype:` line says why. It must not decide the PRD: if it is the only reason for a requirement, say so in the PRD.
+2. **Prototype (3)** runs when a trigger in research section 5 is hit: libraries not yet used together in `src/`, a design-bearing finding labelled Inferred or Unknown, a time or volume expectation no code meets yet, or a flow nobody has seen. Unsure counts as hit, as with the tier. Only a human skips a hit trigger. It is throwaway and tests one hypothesis. Do not merge its code; rewrite it in phase 8 to the standards. When it is skipped, the PRD's `Prototype:` line says why. It must not decide the PRD: if it is the only reason for a requirement, say so in the PRD.
 3. **Architecture Review (5)** checks which feature owns the change, new public APIs, new tables, cross-feature calls, new dependencies (each needs an ADR), and security, against the approved PRD.
 4. **Feature Spec (6)** carries every in-scope PRD item and every Architecture Review decision, or removes it through a change log. It says how every acceptance criterion will be tested and states authorization per function.
-5. **Task Breakdown (7)** tasks are small enough for one reviewable PR, each with a verifiable outcome, the tests that prove it, a file list that covers its description, and the acceptance criteria it covers, including permission rules. Order by risk, not by layer. Dependencies are written once, in the overview table.
+5. **Task Breakdown (7)** tasks are small enough for one reviewable PR, each with a verifiable outcome, the tests that prove it, a file list that covers its description, and the acceptance criteria it covers, including permission rules. Order by risk, not by layer. The first task also proves, with a named test, each Inferred research finding the spec relies on and each section 5 hypothesis no prototype tested. Dependencies are written once, in the overview table.
 6. **Release (10)** states: migration order (additive changes first; destructive ones in a later release), env vars present in staging and production, smoke test, and how to roll back (and whether the migration can be). Platform-specific steps wait until the deploy platform is documented (the runtime is decided: Node in a container, ADR 0007); do not invent commands.
 7. **Learn (11)** is how the rules improve, and it runs right after the release so a mistake does not repeat while a measurement window runs. A repeated agent mistake MUST end as a change to a doc, skill, lint rule, or test, not just a chat correction. Closing out also removes temporary flags and spike branches, files tech-debt tickets, and re-checks that docs match what shipped (the checklist is in `templates/learnings.md`).
 8. **Measure (12)** compares the metric from the PRD to its target in its window, and closes the feature. If it cannot be measured (no analytics yet), record **Unknown** and open a follow-up. Never claim success without data. The tooling is not decided.

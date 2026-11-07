@@ -9,7 +9,7 @@
 - Author: <human, or "AI agent">
 - Date: YYYY-MM-DD
 
-Tier M minimum: Summary, Questions investigated, Libraries and tools, Recommendation (write "n/a" in the rest). Tier L: all sections.
+Tier M minimum: Summary, Questions investigated, Libraries and tools, Is a prototype needed?, Recommendation (write "n/a" in the rest). Tier L: all sections.
 
 This phase **finds out facts and answers unknowns**; it does not make the design. Decisions (modules, data model, contracts, security rules, UI structure) belong to the architecture review and the feature spec, which read this file. Do not write a design here and then again later.
 
@@ -41,7 +41,18 @@ Present evidence, not a decision. The architecture review (tier M: the feature s
 Leaning: <option> because <reason from the evidence>, or "no preference".
 
 ## 5. Is a prototype needed?
-Docs cannot settle every question. Name the riskiest one left, if any: **Hypothesis:** <one sentence that can turn out false> · **Why docs do not settle it:** <…> · **Who must judge it:** <…>. Next phase: `03-prototype.md` (`docs/templates/prototype.md`). None: write "none", and the PRD's `Prototype:` line carries the reason.
+Docs check one API at a time; they cannot show that the parts work together. Answer every trigger with yes or no and the evidence. **One yes means a prototype. Unsure counts as yes.**
+
+| # | Trigger | Hit? (yes · no) | Evidence |
+|---|---|---|---|
+| P1 | Two or more libraries this feature needs are not yet used together in `src/` (example: a Better Auth session read in a server function that runs a Drizzle transaction) | | <the file that already combines them, or "no file found"> |
+| P2 | A finding in section 2 or 3 that the design will rest on is labelled **Inferred** or **Unknown** | | <row numbers> |
+| P3 | The idea states a time or volume expectation (rows, users, file size) that no code in `src/` is known to meet at that load | | <the expectation and its source> |
+| P4 | A user flow or layout that a person must judge and has not seen | | <who must judge it> |
+
+Per yes, one hypothesis: **Trigger:** <P1 to P4> · **Hypothesis:** <one sentence that can turn out false> · **Why docs do not settle it:** <…> · **Who must judge it:** <…>. Next phase: `03-prototype.md` (`docs/templates/prototype.md`). It tests the riskiest; a hypothesis it does not test is proven by the first task instead (`docs/templates/tasks.md`).
+
+Every answer no: the PRD's `Prototype:` line says so. Skipping a prototype when a trigger is hit is a human decision, recorded in that line with the name and date.
 
 ## 6. Impact on tier and scope
 - New risk or L triggers found (from `docs/01-workflow/sdlc-pipeline.md`): <list, or "none">. If any: tier changes to <S|M|L>, a human confirms.

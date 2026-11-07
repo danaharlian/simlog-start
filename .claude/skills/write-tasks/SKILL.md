@@ -9,7 +9,7 @@ Pipeline phase 7. Input: `06-feature-spec.md`. Output: `specs/<slug>/07-tasks.md
 
 ## Steps
 
-1. List the spec's riskiest unknown first. The first task is the thinnest **end-to-end** path (database to UI) through it, not "the schema".
+1. List the spec's riskiest unknown first. The first task is the thinnest **end-to-end** path (database to UI) through it, not "the schema". It also proves, with one named test each, every assumption no code has proven yet: a finding labelled **Inferred** in `02-research.md` that the spec relies on, and a section 5 hypothesis no prototype tested. If one turns out false, the build stops and the spec changes first (step 9).
 2. Cut vertical tasks: each leaves `main` releasable, covers named AC and NFR ids, and fits one reviewable PR (target 400 changed lines, excluding generated files and migrations). Never a task per layer.
 3. Fill the overview table (outcome, risk and why, dependencies, AC and NFR covered). Order by risk unless a dependency forces otherwise; say why. Dependencies live only here: no second diagram.
 4. Per task, write the detail block: spec rows delivered, **files this task may change** (from the layer breakdown, covering everything the description asks for), tests written first (AC → test name, including each permission rule), what to read first, migration, env and ADR, public API or events added, and the "done when" line.

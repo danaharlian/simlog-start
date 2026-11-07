@@ -1,15 +1,15 @@
 ---
 name: write-prototype
-description: Test one risky hypothesis on a throwaway branch and record the result (pipeline phase 3), including the flow and layout a product owner can judge for a UI. Use when research names a hypothesis it could not settle, or when asked to prototype or spike. Produces 03-prototype.md. The code is never merged.
+description: Test one risky hypothesis on a throwaway branch and record the result (pipeline phase 3), including the flow and layout a product owner can judge for a UI. Use when a trigger in research section 5 is hit, or when asked to prototype or spike. Produces 03-prototype.md. The code is never merged.
 ---
 
 # Write the prototype
 
-Pipeline phase 3. Input: `specs/<slug>/02-research.md`, section 5. Output: `specs/<slug>/03-prototype.md` from `docs/templates/prototype.md`. No risky hypothesis: skip this phase and put the reason in the PRD's `Prototype:` line.
+Pipeline phase 3. Input: `specs/<slug>/02-research.md`, section 5. Output: `specs/<slug>/03-prototype.md` from `docs/templates/prototype.md`. No trigger hit: skip this phase and put the reason in the PRD's `Prototype:` line. A trigger is hit and someone wants to skip: that is a human decision, recorded in the same line.
 
 ## Steps
 
-1. Write one hypothesis that can turn out false, and what changes if it does. More than one: ask which is riskiest.
+1. Write one hypothesis that can turn out false, and what changes if it does. More than one: ask which is riskiest. The others are proven by the first task (skill `write-tasks`, step 1).
 2. Agree a time-box with the human before building.
 3. Build on `spike/<slug>`, only what tests the hypothesis. Say what is faked. Rule zero still applies: verify library calls (`verify-library-docs`).
 4. Record the result with evidence: command output, a measurement, or what a named person did with it. A result that disproves the hypothesis is a good result.
