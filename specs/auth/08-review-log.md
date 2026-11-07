@@ -10,7 +10,7 @@
 ## T1: Register tersimpan di PostgreSQL dan `/status` membaca status dari database
 
 ### Round 1: 2026-11-08
-- **PR:** https://github.com/danaharlian/simlog-start/compare/docs/auth-planning...feat/auth-t1 (PR belum dibuka; `gh` tidak terpasang) · **Commit reviewed:** `b201d5f`
+- **PR:** https://github.com/danaharlian/simlog-start/pull/2 (stacked on #1) · **Commit reviewed:** `b201d5f`
 - **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, 2026-11-08 · human review: pending (Dana Harliansyah)
 - **Verdict:** request changes (subagent)
 
