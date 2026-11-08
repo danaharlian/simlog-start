@@ -34,7 +34,11 @@ Better Auth hardening (ADR 0046): `disableOriginCheck: false`, `formCsrfMiddlewa
 
 ## Seed
 
-`pnpm db:seed` (ADR 0042) creates the dev superadmin from `SEED_SUPERADMIN_*` and one sample account per status: `contoh_menunggu`, `contoh_aktif`, `contoh_ditolak`, `contoh_nonaktif` (emails `contoh.menunggu@simlog.test`, `contoh.aktif@simlog.test`, and so on). The sample accounts use the superadmin's password, so no password is written in code. The seed refuses before writing when `NODE_ENV` is `production` or `SEED_ALLOW` is not `true`. A run twice keeps every existing account as it is.
+`SEED_ALLOW=true pnpm db:seed` (ADR 0042) creates the dev superadmin from `SEED_SUPERADMIN_*` and one sample account per status: `contoh_menunggu`, `contoh_aktif`, `contoh_ditolak`, `contoh_nonaktif` (emails `contoh.menunggu@simlog.test`, `contoh.aktif@simlog.test`, and so on), all with `SEED_SAMPLE_PASSWORD`.
+
+- **Refuses before writing** when `NODE_ENV` is `production`, when `DATABASE_URL` is set in the shell (only the `.env` database is seeded), or when `SEED_ALLOW` is not `true` on the command line. A `SEED_ALLOW` in `.env` is ignored.
+- **Run twice:** every existing account is kept as it is, and the output shows its stored status. Two runs at the same time create no duplicate, but the second may stop with `superadmin_not_active` while the first is still activating the superadmin; run it again.
+- **Interrupted run:** if a run stops between creating the superadmin and activating it, the account stays `pending` and every later run stops with `superadmin_not_active`. The seed never promotes an account it did not just create, so delete that account in the dev database and run again. A sample whose status is wrong is shown as such in the output; change it on `/users`.
 
 ## Owned tables
 

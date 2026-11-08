@@ -1,3 +1,4 @@
+import { isAPIError } from "better-auth/api"
 import { z } from "zod"
 import { db } from "@/shared/db/client"
 import { err, ok } from "@/shared/errors"
@@ -5,6 +6,7 @@ import type { Result } from "@/shared/errors"
 import { passwordSchema, usernameSchema } from "@/features/auth/schemas"
 import type { AccountStatus, StatusTarget } from "@/features/auth/schemas"
 import {
+  findAccountAccess,
   findAccountIdByEmail,
   updateAccountRole,
   updateAccountStatus,
@@ -16,29 +18,51 @@ import {
 import type { ActiveSuperadmin } from "@/features/auth/server/accounts.service"
 import { auth } from "@/features/auth/server/auth.repository"
 
-// Dev seed (PRD R24, R25; spec section 1, "Seed"). It receives the environment as a plain record
-// from scripts/seed.ts and reads nothing else (environment.md, rules 1 and 3).
+// Dev seed (PRD R24, R25; spec section 1, "Seed"). scripts/seed.ts hands it the environment as
+// plain records; it reads nothing else (environment.md, rules 1 and 3).
+
+type SeedEnv = Readonly<Record<string, string | undefined>>
+
+export type SeedInput = {
+  // The environment after .env is loaded.
+  readonly env: SeedEnv
+  // The shell's own variables, read before .env is loaded (review T7 B1).
+  readonly shell: SeedEnv
+  // Test seam: makes the sample identities unique on the shared test database (review T7 S1).
+  readonly sampleTag?: string
+}
 
 export type SeedOutcome = "created" | "existing"
 
 export type SeedReport = {
   readonly superadmin: SeedOutcome
-  readonly samples: Readonly<Record<AccountStatus, SeedOutcome>>
+  // An existing sample is kept as it is, so the report shows its stored status (review T7 S3).
+  readonly samples: Readonly<
+    Record<
+      AccountStatus,
+      { readonly outcome: SeedOutcome; readonly status: AccountStatus }
+    >
+  >
 }
 
 export type SeedRefusal = {
   readonly reason:
-    "production" | "not_allowed" | "invalid_config" | "superadmin_not_active"
+    | "production"
+    | "shell_database_url"
+    | "not_allowed"
+    | "invalid_config"
+    | "sign_up_refused"
+    | "superadmin_not_active"
   readonly detail: string
 }
-
-type SeedEnv = Readonly<Record<string, string | undefined>>
 
 const seedConfigSchema = z.object({
   SEED_SUPERADMIN_NAME: z.string().trim().min(1),
   SEED_SUPERADMIN_USERNAME: usernameSchema,
   SEED_SUPERADMIN_EMAIL: z.email(),
   SEED_SUPERADMIN_PASSWORD: passwordSchema,
+  // Its own password, so a sample login never reveals the superadmin's (T7 PR gate).
+  SEED_SAMPLE_PASSWORD: passwordSchema,
 })
 type SeedConfig = z.infer<typeof seedConfigSchema>
 
@@ -65,22 +89,30 @@ const SAMPLES: Readonly<Record<AccountStatus, SampleAccount>> = {
   },
 }
 
-const sampleEmail = (status: AccountStatus) =>
-  `${SAMPLES[status].username.replace("_", ".")}@simlog.test`
-
-export const SEED_SAMPLE_EMAILS: Readonly<Record<AccountStatus, string>> = {
-  pending: sampleEmail("pending"),
-  active: sampleEmail("active"),
-  rejected: sampleEmail("rejected"),
-  inactive: sampleEmail("inactive"),
+export function sampleIdentity(status: AccountStatus, tag = "") {
+  const username = `${SAMPLES[status].username}${tag}`
+  return { username, email: `${username.replace("_", ".")}@simlog.test` }
 }
 
-// R25, EC20: the decision comes before any parsing or writing.
-function guardRefusal(env: SeedEnv): SeedRefusal | undefined {
-  if (env.NODE_ENV === "production")
+// R25, EC20: decided before any parsing or writing. Tool code outside the app, so it reads
+// NODE_ENV from the record it is handed (environment.md, rule 6 exception).
+function guardRefusal(input: SeedInput): SeedRefusal | undefined {
+  if (input.env.NODE_ENV === "production")
     return { reason: "production", detail: "NODE_ENV is production" }
-  if (env.SEED_ALLOW !== "true")
-    return { reason: "not_allowed", detail: 'SEED_ALLOW must be "true"' }
+  // The production migration runs with the URL in the shell (environment.md), so a shell URL is
+  // never seeded: only the database in .env is.
+  if (input.shell.DATABASE_URL !== undefined)
+    return {
+      reason: "shell_database_url",
+      detail:
+        "DATABASE_URL is set in the shell; the seed writes only to the database in .env",
+    }
+  if (input.shell.SEED_ALLOW !== "true")
+    return {
+      reason: "not_allowed",
+      detail:
+        "run SEED_ALLOW=true pnpm db:seed; a SEED_ALLOW in .env is ignored",
+    }
   return undefined
 }
 
@@ -91,59 +123,77 @@ type NewAccount = {
   readonly password: string
 }
 
+type CreatedOrFound = { readonly id: string; readonly outcome: SeedOutcome }
+
 // Better Auth hashes the password and normalizes the username (02-research.md, option 4b A).
-// The unique email decides whether the account is new, not a read before the write
-// (drizzle-concurrency.md): an account from an earlier or a parallel run is kept as it is.
+// Race: two seed runs → the unique email index (users_email_key) decides and the loser looks the
+// account up; no read decides the write (spec section 4, drizzle-concurrency.md).
+// Relies on sign-up throwing for a taken email, which holds while requireEmailVerification is off
+// and autoSignIn is not false (better-auth 1.7.18, sign-up.mjs; review T7 N1).
 async function createOrFind(
   account: NewAccount
-): Promise<{ readonly id: string; readonly outcome: SeedOutcome }> {
+): Promise<Result<CreatedOrFound, SeedRefusal>> {
   try {
     const { user } = await auth.api.signUpEmail({ body: account })
-    return { id: user.id, outcome: "created" }
+    return ok({ id: user.id, outcome: "created" })
   } catch (cause) {
     const id = await findAccountIdByEmail(db, account.email)
-    if (id === undefined) throw cause
-    return { id, outcome: "existing" }
+    if (id !== undefined) return ok({ id, outcome: "existing" })
+    // Another email holds the username, for example. Better Auth's message holds no account data.
+    if (isAPIError(cause))
+      return err({
+        reason: "sign_up_refused",
+        detail: `@${account.username}: ${cause.message}`,
+      })
+    throw cause
   }
 }
 
 // The first superadmin has no one to activate it, so the seed writes its status and role directly.
-async function ensureSuperadmin(config: SeedConfig) {
+async function ensureSuperadmin(
+  config: SeedConfig
+): Promise<Result<CreatedOrFound, SeedRefusal>> {
   const account = await createOrFind({
     name: config.SEED_SUPERADMIN_NAME,
     username: config.SEED_SUPERADMIN_USERNAME,
     email: config.SEED_SUPERADMIN_EMAIL,
     password: config.SEED_SUPERADMIN_PASSWORD,
   })
-  if (account.outcome === "created")
+  if (account.ok && account.data.outcome === "created")
     await db.transaction(async (tx) => {
       await updateAccountStatus(tx, {
-        id: account.id,
+        id: account.data.id,
         status: "active",
         changedAt: new Date(),
       })
-      await updateAccountRole(tx, { id: account.id, role: "superadmin" })
+      await updateAccountRole(tx, { id: account.data.id, role: "superadmin" })
     })
   return account
 }
 
+type SampleResult = Result<SeedReport["samples"][AccountStatus], SeedRefusal>
+
 async function seedSample(
   actor: ActiveSuperadmin,
   status: AccountStatus,
-  password: string
-): Promise<SeedOutcome> {
+  config: SeedConfig,
+  tag: string | undefined
+): Promise<SampleResult> {
   const sample = SAMPLES[status]
   const account = await createOrFind({
     name: sample.name,
-    username: sample.username,
-    email: SEED_SAMPLE_EMAILS[status],
-    password,
+    ...sampleIdentity(status, tag),
+    password: config.SEED_SAMPLE_PASSWORD,
   })
-  if (account.outcome === "existing") return "existing"
+  if (!account.ok) return account
+  if (account.data.outcome === "existing") {
+    const stored = await findAccountAccess(db, account.data.id)
+    return ok({ outcome: "existing", status: stored?.status ?? status })
+  }
   let current: AccountStatus = "pending"
   for (const next of sample.path) {
     const result = await changeAccountStatus(actor, {
-      userId: account.id,
+      userId: account.data.id,
       expectedStatus: current,
       nextStatus: next,
     })
@@ -151,40 +201,55 @@ async function seedSample(
       throw new Error(`seed: ${status} sample: ${result.error.code}`)
     current = next
   }
-  return "created"
+  return ok({ outcome: "created", status: current })
 }
 
-// Sample accounts share the superadmin's password from the environment, so no password is
-// written in code (R24).
+async function seedSamples(
+  actor: ActiveSuperadmin,
+  config: SeedConfig,
+  tag: string | undefined
+): Promise<Result<SeedReport["samples"], SeedRefusal>> {
+  const pending = await seedSample(actor, "pending", config, tag)
+  if (!pending.ok) return pending
+  const active = await seedSample(actor, "active", config, tag)
+  if (!active.ok) return active
+  const rejected = await seedSample(actor, "rejected", config, tag)
+  if (!rejected.ok) return rejected
+  const inactive = await seedSample(actor, "inactive", config, tag)
+  if (!inactive.ok) return inactive
+  return ok({
+    pending: pending.data,
+    active: active.data,
+    rejected: rejected.data,
+    inactive: inactive.data,
+  })
+}
+
 export async function seedAccounts(
-  env: SeedEnv
+  input: SeedInput
 ): Promise<Result<SeedReport, SeedRefusal>> {
-  const refusal = guardRefusal(env)
+  const refusal = guardRefusal(input)
   if (refusal !== undefined) return err(refusal)
-  const config = seedConfigSchema.safeParse(env)
+  const config = seedConfigSchema.safeParse(input.env)
   if (!config.success)
     return err({
       reason: "invalid_config",
-      // Names only: a value could be the password.
+      // Names only: a value could be a password.
       detail: config.error.issues
         .map((issue) => issue.path.join("."))
         .join(", "),
     })
 
   const superadmin = await ensureSuperadmin(config.data)
-  const actor = await authorizeActiveSuperadmin(superadmin.id)
+  if (!superadmin.ok) return superadmin
+  const actor = await authorizeActiveSuperadmin(superadmin.data.id)
   if (!actor.ok)
     return err({
       reason: "superadmin_not_active",
       detail: `@${config.data.SEED_SUPERADMIN_USERNAME} exists but is not an active superadmin`,
     })
 
-  const password = config.data.SEED_SUPERADMIN_PASSWORD
-  const samples = {
-    pending: await seedSample(actor.data, "pending", password),
-    active: await seedSample(actor.data, "active", password),
-    rejected: await seedSample(actor.data, "rejected", password),
-    inactive: await seedSample(actor.data, "inactive", password),
-  }
-  return ok({ superadmin: superadmin.outcome, samples })
+  const samples = await seedSamples(actor.data, config.data, input.sampleTag)
+  if (!samples.ok) return samples
+  return ok({ superadmin: superadmin.data.outcome, samples: samples.data })
 }

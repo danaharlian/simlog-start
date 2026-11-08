@@ -175,7 +175,7 @@ A foreign key across features is a choice, recorded with its reason in the featu
 
 - Separate from migrations. Never run in production. Never real user data or real credentials.
 - Reference data every environment needs (a list of countries) is a migration (`generate --custom`), not a seed.
-- **Runner:** `tsx` (ADR 0042, closes open decision AB). `pnpm db:seed` runs `scripts/seed.ts`, which imports only a feature's `index.server.ts` and passes `process.env` to it. The feature validates the record with Zod and refuses before writing when `NODE_ENV` is `production` or `SEED_ALLOW` is not `true`.
+- **Runner:** `tsx` (ADR 0042, closes open decision AB). `SEED_ALLOW=true pnpm db:seed` runs `scripts/seed.ts`. The script copies the shell's variables, loads `.env`, then imports only a feature's `index.server.ts` and hands it both records. The feature validates them with Zod and refuses before writing when `NODE_ENV` is `production`, `DATABASE_URL` comes from the shell, or `SEED_ALLOW` is not `true` on the command line.
 - **Accounts through the auth library:** the auth seed creates accounts with `auth.api.signUpEmail`, so passwords are hashed and usernames normalized as in a real sign-up. An existing email is kept as it is: the unique index decides, and the seed then looks the account up (`drizzle-concurrency.md`).
 
 ## Types
