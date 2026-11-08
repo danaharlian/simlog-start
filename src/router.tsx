@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query"
 import { createRouter as createTanStackRouter } from "@tanstack/react-router"
+import { getGlobalStartContext } from "@tanstack/react-start"
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query"
 import { routeTree } from "./routeTree.gen"
 
@@ -12,8 +13,14 @@ export function getRouter() {
     defaultOptions: { queries: { staleTime: DEFAULT_STALE_TIME_MS } },
   })
 
+  // The request's CSP nonce, so the router's own inline scripts are allowed (ADR 0047). Only the
+  // server renders those scripts.
+  const nonce =
+    typeof window === "undefined" ? getGlobalStartContext()?.nonce : undefined
+
   const router = createTanStackRouter({
     routeTree,
+    ssr: { nonce },
     context: { queryClient },
     scrollRestoration: true,
     defaultPreload: "intent",

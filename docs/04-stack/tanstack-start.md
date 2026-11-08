@@ -61,6 +61,7 @@ Observed on the built server, 2026-10-31 (requests with crafted headers, no real
 |---|---|---|---|
 | No `src/start.ts` | Server function | 403 | 200 |
 | `src/start.ts` with the filter above | Server function | 403 | 200 |
+| This app's `src/start.ts` (headers middleware, then this CSRF middleware), 2026-11-08 | Server function POST with a valid session | 403 for a foreign `Origin`, `Sec-Fetch-Site: cross-site`, or no origin headers; the 403 carries the security headers | 200 |
 | **`src/start.ts` without CSRF** (build passes) | Server function | **200: unprotected** | 200 |
 | Any of these | Server route with no middleware of its own | 200 | 200 |
 | Any of these | Server route with `server: { middleware: [createCsrfMiddleware()] }` | 403 | 200 |
@@ -107,7 +108,16 @@ export function getRouter() {
 | Nonce through `ssr.nonce` | Page renders and hydrates; every script tag carries the nonce |
 | Middleware above | Headers present on a page, a server route, a 404, and a server function |
 
-`ssr.nonce` comes from the installed `router.d.ts`, and `getGlobalStartContext` from the package's exports; no docs page describing this pair was found. **Not checked:** the dev server, a stylesheet or font from another origin, inline styles from a component library, and static files served by a proxy, which do not pass through this middleware. Add those sources to the policy deliberately. HSTS belongs where TLS ends. The policy for a real app is open decision AC.
+`ssr.nonce` comes from the installed `router.d.ts`, and `getGlobalStartContext` from the package's exports; no docs page describing this pair was found.
+
+**In this app (ADR 0047, `specs/auth` T8, 2026-11-08):** `src/shared/server/security-headers.ts` builds the policy and sets the headers on a **copy** of the response, because `Response.redirect()` and passed-through responses have immutable headers. HTML without `no-store` gets `Cache-Control: no-store`, so a shared cache never keeps a nonce. `src/start.ts` must export `startInstance`: the Start plugin then writes `config: Awaited<ReturnType<typeof startInstance.getOptions>>` into `Register` in `routeTree.gen.ts` on the next build, and only after that does `getGlobalStartContext()?.nonce` type-check (before it, the context is `never`). Observed on the production build (`vite preview`, Node 24.22.1):
+
+- headers on a page, an SSR redirect (307), a 404, a server function (GET and POST), Better Auth's `/api/auth/*`, and the CSRF 403;
+- a different nonce per request;
+- every `<script>` carries the nonce on `/login`, `/`, and `/users`, which streams query data (ADR 0045);
+- the dev server's HTML scripts and stylesheets carry the nonce too.
+
+The browser console during a walk is the check for violations (QA). HSTS stays where TLS ends (ADR 0047). **Not checked:** the dev server, a stylesheet or font from another origin, inline styles from a component library, and static files served by a proxy, which do not pass through this middleware. Add those sources to the policy deliberately. HSTS belongs where TLS ends. The policy for a real app is open decision AC.
 
 ## Next.js habits that do not apply
 
