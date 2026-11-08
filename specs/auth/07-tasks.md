@@ -238,7 +238,7 @@ Urutan mengikuti risiko, kecuali T5 dan T6 yang menunggu T4 karena aksinya ada d
 - **Asal:** `09-qa.md` D2 (Medium), keputusan owner: diperbaiki.
 - **Files this task may change:** `src/shared/ui/app-text-field.tsx`, `src/features/auth/components/register-form.tsx`, `login-form.tsx`, tes, `docs/04-stack/tanstack-form.md` (contoh komponen kolom, bila perlu).
 - **Tests written first:** error kolom tampil setelah blur dan setelah submit, tidak saat mengetik pertama kali; error hilang begitu nilai menjadi sah tanpa blur lagi.
-- **Done when:** walk QA ronde 2 untuk item 7 ok; AC2 dan AC26 tetap lulus.
+- **Done when:** walk QA ronde 2 untuk item 7 ok, termasuk VoiceOver: pesan error yang muncul atau hilang saat mengetik tidak terlalu ramai (review T9 S2); AC2 dan AC26 tetap lulus.
 
 ## Entry point visibility
 T2 membuat `/login` dan `/register` bisa dibuka lewat URL, tanpa tautan. T3 mengganti `/` scaffold dengan dashboard, sehingga siapa pun yang membuka `/` diarahkan ke `/login`: di sinilah fitur terlihat. T4 menambah menu Manajemen pengguna untuk superadmin. Semua ini hanya sampai ke staging sampai Release gate.
@@ -316,7 +316,7 @@ T2 membuat `/login` dan `/register` bisa dibuka lewat URL, tanpa tautan. T3 meng
 | 2026-11-08 | T7: guard seed (spec section 1, R25) juga menolak `DATABASE_URL` yang diset di shell, dan `SEED_ALLOW` hanya diterima dari command line (nilai di `.env` diabaikan). `scripts/seed.ts` menyalin variabel shell, memuat `.env` sendiri, lalu mengimpor `index.server` secara dinamis; `db:seed` menjadi `tsx scripts/seed.ts` | Review T7 R1-B1: migrasi production dijalankan dengan URL di shell (`environment.md`), sehingga `SEED_ALLOW=true` di `.env` bisa men-seed production. Keputusan Dana Harliansyah (Tech Lead), 2026-11-08, via chat (pilihan "Shell URL ditolak (Recommended)") |
 | 2026-11-08 | T7: `seedAccounts` menerima `{ env, shell, sampleTag? }`; `sampleTag` hanya untuk tes, agar jalur pembuatan akun contoh berjalan di setiap run pada database test bersama | Review T7 R1-S1 |
 | 2026-11-08 | T8 dan T9 (fix task QA ronde 1): D1 header keamanan, D2 waktu validasi form. Ruang lingkup dan AC tidak berubah | `sdlc-pipeline.md` section 4: setiap defect yang memblokir menjadi fix task lewat change log. Keputusan Dana Harliansyah (QA Lead), 2026-11-08, via chat: "D1 High, perbaiki D1 dan D2 lalu QA ronde 2" |
-| 2026-11-08 | T9: tes di `__tests__/field-validation.test.ts` (create), menjalankan `FormApi` dan `FieldApi` dengan `registerSchema`; `visibleFieldErrors` diekspor dari `shared/ui/app-text-field.tsx` | Tes komponen DOM belum disiapkan (`versions.md`, baris Vitest); keputusan tampil atau tidak dipisah menjadi fungsi murni |
+| 2026-11-08 | T9: `components/auth-form-options.ts` (create, opsi statis form register dan login lewat `formOptions`), `shared/ui/app-field-errors.ts` (create, `visibleFieldErrors`), tes `__tests__/field-validation.test.ts` (create) | Tes komponen DOM belum disiapkan (`versions.md`, baris Vitest), jadi keputusan tampil atau tidak dipisah menjadi fungsi murni. Tes dibangun dari opsi form yang sama, sehingga form yang kembali ke `onBlur` gagal di tes (review T9 S1, N4) |
 | 2026-11-08 | T1: tes env di `src/shared/config/env.server.test.ts` (bukan `__tests__/` fitur) | Tes itu menguji modul `shared`, jadi diletakkan di sebelah kodenya (`folder-structure.md`, Naming: tests) |
 
 ## Gate review

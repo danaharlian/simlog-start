@@ -3,16 +3,11 @@ import { useRef } from "react"
 import { focusFirstInvalidControl, useAppForm } from "@/shared/ui/app-form"
 import { FieldDescription, FieldGroup } from "@/shared/ui/field"
 import { signInErrorText } from "@/features/auth/components/auth-messages"
+import { loginFormOptions } from "@/features/auth/components/auth-form-options"
 import { AuthSplitLayout } from "@/features/auth/components/auth-split-layout"
 import { FormBanner } from "@/features/auth/components/form-banner"
 import { useSignIn } from "@/features/auth/hooks/use-sign-in"
 import { loginSchema } from "@/features/auth/schemas"
-import type { LoginFormValues } from "@/features/auth/schemas"
-
-const EMPTY_LOGIN_VALUES = {
-  identifier: "",
-  password: "",
-} satisfies LoginFormValues
 
 type LoginFormProps = { readonly onSignedIn: () => Promise<void> | void }
 
@@ -20,11 +15,9 @@ export function LoginForm({ onSignedIn }: LoginFormProps) {
   const signIn = useSignIn()
   const formRef = useRef<HTMLFormElement>(null)
   const form = useAppForm({
-    defaultValues: EMPTY_LOGIN_VALUES,
+    ...loginFormOptions,
     validators: {
-      // onChange, so an error clears as soon as the value is valid; AppTextField shows it only after
-      // the field is left or the form is submitted (QA D2; tanstack-form.md, rule 4).
-      onChange: loginSchema,
+      ...loginFormOptions.validators,
       onSubmitAsync: async ({ value }) => {
         const result = await signIn.mutateAsync(loginSchema.parse(value))
         if (!result.ok)

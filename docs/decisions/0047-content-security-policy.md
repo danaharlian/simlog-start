@@ -3,6 +3,7 @@
 - Status: proposed
 - Date: 2026-11-08
 - Deciders: pending (Software Architect)
+- Amends: `docs/03-standards/security.md` rule 9 (HSTS is set where TLS ends, not by the app)
 
 ## Context
 
@@ -28,16 +29,19 @@ A request middleware in `src/shared/server/security-headers.ts`, first in `reque
 
 | Header | Value |
 |---|---|
-| `Content-Security-Policy` | `default-src 'self'; script-src 'self' 'nonce-<per request>'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'` |
+| `Content-Security-Policy` | `default-src 'self'; script-src 'self' 'nonce-<per request>'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'` |
 | `X-Content-Type-Options` | `nosniff` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
 | `X-Frame-Options` | `DENY` (for browsers that ignore `frame-ancestors`) |
+| `Cache-Control` | `no-store` on HTML responses that carry the nonce, unless the response already sets `private, no-store`. A shared cache must never reuse a nonce, and pages with a nonce are never prerendered (review T9 S5) |
 
 The nonce reaches the router through `ssr.nonce` in `src/router.tsx`. Each part of the policy has a reason:
 - **`style-src 'unsafe-inline'`:** the sidebar's style attributes need it. Inline styles cannot run script, and scripts stay nonce-only.
-- **`img-src data:`:** covers small inline images from CSS or icons.
-- **HSTS:** set where TLS ends, at the proxy or the platform, not in the app. It is a line in the release checklist until hosting is documented.
+- **No `data:` source:** nothing in `src/` or the build uses a `data:` URI today. One is added only with a real use (review T9 N5).
+- **Adding a nonce or hash to `style-src` later** silently disables `'unsafe-inline'` there, which would break the sidebar. Any such change re-checks the sidebar.
+- **HSTS:** set where TLS ends, at the proxy or the platform, not in the app. This amends `security.md` rule 9. Until hosting is documented it is a line in the release checklist, and QA D1 keeps its HSTS part open until then (review T9 S4).
+- **Responses whose headers cannot be changed:** the middleware copies such a response before setting headers, instead of calling `set` on it. A `Response.redirect()` or a passed-through `fetch` response has immutable headers, and `set` would throw (review T9 S3; **Inferred**, checked in T8).
 
 A new external origin (analytics, a CDN, fonts) is added to the policy deliberately, in the PR that brings it, with a note here.
 
@@ -57,6 +61,11 @@ A new external origin (analytics, a CDN, fonts) is added to the policy deliberat
 - **The policy itself.** Not run against this app. T8 checks it in the production build, the dev server, and the owner's browser walk in QA round 2, which must show no CSP violation in the console.
 - **Base UI positioning styles.** Whether popovers, menus, and dialogs set them through the CSSOM (allowed under any CSP) or through attributes. **Inferred**: the CSSOM, because they are computed on the client.
 - **API names and types.** The type for passing the nonce in the request context (`getGlobalStartContext`, `Register`) is checked in the installed `@tanstack/react-start` types during T8.
+- **Responses not yet seen with the headers.** T8 tests them (review T9 S3):
+  - the SSR redirect (`/` without a session → `/login`);
+  - Better Auth's own responses under `/api/auth/*`;
+  - the CSRF middleware's 403;
+  - a page that streams query data (`/users`, ADR 0045), where every streamed inline script must carry the nonce.
 
 ## Alternatives considered
 
@@ -65,6 +74,7 @@ A new external origin (analytics, a CDN, fonts) is added to the policy deliberat
 | Nonce for styles too, no `'unsafe-inline'` | Stricter CSS | Style attributes cannot carry a nonce. It would mean changing the generated sidebar primitive, which `tailwind-shadcn.md` forbids for one feature |
 | `script-src 'self'` without a nonce | Simpler | Blank page (observed, ADR 0015) |
 | HSTS from the app | Header present even without a proxy | Over plain HTTP it is ignored, and behind a proxy the proxy owns TLS. Duplicates the platform's job |
+| `style-src 'self'` plus `style-src-attr 'unsafe-inline'` (CSP3) | Allows the sidebar's style attributes but not injected `<style>` elements | Browser support for the split directives was not checked (**Inferred** recent browsers only). Kept as the first tightening step once support is checked (review T9 N6) |
 | `Content-Security-Policy-Report-Only` first | No risk of breaking pages | Leaves the app unprotected at release. Kept as a fallback if the browser walk finds a violation that cannot be fixed in T8 |
 
 ## Verification
