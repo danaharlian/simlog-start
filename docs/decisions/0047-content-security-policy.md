@@ -1,8 +1,8 @@
 # 0047 Content Security Policy and security headers for the app (closes open decision AC)
 
-- Status: proposed
+- Status: accepted
 - Date: 2026-11-08
-- Deciders: pending (Software Architect)
+- Deciders: Dana Harliansyah (Software Architect), via chat, 2026-11-08: “PR #9 approve. ADR 0047 accepted”
 - Amends: `docs/03-standards/security.md` rule 9 (HSTS is set where TLS ends, not by the app)
 
 ## Context

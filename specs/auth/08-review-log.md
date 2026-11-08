@@ -206,8 +206,8 @@
 
 ### Round 1: 2026-11-08
 - **PR:** https://github.com/danaharlian/simlog-start/pull/9 · **Commit reviewed:** `d63d3da` (dengan `4bfeca5` dan `10eb4ad`: dokumen QA ronde 1, fix task, ADR 0047 proposed)
-- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: pending
-- **Verdict:** approve with should-fix (subagent, on `d63d3da`)
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: Dana Harliansyah (Tech Lead), 2026-11-08, via chat
+- **Verdict:** approve with should-fix (subagent, on `d63d3da`); approve (Dana Harliansyah, on `5ca508d`)
 
 | ID | File:line | Review pass | Severity | Finding | Resolution | Status |
 |---|---|---|---|---|---|---|
@@ -227,6 +227,6 @@
 
 **Unverified:** urutan fokus setelah submit dengan error dari server (dicek di QA ronde 2: fokus setelah "Email sudah dipakai"); VoiceOver (R1-S2).
 
-**Decisions made in review:** none yet.
+**Decisions made in review:** `components/auth-form-options.ts` dan `shared/ui/app-field-errors.ts` di luar file list T9 disetujui; ADR 0047 accepted (Software Architect).
 
-**Outcome:** blocking findings resolved: yes (tidak ada) · PR gate: pending
+**Outcome:** blocking findings resolved: yes (tidak ada) · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #9 approve. ADR 0047 accepted"
