@@ -72,3 +72,32 @@
 **Decisions made in review:** ADR 0046 (ketiga poin) accepted; koreksi spec section 4 (hasil register bersamaan) disetujui di Spec gate round 4.
 
 **Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #3 approve. ADR 0046 accepted. Konfirmasi koreksi spec section 4."
+
+## T3: Dashboard dan shell `sidebar-07`
+
+### Round 1: 2026-11-08
+- **PR:** https://github.com/danaharlian/simlog-start/pull/4 · **Commit reviewed:** `6be8076`
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: pending (Dana Harliansyah)
+- **Verdict:** approve setelah should-fix 1 sampai 3 (subagent); tidak ada temuan blocking
+
+| ID | File:line | Review pass | Severity | Finding | Resolution | Status |
+|---|---|---|---|---|---|---|
+| R1-S1 | PR #4 | evidence | Non-blocking | Tidak ada catatan cek dev untuk AC T3 | Dicatat di deskripsi PR: AC8 dan AC10 (pending) dicek di dev dengan curl; AC6 dan AC12 dipindah ke QA atas keputusan owner (change log `07-tasks.md`) | resolved |
+| R1-S2 | `shared/ui/app-shell.tsx:195` | design | Non-blocking | `shared/ui` menyalin teks fitur auth | Fixed in `87066cb`: semua label lewat props; `SIGN_OUT_TEXT` milik auth | resolved |
+| R1-S3 | `shared/ui/app-shell.tsx:155` | accessibility | Non-blocking | Navigasi tanpa landmark | Fixed in `87066cb`: `<nav aria-label>` | resolved |
+| R1-N4 | `app-shell.tsx:55` | conventions | Non-blocking | Nama prop boolean | Fixed in `87066cb`: `isSigningOut`, error sebagai teks | resolved |
+| R1-N5 | `_app.tsx:52` | design | Non-blocking | Judul header tetap "Beranda" | Dipindah ke T4 lewat change log (`TODO(T4)` di kode) | resolved (T4) |
+| R1-N6 | `_app.tsx:32` | design | Non-blocking | Menu aktif dihitung manual | Fixed in `87066cb`: `useMatchRoute` di `AppShell` | resolved |
+| R1-N7 | `_app/index.tsx:12` | UI | Non-blocking | Penanganan null tidak konsisten | Fixed in `87066cb` | resolved |
+| R1-N8 | `app-shell.tsx:184`, `__root.tsx:66` | accessibility | Non-blocking | Label toggle Inggris; `lang="en"`; judul root scaffold | Fixed in `87066cb` | resolved |
+| R1-N9 | `app-shell.tsx:145` | design | Non-blocking | `AppShell` menulis `/` sendiri | Fixed in `87066cb`: prop `homeTo` | resolved |
+| R1-N10 | `breadcrumb.tsx`, `collapsible.tsx` | scope | Non-blocking | Primitive belum dipakai | Dicatat di change log; dipakai saat dibutuhkan atau dikeluarkan dari lock oleh person | resolved |
+| R1-N11 | `sidebar.tsx` (cookie) | design | Non-blocking | Status sidebar tidak bertahan setelah reload | Dicatat di change log; tidak ada AC | resolved |
+| R1-N12 | `aac0afa` | git | Non-blocking | Commit primitive menghapus `routes/index.tsx` dan tanpa `Docs consulted` | PR di-merge squash, jadi riwayat menjadi satu commit; tidak diubah (force-push setelah review dilarang) | resolved |
+| R1-N13 | Sheet mobile | UI | Non-blocking | Sheet tidak menutup saat klik item halaman yang sama | Perilaku bawaan block; dicatat, tidak diubah | resolved |
+
+**Unverified:** tampilan pengguna aktif di browser (sidebar ciut ke ikon, Sheet mobile, keyboard di menu pengguna, urutan logout dengan `queryClient.clear()`): manual check di QA dengan akun dari seed T7. `Tooltip.Root` tanpa `Tooltip.Provider`: **Inferred** berjalan.
+
+**Decisions made in review:** cek manual AC6 dan AC12 ditunda ke QA (keputusan owner, 2026-11-08); judul header pindah ke T4.
+
+**Outcome:** blocking findings resolved: yes (tidak ada) · PR gate passed: not yet (menunggu Dana Harliansyah)
