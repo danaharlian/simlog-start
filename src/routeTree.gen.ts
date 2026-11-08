@@ -9,17 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as GuestRouteImport } from './routes/_guest'
 import { Route as StatusRouteImport } from './routes/_status'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as GuestLoginRouteImport } from './routes/_guest/login'
 import { Route as GuestRegisterRouteImport } from './routes/_guest/register'
 import { Route as StatusStatusRouteImport } from './routes/_status/status'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuestRoute = GuestRouteImport.update({
@@ -29,6 +29,11 @@ const GuestRoute = GuestRouteImport.update({
 const StatusRoute = StatusRouteImport.update({
   id: '/_status',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
 } as any)
 const GuestLoginRoute = GuestLoginRouteImport.update({
   id: '/login',
@@ -52,14 +57,14 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
   '/status': typeof StatusStatusRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
   '/status': typeof StatusStatusRoute
@@ -67,12 +72,13 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
   '/_guest': typeof GuestRouteWithChildren
   '/_status': typeof StatusRouteWithChildren
   '/_guest/login': typeof GuestLoginRoute
   '/_guest/register': typeof GuestRegisterRoute
   '/_status/status': typeof StatusStatusRoute
+  '/_app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -82,17 +88,18 @@ export interface FileRouteTypes {
   to: '/' | '/login' | '/register' | '/status' | '/api/auth/$'
   id:
     | '__root__'
-    | '/'
+    | '/_app'
     | '/_guest'
     | '/_status'
     | '/_guest/login'
     | '/_guest/register'
     | '/_status/status'
+    | '/_app/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   GuestRoute: typeof GuestRouteWithChildren
   StatusRoute: typeof StatusRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -100,11 +107,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_guest': {
@@ -120,6 +127,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_guest/login': {
       id: '/_guest/login'
@@ -152,6 +166,16 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 interface GuestRouteChildren {
   GuestLoginRoute: typeof GuestLoginRoute
   GuestRegisterRoute: typeof GuestRegisterRoute
@@ -176,7 +200,7 @@ const StatusRouteWithChildren =
   StatusRoute._addFileChildren(StatusRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   GuestRoute: GuestRouteWithChildren,
   StatusRoute: StatusRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
