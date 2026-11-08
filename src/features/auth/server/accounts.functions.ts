@@ -1,7 +1,11 @@
 import { createServerFn } from "@tanstack/react-start"
 import { withErrorBoundary } from "@/shared/server/with-error-boundary"
-import { listAccountsInputSchema } from "@/features/auth/schemas"
 import {
+  changeAccountStatusSchema,
+  listAccountsInputSchema,
+} from "@/features/auth/schemas"
+import {
+  changeAccountStatus as changeAccountStatusForAdmin,
   getCurrentUserDto,
   listAccountsForAdmin,
 } from "@/features/auth/server/accounts.service"
@@ -25,6 +29,17 @@ export const listAccounts = createServerFn({ method: "GET" })
     withErrorBoundary("auth.listAccounts", async () =>
       context.superadmin.ok
         ? listAccountsForAdmin(context.superadmin.data, data)
+        : context.superadmin
+    )
+  )
+
+export const changeAccountStatus = createServerFn({ method: "POST" })
+  .middleware([requireActiveSuperadmin])
+  .validator(changeAccountStatusSchema)
+  .handler(({ context, data }) =>
+    withErrorBoundary("auth.changeAccountStatus", async () =>
+      context.superadmin.ok
+        ? changeAccountStatusForAdmin(context.superadmin.data, data)
         : context.superadmin
     )
   )

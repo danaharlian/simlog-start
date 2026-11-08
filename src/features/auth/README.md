@@ -20,8 +20,11 @@ Server functions:
 
 - `getCurrentUser` (GET, `withSession`; returns `CurrentUser | null`; `Cache-Control: private, no-store`).
 - `listAccounts` (GET, `requireActiveSuperadmin`; input `listAccountsInputSchema`; returns `Result<AccountsPage>`; `AUTH_REQUIRED` or `AUTH_NOT_ACTIVE_SUPERADMIN` otherwise).
+- `changeAccountStatus` (POST, `requireActiveSuperadmin`; input `changeAccountStatusSchema`; returns `Result<AccountRow>`). Errors: `AUTH_NOT_ACTIVE_SUPERADMIN`, `AUTH_ACCOUNT_NOT_FOUND`, `AUTH_CANNOT_CHANGE_SELF`, `AUTH_ACCOUNT_STATUS_CHANGED`, `AUTH_INVALID_STATUS_TRANSITION`. Logs `auth.account_status_changed` (actor and target ids, from, to).
 
 Authorization: `requireActiveSuperadmin` reads the actor's row on every call and puts the decision (`Result`) in `context.superadmin`; the handler returns it or calls the service.
+
+Status changes (T5): one transaction locks the actor's row and the target's row with `FOR UPDATE`, ordered by id, then `decideStatusChange` (`server/accounts.rules.ts`) checks that the actor is not the target, that the status is still the one the superadmin saw (`expectedStatus`), and that the transition is allowed. Of two superadmins acting on the same account at once, one wins and the other gets `AUTH_ACCOUNT_STATUS_CHANGED`. The write sets `status_changed_at`.
 
 Better Auth hardening (ADR 0046): `disableOriginCheck: false`, `formCsrfMiddleware` on `/sign-in/username`, and Better Auth's logs routed to pino with the message only.
 

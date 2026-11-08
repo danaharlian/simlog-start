@@ -2,9 +2,16 @@ import { randomUUID } from "node:crypto"
 import { eq } from "drizzle-orm"
 import { describe, expect, it } from "vitest"
 import { users } from "@/features/auth/db/schema"
-import type { AccountStatus, Role } from "@/features/auth/schemas"
+import type {
+  AccountStatus,
+  ChangeAccountStatusInput,
+  Role,
+} from "@/features/auth/schemas"
 import { auth } from "@/features/auth/server/auth.repository"
-import { authorizeActiveSuperadmin } from "@/features/auth/server/accounts.service"
+import {
+  authorizeActiveSuperadmin,
+  changeAccountStatus,
+} from "@/features/auth/server/accounts.service"
 import { db } from "@/shared/db/client"
 
 async function createAccount(
@@ -62,5 +69,29 @@ describe("authorizeActiveSuperadmin (AC13, NFR3, R22)", () => {
       ok: false,
       error: { kind: "unauthorized", code: "AUTH_REQUIRED" },
     })
+  })
+
+  it("changeAccountStatus menolak pengguna role user", async () => {
+    const callerId = await createAccount("active", "user")
+    const targetId = await createAccount("pending", "user")
+    const input: ChangeAccountStatusInput = {
+      userId: targetId,
+      expectedStatus: "pending",
+      nextStatus: "active",
+    }
+    // The same steps as the server function: requireActiveSuperadmin, then the service only on ok.
+    const proof = await authorizeActiveSuperadmin(callerId)
+    const result = proof.ok
+      ? await changeAccountStatus(proof.data, input)
+      : proof
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: "forbidden", code: "AUTH_NOT_ACTIVE_SUPERADMIN" },
+    })
+    const [stored] = await db
+      .select({ status: users.status })
+      .from(users)
+      .where(eq(users.id, targetId))
+    expect(stored?.status).toBe("pending")
   })
 })

@@ -112,3 +112,11 @@ export type AccountsPage = {
   readonly pageSize: number
   readonly total: number
 }
+
+// A status change sends the status the superadmin saw, so a change made meanwhile is caught (spec section 4).
+export const changeAccountStatusSchema = z.object({
+  userId: z.uuid(),
+  expectedStatus: accountStatusSchema,
+  nextStatus: accountStatusSchema,
+})
+export type ChangeAccountStatusInput = z.infer<typeof changeAccountStatusSchema>
