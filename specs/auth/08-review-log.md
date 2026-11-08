@@ -150,3 +150,26 @@
 **Decisions made in review:** invalidasi seluruh scope `auth` setelah setiap hasil aksi disetujui; menu aksi dengan daftar pilihan sendiri per status disetujui (`*.rules.ts` tetap pemutus di server); N3: banner muat ulang saat sesi berakhir dipertahankan, sama dengan T4.
 
 **Outcome:** blocking findings resolved: yes (tidak ada) · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #6 approve, keputusan 1–3 sesuai rekomendasi"
+
+## T6: Angkat dan cabut superadmin
+
+### Round 1: 2026-11-08
+- **PR:** https://github.com/danaharlian/simlog-start/pull/7 · **Commit reviewed:** `552da2d`
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: pending
+- **Verdict:** request changes (subagent, on `552da2d`)
+
+| ID | File:line | Review pass | Severity | Finding | Resolution | Status |
+|---|---|---|---|---|---|---|
+| R1-B1 | `schemas.ts:136` | deprecated API | Blocking | `refine` di `changeAccountRoleSchema` memakai `message`, yang `@deprecated` di zod 4.6.7 (`core/api.d.ts:9`) | Fixed in `42af903`: `error`. `registerSchema` (`schemas.ts:65`) punya masalah yang sama: tindak lanjut tier S, dicatat di change log `07-tasks.md` | resolved |
+| R1-S1 | `hooks/use-account-actions.ts:2`, `confirm-account-action-dialog.tsx:12` | layering | Non-blocking | Hook dan dialog mengimpor tipe dan helper dari komponen `.tsx` | Fixed in `42af903`: helper murni `components/account-actions.ts` | resolved |
+| R1-S2 | `account-row-actions.tsx:48` | tests | Non-blocking | Sisi UI dari AC18 (baris sendiri tanpa Nonaktifkan dan Cabut) tidak dites | Fixed in `42af903`: `__tests__/account-actions.test.ts` | resolved |
+| R1-S3 | `__tests__/accounts.concurrency.test.ts` | tests | Non-blocking | Tidak ada tes perubahan status dan role yang saling bertabrakan | Fixed in `42af903`: "menonaktifkan dan mencabut saling bersamaan" | resolved |
+| R1-N1 | `accounts.service.ts:227` | logging | Non-blocking | Nama operasi dan pesan log dibangun dari template | Fixed in `42af903`: `CHANGE_LOG` dengan nama literal | resolved |
+| R1-N2 | `accounts.service.ts:213` | types | Non-blocking | `from` dan `to` bertipe `string` | Fixed in `42af903`: `AccountStatus \| Role` | resolved |
+| R1-N3 | `account-row-actions.tsx:93` | UI | Non-blocking | `key` memakai teks label | Fixed in `42af903`: `actionKey` | resolved |
+
+**Unverified:** tes saling cabut tidak diuji dengan menghapus lock (mutation test); menu, dialog, dan banner di layar dengan keyboard dan pembaca layar (QA, akun seed T7); menu "Manajemen pengguna" muncul atau hilang setelah role berubah (AC17, AC19 sisi navigasi; QA).
+
+**Decisions made in review:** pending (PR gate).
+
+**Outcome:** blocking findings resolved: yes · PR gate: pending
