@@ -22,7 +22,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content: "width=device-width, initial-scale=1",
         },
         {
-          title: "TanStack Start Starter",
+          title: "Simlog",
         },
       ],
       links: [
@@ -63,7 +63,7 @@ function RootError() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="id">
       <head>
         <HeadContent />
       </head>
