@@ -3,11 +3,23 @@
     "alert.tsx": {
       "sha256": "f253568242c1c69b343f12474002fdbe229f603158171c59e21c491ab79f2e6e"
     },
+    "avatar.tsx": {
+      "sha256": "782659d874d45f3c886a7243353f8635f6a87991988947a1e37fe9a0f3483b42"
+    },
+    "breadcrumb.tsx": {
+      "sha256": "3f3315bcb2f91a326b0fcc0f039828bd0c1446af12033a8c3488edf095158b76"
+    },
     "button.tsx": {
       "sha256": "313353436d0fcc8e44ab470adb614b9fd013d28626f624328ea0d66d41a6c81b"
     },
     "card.tsx": {
       "sha256": "8ad3a18d36bda0598dc0e9aa96ea22854944d5443ee4946f1d173815e115375f"
+    },
+    "collapsible.tsx": {
+      "sha256": "ead4349ff7b01d696ef89294a81d18ee1d3f732321398896462c834ab9b9e065"
+    },
+    "dropdown-menu.tsx": {
+      "sha256": "2d38aa297858bd17e4315c26f692e9eadc443889ce5dd820041b5c9194c3bcdf"
     },
     "field.tsx": {
       "sha256": "fc7994bed4ec4ba7341f0c8af8a60dfe8efd0d8316d197b303354082e8f98a9c"
@@ -20,7 +32,21 @@
     },
     "separator.tsx": {
       "sha256": "9a80ff8c110e0c55489509f4f82ebcc929c0174b59544047147b7134f86a54e7"
+    },
+    "sheet.tsx": {
+      "sha256": "97f603ccc1e3a57b059528e70dff10440d74c2e2627b9b156896e44f0039877a"
+    },
+    "sidebar.tsx": {
+      "sha256": "365ba9261daf3cb45ae6ba8ce5c3e6e26e5f4df26ce2fd078f28395d1846fcdc"
+    },
+    "skeleton.tsx": {
+      "sha256": "4c2af7fa9c645358a0fb188779deab6f0b981733b62befc25e18aaebea1350dc"
+    },
+    "tooltip.tsx": {
+      "sha256": "f83d5f511812573f4ac98b866d397a46fda0f27eeb0af0ea89af01969eefbc5a"
     }
   },
-  "own": {}
+  "own": {
+    "css-custom-properties.d.ts": "Listed fix for sidebar.tsx in docs/04-stack/tailwind-shadcn.md (Generated primitives that fail lint): lets style accept CSS variables without a cast"
+  }
 }
