@@ -79,4 +79,10 @@ export const AUTH_ERROR_TEXT: Record<AuthErrorCode, string> = {
   [AUTH_ERROR.SESSION_REQUIRED]:
     "Sesi Anda sudah berakhir. Muat ulang halaman untuk masuk lagi.",
   [AUTH_ERROR.NOT_ACTIVE_SUPERADMIN]: "Anda tidak punya akses ke halaman ini.",
+  [AUTH_ERROR.ACCOUNT_NOT_FOUND]: "Akun tidak ditemukan. Daftar dimuat ulang.",
+  [AUTH_ERROR.CANNOT_CHANGE_SELF]: "Anda tidak bisa mengubah akun sendiri.",
+  [AUTH_ERROR.ACCOUNT_STATUS_CHANGED]:
+    "Status akun sudah berubah. Daftar dimuat ulang.",
+  [AUTH_ERROR.INVALID_STATUS_TRANSITION]:
+    "Aksi ini tidak berlaku untuk status akun saat ini.",
 }

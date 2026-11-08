@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { formatDateTime } from "@/shared/lib/format"
 import { Badge } from "@/shared/ui/badge"
 import {
@@ -10,6 +11,7 @@ import {
   TableRow,
 } from "@/shared/ui/table"
 import {
+  ACCOUNT_ACTION_TEXT,
   ACCOUNT_STATUS_LABEL,
   ROLE_LABEL,
 } from "@/features/auth/components/account-labels"
@@ -25,10 +27,14 @@ const STATUS_BADGE: Record<
   inactive: "outline",
 }
 
-type AccountsTableProps = { readonly rows: ReadonlyArray<AccountRow> }
+type AccountsTableProps = {
+  readonly rows: ReadonlyArray<AccountRow>
+  // The view decides what each row offers; the table only places it (components.md: callbacks go up).
+  readonly actions: (row: AccountRow) => ReactNode
+}
 
 // Shows only the R16 columns (NFR6); the DTO carries nothing else.
-export function AccountsTable({ rows }: AccountsTableProps) {
+export function AccountsTable({ rows, actions }: AccountsTableProps) {
   return (
     <Table>
       <TableCaption className="sr-only">Daftar akun</TableCaption>
@@ -40,6 +46,9 @@ export function AccountsTable({ rows }: AccountsTableProps) {
           <TableHead>Status</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Waktu daftar</TableHead>
+          <TableHead className="text-right">
+            <span className="sr-only">{ACCOUNT_ACTION_TEXT.column}</span>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -55,6 +64,7 @@ export function AccountsTable({ rows }: AccountsTableProps) {
             </TableCell>
             <TableCell>{ROLE_LABEL[row.role]}</TableCell>
             <TableCell>{formatDateTime(new Date(row.createdAt))}</TableCell>
+            <TableCell className="text-right">{actions(row)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

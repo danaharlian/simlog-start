@@ -112,3 +112,15 @@ export type AccountsPage = {
   readonly pageSize: number
   readonly total: number
 }
+
+// A status change sends the status the superadmin saw, so a change made meanwhile is caught (spec section 4).
+// No action leads back to pending (spec section 8), so the schema refuses it before the server runs.
+export const statusTargetSchema = accountStatusSchema.exclude(["pending"])
+export type StatusTarget = z.infer<typeof statusTargetSchema>
+
+export const changeAccountStatusSchema = z.object({
+  userId: z.uuid(),
+  expectedStatus: accountStatusSchema,
+  nextStatus: statusTargetSchema,
+})
+export type ChangeAccountStatusInput = z.infer<typeof changeAccountStatusSchema>

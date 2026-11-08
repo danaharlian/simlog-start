@@ -127,3 +127,26 @@
 **Decisions made in review:** pola otorisasi `Result` di `context` dengan brand `ActiveSuperadmin` disetujui; prefiks `AUTH_` disetujui; dua kasus RPC sisanya ke QA; S7: pertahankan `Table` (deviasi dicatat). Bukti log `warn` tetap terbuka (`LOG_LEVEL`).
 
 **Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "T4: pola otorisasi setuju, prefiks AUTH_ setuju, B1 cukup + sisanya QA, S7 pertahankan Table dan catat deviasi. PR #5 approve"
+
+## T5: Perubahan status akun
+
+### Round 1: 2026-11-08
+- **PR:** https://github.com/danaharlian/simlog-start/pull/6 · **Commit reviewed:** `e422f66`
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: Dana Harliansyah (Tech Lead), 2026-11-08, via chat
+- **Verdict:** approve (subagent, on `e422f66`); approve (Dana Harliansyah, on `173d784`)
+
+| ID | File:line | Review pass | Severity | Finding | Resolution | Status |
+|---|---|---|---|---|---|---|
+| R1-S1 | `shared/lib/query-scope.ts:14` | tests | Non-blocking | `invalidateFeature` tanpa unit test (`tanstack-query.md` rule 12) | Fixed in `bc49d79`: `query-scope.test.ts` (key sendiri, query yang bergantung, query lain); baris change log | resolved |
+| R1-N1 | `__tests__/accounts.authorization.test.ts:17`, `accounts.list.test.ts:36` | tests | Non-blocking | `createAccount` diduplikasi padahal ada `accounts.helpers.ts` | Fixed in `bc49d79`: kedua file memakai `createAccount` dan `superadminActor` dari helper | resolved |
+| R1-N2 | `user-management-view.tsx:49` | UI | Non-blocking | Banner gagal tetap tampil setelah saringan atau halaman berubah | Fixed in `bc49d79`: `changeStatus.reset()` saat search berubah | resolved |
+| R1-N3 | `user-management-view.tsx:49` | errors | Non-blocking | `AUTH_REQUIRED` saat aksi tampil sebagai banner, spec section 6 meminta ke `/login` | Tidak diubah: sama dengan penanganan daftar di T4 (teks meminta muat ulang, lalu loader mengalihkan ke `/login`); keputusan reviewer di PR gate: pertahankan seperti T4 | resolved (keputusan reviewer) |
+| R1-N4 | `schemas.ts:120` | validation | Non-blocking | `nextStatus` menerima `pending` | Fixed in `bc49d79`: `statusTargetSchema`; `StatusTarget` diturunkan dari schema; tes schema | resolved |
+| R1-N5 | `accounts.service.ts:106` | logging | Non-blocking | Penolakan di dalam transaksi tidak dicatat | Fixed in `bc49d79`: `warn` `auth.account_status_refused` (id dan kode) | resolved |
+| R1-N6 | `__tests__/accounts.concurrency.test.ts` | tests | Non-blocking | Tumpang tindih transaksi tidak dipaksa (**Inferred** tetap menangkap lock yang hilang: 6 transaksi, pool 10) | Tidak diubah; bukti deterministik butuh kendali urutan transaksi di tes, dicatat untuk T6 bila tes saling cabut butuh pola yang sama | resolved (dicatat) |
+
+**Unverified:** fokus setelah dialog tertutup (dialog dibuka dari menu, tidak dari Trigger-nya sendiri, dan unmount langsung); menu, dialog, dan banner di layar: manual check dengan keyboard dan pembaca layar di QA, dengan akun seed T7 (spec section 8, Accessibility notes; AC26 dan NFR5 hanya mencakup form login dan register).
+
+**Decisions made in review:** invalidasi seluruh scope `auth` setelah setiap hasil aksi disetujui; menu aksi dengan daftar pilihan sendiri per status disetujui (`*.rules.ts` tetap pemutus di server); N3: banner muat ulang saat sesi berakhir dipertahankan, sama dengan T4.
+
+**Outcome:** blocking findings resolved: yes (tidak ada) · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #6 approve, keputusan 1–3 sesuai rekomendasi"

@@ -1,20 +1,11 @@
-import { randomUUID } from "node:crypto"
 import { eq, inArray } from "drizzle-orm"
 import { describe, expect, it } from "vitest"
 import { users } from "@/features/auth/db/schema"
 import { ACCOUNTS_PAGE_SIZE } from "@/features/auth/schemas"
-import type {
-  AccountStatus,
-  ListAccountsInput,
-  Role,
-} from "@/features/auth/schemas"
-import { auth } from "@/features/auth/server/auth.repository"
-import {
-  authorizeActiveSuperadmin,
-  listAccountsForAdmin,
-} from "@/features/auth/server/accounts.service"
-import type { ActiveSuperadmin } from "@/features/auth/server/accounts.service"
+import type { ListAccountsInput } from "@/features/auth/schemas"
+import { listAccountsForAdmin } from "@/features/auth/server/accounts.service"
 import { db } from "@/shared/db/client"
+import { createAccount, superadminActor } from "./accounts.helpers"
 
 const FAR_PAGE = 10_000
 // Timestamps unique to this run and newer than any earlier run's, so rows other tests or runs left
@@ -33,35 +24,8 @@ const DTO_KEYS = [
   "username",
 ]
 
-async function createAccount(
-  status: AccountStatus,
-  role: Role = "user"
-): Promise<string> {
-  const suffix = randomUUID().slice(0, 8)
-  const { user } = await auth.api.signUpEmail({
-    body: {
-      name: `Joko ${suffix}`,
-      email: `joko.${suffix}@contoh.id`,
-      username: `joko_${suffix}`,
-      password: "rahasia-123",
-    },
-  })
-  await db.update(users).set({ status, role }).where(eq(users.id, user.id))
-  return user.id
-}
-
-// Services take the proof of authorization, so tests get it the same way a handler does.
-async function superadmin(): Promise<ActiveSuperadmin> {
-  const result = await authorizeActiveSuperadmin(
-    await createAccount("active", "superadmin")
-  )
-  if (!result.ok)
-    throw new Error(`authorizeActiveSuperadmin failed: ${result.error.code}`)
-  return result.data
-}
-
 async function listOrFail(input: ListAccountsInput) {
-  const result = await listAccountsForAdmin(await superadmin(), input)
+  const result = await listAccountsForAdmin(await superadminActor(), input)
   if (!result.ok)
     throw new Error(`listAccountsForAdmin failed: ${result.error.code}`)
   return result.data

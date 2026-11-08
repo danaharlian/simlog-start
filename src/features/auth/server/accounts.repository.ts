@@ -1,4 +1,4 @@
-import { asc, count, desc, eq } from "drizzle-orm"
+import { asc, count, desc, eq, inArray } from "drizzle-orm"
 import type { SQL } from "drizzle-orm"
 import type { DbOrTx } from "@/shared/db/client"
 import { users } from "@/features/auth/db/schema"
@@ -65,4 +65,42 @@ export async function listAccounts(executor: DbOrTx, query: ListAccountsQuery) {
     executor.select({ total: count() }).from(users).where(where),
   ])
   return { rows, total: totals[0]?.total ?? 0 }
+}
+
+// Locks the actor's and the target's rows until the transaction ends, always in id order so two
+// transactions never wait on each other in opposite order (drizzle-concurrency.md, rules 1 and 3).
+export async function lockAccountsForChange(
+  tx: DbOrTx,
+  ids: ReadonlyArray<string>
+) {
+  return tx
+    .select({ id: users.id, status: users.status, role: users.role })
+    .from(users)
+    .where(inArray(users.id, [...ids]))
+    .orderBy(asc(users.id))
+    .for("update")
+}
+
+export async function updateAccountStatus(
+  tx: DbOrTx,
+  input: {
+    readonly id: string
+    readonly status: AccountStatus
+    readonly changedAt: Date
+  }
+) {
+  const [row] = await tx
+    .update(users)
+    .set({ status: input.status, statusChangedAt: input.changedAt })
+    .where(eq(users.id, input.id))
+    .returning({
+      id: users.id,
+      name: users.name,
+      username: users.username,
+      email: users.email,
+      status: users.status,
+      role: users.role,
+      createdAt: users.createdAt,
+    })
+  return row
 }
