@@ -8,10 +8,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog"
-import {
-  ACCOUNT_ACTION_TEXT,
-  STATUS_ACTION_TEXT,
-} from "@/features/auth/components/account-labels"
+import { ACCOUNT_ACTION_TEXT } from "@/features/auth/components/account-labels"
+import { actionText } from "@/features/auth/components/account-row-actions"
 import type { AccountAction } from "@/features/auth/components/account-row-actions"
 
 type ConfirmAccountActionDialogProps = {
@@ -28,7 +26,7 @@ export function ConfirmAccountActionDialog({
   onConfirm,
   onDismiss,
 }: ConfirmAccountActionDialogProps) {
-  const text = STATUS_ACTION_TEXT[action.nextStatus]
+  const text = actionText(action)
   return (
     <AlertDialog
       open

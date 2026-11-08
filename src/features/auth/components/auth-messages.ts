@@ -85,4 +85,8 @@ export const AUTH_ERROR_TEXT: Record<AuthErrorCode, string> = {
     "Status akun sudah berubah. Daftar dimuat ulang.",
   [AUTH_ERROR.INVALID_STATUS_TRANSITION]:
     "Aksi ini tidak berlaku untuk status akun saat ini.",
+  [AUTH_ERROR.ACCOUNT_ROLE_CHANGED]:
+    "Role akun sudah berubah. Daftar dimuat ulang.",
+  [AUTH_ERROR.TARGET_NOT_ACTIVE]:
+    "Hanya pengguna aktif yang bisa dijadikan superadmin.",
 }

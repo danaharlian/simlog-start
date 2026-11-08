@@ -2,9 +2,13 @@ import { randomUUID } from "node:crypto"
 import { eq } from "drizzle-orm"
 import { describe, expect, it } from "vitest"
 import { users } from "@/features/auth/db/schema"
-import type { ChangeAccountStatusInput } from "@/features/auth/schemas"
+import type {
+  ChangeAccountRoleInput,
+  ChangeAccountStatusInput,
+} from "@/features/auth/schemas"
 import {
   authorizeActiveSuperadmin,
+  changeAccountRole,
   changeAccountStatus,
 } from "@/features/auth/server/accounts.service"
 import { db } from "@/shared/db/client"
@@ -72,5 +76,27 @@ describe("authorizeActiveSuperadmin (AC13, NFR3, R22)", () => {
       .from(users)
       .where(eq(users.id, targetId))
     expect(stored?.status).toBe("pending")
+  })
+
+  it("changeAccountRole menolak pengguna role user", async () => {
+    const callerId = await createAccount("active", "user")
+    const targetId = await createAccount("active", "user")
+    const input: ChangeAccountRoleInput = {
+      userId: targetId,
+      expectedRole: "user",
+      nextRole: "superadmin",
+    }
+    // The same steps as the server function: requireActiveSuperadmin, then the service only on ok.
+    const proof = await authorizeActiveSuperadmin(callerId)
+    const result = proof.ok ? await changeAccountRole(proof.data, input) : proof
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: "forbidden", code: "AUTH_NOT_ACTIVE_SUPERADMIN" },
+    })
+    const [stored] = await db
+      .select({ role: users.role })
+      .from(users)
+      .where(eq(users.id, targetId))
+    expect(stored?.role).toBe("user")
   })
 })

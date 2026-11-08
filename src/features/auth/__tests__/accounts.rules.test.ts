@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest"
-import { changeAccountStatusSchema } from "@/features/auth/schemas"
-import { decideStatusChange } from "@/features/auth/server/accounts.rules"
+import {
+  changeAccountRoleSchema,
+  changeAccountStatusSchema,
+} from "@/features/auth/schemas"
+import {
+  decideRoleChange,
+  decideStatusChange,
+} from "@/features/auth/server/accounts.rules"
 import type { AccountStatus } from "@/features/auth/schemas"
 
 const ACTOR = "11111111-1111-4111-8111-111111111111"
@@ -83,5 +89,74 @@ describe("changeAccountStatusSchema", () => {
       changeAccountStatusSchema.safeParse({ ...input, nextStatus: "inactive" })
         .success
     ).toBe(true)
+  })
+})
+
+describe("decideRoleChange (AC17, AC18 role, EC16, EC18)", () => {
+  const base = {
+    actorId: ACTOR,
+    targetId: TARGET,
+    targetStatus: "active",
+    currentRole: "user",
+    expectedRole: "user",
+    nextRole: "superadmin",
+  } as const
+
+  it("mengangkat pengguna aktif dan mencabut superadmin lain diterapkan", () => {
+    expect(decideRoleChange(base)).toEqual({ kind: "apply" })
+    expect(
+      decideRoleChange({
+        ...base,
+        currentRole: "superadmin",
+        expectedRole: "superadmin",
+        nextRole: "user",
+      })
+    ).toEqual({ kind: "apply" })
+  })
+
+  it("mencabut role diri sendiri ditolak CANNOT_CHANGE_SELF", () => {
+    expect(
+      decideRoleChange({
+        ...base,
+        targetId: ACTOR,
+        currentRole: "superadmin",
+        expectedRole: "superadmin",
+        nextRole: "user",
+      })
+    ).toEqual({ kind: "reject", reason: "self" })
+  })
+
+  it("role yang sudah berubah sejak dibaca ditolak", () => {
+    expect(decideRoleChange({ ...base, currentRole: "superadmin" })).toEqual({
+      kind: "reject",
+      reason: "changed",
+    })
+  })
+
+  it("mengangkat pengguna yang tidak aktif ditolak, mencabut superadmin nonaktif diterapkan", () => {
+    for (const targetStatus of ["pending", "rejected", "inactive"] as const)
+      expect(decideRoleChange({ ...base, targetStatus })).toEqual({
+        kind: "reject",
+        reason: "target_not_active",
+      })
+    expect(
+      decideRoleChange({
+        ...base,
+        targetStatus: "inactive",
+        currentRole: "superadmin",
+        expectedRole: "superadmin",
+        nextRole: "user",
+      })
+    ).toEqual({ kind: "apply" })
+  })
+
+  it("schema menolak nextRole yang sama dengan expectedRole", () => {
+    expect(
+      changeAccountRoleSchema.safeParse({
+        userId: TARGET,
+        expectedRole: "user",
+        nextRole: "user",
+      }).success
+    ).toBe(false)
   })
 })

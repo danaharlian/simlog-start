@@ -5,10 +5,13 @@ import type { Result } from "@/shared/errors"
 import { ACCOUNTS_PAGE_SIZE } from "@/features/auth/schemas"
 import type {
   AccountRow,
+  AccountStatus,
   AccountsPage,
+  ChangeAccountRoleInput,
   ChangeAccountStatusInput,
   CurrentUser,
   ListAccountsInput,
+  Role,
 } from "@/features/auth/schemas"
 import { z } from "zod"
 import { logger } from "@/shared/server/logger.server"
@@ -19,9 +22,13 @@ import {
   findCurrentUser,
   listAccounts,
   lockAccountsForChange,
+  updateAccountRole,
   updateAccountStatus,
 } from "@/features/auth/server/accounts.repository"
-import { decideStatusChange } from "@/features/auth/server/accounts.rules"
+import {
+  decideRoleChange,
+  decideStatusChange,
+} from "@/features/auth/server/accounts.rules"
 
 // Reads the row on every call, so a status change applies on the user's next request (R21, D10).
 export async function getCurrentUserDto(
@@ -77,12 +84,14 @@ export async function listAccountsForAdmin(
   return ok({ items, page: input.page, pageSize: ACCOUNTS_PAGE_SIZE, total })
 }
 
+const SELF_REJECTION = () =>
+  appError.forbidden(
+    AUTH_ERROR.CANNOT_CHANGE_SELF,
+    "a superadmin cannot change their own account"
+  )
+
 const STATUS_REJECTIONS = {
-  self: () =>
-    appError.forbidden(
-      AUTH_ERROR.CANNOT_CHANGE_SELF,
-      "a superadmin cannot change their own status"
-    ),
+  self: SELF_REJECTION,
   changed: () =>
     appError.conflict(
       AUTH_ERROR.ACCOUNT_STATUS_CHANGED,
@@ -95,15 +104,38 @@ const STATUS_REJECTIONS = {
     ),
 } as const
 
-// Runs inside the transaction: lock, decide on the committed rows, then write.
-async function applyStatusChange(
+const ROLE_REJECTIONS = {
+  self: SELF_REJECTION,
+  changed: () =>
+    appError.conflict(
+      AUTH_ERROR.ACCOUNT_ROLE_CHANGED,
+      "the role changed since it was read"
+    ),
+  target_not_active: () =>
+    appError.conflict(
+      AUTH_ERROR.TARGET_NOT_ACTIVE,
+      "only an active account can become a superadmin"
+    ),
+} as const
+
+type LockedTarget = {
+  readonly id: string
+  readonly status: AccountStatus
+  readonly role: Role
+}
+
+const accountNotFound = (userId: string) =>
+  appError.notFound(AUTH_ERROR.ACCOUNT_NOT_FOUND, `account ${userId} not found`)
+
+// Runs first in every change transaction. Race: two superadmins change one account, or demote each
+// other, at once → both rows are locked in id order and every decision is made on what is
+// committed (spec section 4, AC20, EC16, EC17).
+async function lockActorAndTarget(
   tx: Tx,
   actor: ActiveSuperadmin,
-  input: ChangeAccountStatusInput
-): Promise<Result<AccountRow, AuthError>> {
-  // Race: two superadmins change one account, or demote each other, at once → both rows are locked
-  // and the decision is made on what is committed (spec section 4, AC20).
-  const locked = await lockAccountsForChange(tx, [actor.actorId, input.userId])
+  targetId: string
+): Promise<Result<LockedTarget, AuthError>> {
+  const locked = await lockAccountsForChange(tx, [actor.actorId, targetId])
   const actorRow = locked.find((row) => row.id === actor.actorId)
   if (actorRow?.status !== "active" || actorRow.role !== "superadmin")
     return err(
@@ -112,38 +144,102 @@ async function applyStatusChange(
         `user ${actor.actorId} is no longer an active superadmin`
       )
     )
-  const target = locked.find((row) => row.id === input.userId)
-  if (target === undefined)
-    return err(
-      appError.notFound(
-        AUTH_ERROR.ACCOUNT_NOT_FOUND,
-        `account ${input.userId} not found`
-      )
-    )
+  const target = locked.find((row) => row.id === targetId)
+  return target === undefined ? err(accountNotFound(targetId)) : ok(target)
+}
 
+type ChangedRow = Omit<AccountRow, "createdAt"> & { readonly createdAt: Date }
+
+function toAccountRow(
+  userId: string,
+  updated: ChangedRow | undefined
+): Result<AccountRow, AuthError> {
+  return updated === undefined
+    ? err(accountNotFound(userId))
+    : ok({ ...updated, createdAt: updated.createdAt.toISOString() })
+}
+
+async function applyStatusChange(
+  tx: Tx,
+  actor: ActiveSuperadmin,
+  input: ChangeAccountStatusInput
+): Promise<Result<AccountRow, AuthError>> {
+  const target = await lockActorAndTarget(tx, actor, input.userId)
+  if (!target.ok) return target
   const decision = decideStatusChange({
     actorId: actor.actorId,
-    targetId: target.id,
-    currentStatus: target.status,
+    targetId: target.data.id,
+    currentStatus: target.data.status,
     expectedStatus: input.expectedStatus,
     nextStatus: input.nextStatus,
   })
   if (decision.kind === "reject")
     return err(STATUS_REJECTIONS[decision.reason]())
-
   const updated = await updateAccountStatus(tx, {
-    id: target.id,
+    id: target.data.id,
     status: input.nextStatus,
     changedAt: new Date(),
   })
-  if (updated === undefined)
-    return err(
-      appError.notFound(
-        AUTH_ERROR.ACCOUNT_NOT_FOUND,
-        `account ${input.userId} not found`
-      )
+  return toAccountRow(input.userId, updated)
+}
+
+async function applyRoleChange(
+  tx: Tx,
+  actor: ActiveSuperadmin,
+  input: ChangeAccountRoleInput
+): Promise<Result<AccountRow, AuthError>> {
+  const target = await lockActorAndTarget(tx, actor, input.userId)
+  if (!target.ok) return target
+  const decision = decideRoleChange({
+    actorId: actor.actorId,
+    targetId: target.data.id,
+    targetStatus: target.data.status,
+    currentRole: target.data.role,
+    expectedRole: input.expectedRole,
+    nextRole: input.nextRole,
+  })
+  if (decision.kind === "reject") return err(ROLE_REJECTIONS[decision.reason]())
+  const updated = await updateAccountRole(tx, {
+    id: target.data.id,
+    role: input.nextRole,
+  })
+  return toAccountRow(input.userId, updated)
+}
+
+type ChangeAudit = {
+  readonly subject: "status" | "role"
+  readonly actor: ActiveSuperadmin
+  readonly targetId: string
+  readonly from: string
+  readonly to: string
+}
+
+// Audit: ids, values, and codes only (spec section 10, security.md rule 13). A refusal decided on
+// the locked rows is a warn, like the middleware's (review T5 N5).
+function logChange(
+  audit: ChangeAudit,
+  result: Result<AccountRow, AuthError>
+): void {
+  const ids = { actorId: audit.actor.actorId, targetId: audit.targetId }
+  if (result.ok)
+    logger.info(
+      {
+        operation: `auth.account_${audit.subject}_changed`,
+        ...ids,
+        from: audit.from,
+        to: audit.to,
+      },
+      `account ${audit.subject} changed`
     )
-  return ok({ ...updated, createdAt: updated.createdAt.toISOString() })
+  else
+    logger.warn(
+      {
+        operation: `auth.account_${audit.subject}_refused`,
+        ...ids,
+        code: result.error.code,
+      },
+      `account ${audit.subject} change refused`
+    )
 }
 
 // Activate, reject, deactivate, reactivate (R17, R18). Every failure returns before the write, so
@@ -155,29 +251,34 @@ export async function changeAccountStatus(
   const result = await db.transaction((tx) =>
     applyStatusChange(tx, actor, input)
   )
-  if (result.ok) {
-    // Audit: ids and statuses only (spec section 10, security.md rule 13).
-    logger.info(
-      {
-        operation: "auth.account_status_changed",
-        actorId: actor.actorId,
-        targetId: input.userId,
-        from: input.expectedStatus,
-        to: input.nextStatus,
-      },
-      "account status changed"
-    )
-  } else {
-    // Refusals decided on the locked rows (EC14, EC15, EC17); same shape as the middleware's warn.
-    logger.warn(
-      {
-        operation: "auth.account_status_refused",
-        actorId: actor.actorId,
-        targetId: input.userId,
-        code: result.error.code,
-      },
-      "account status change refused"
-    )
-  }
+  logChange(
+    {
+      subject: "status",
+      actor,
+      targetId: input.userId,
+      from: input.expectedStatus,
+      to: input.nextStatus,
+    },
+    result
+  )
+  return result
+}
+
+// Promote and revoke superadmins (R19, R20), in the same kind of transaction.
+export async function changeAccountRole(
+  actor: ActiveSuperadmin,
+  input: ChangeAccountRoleInput
+): Promise<Result<AccountRow, AuthError>> {
+  const result = await db.transaction((tx) => applyRoleChange(tx, actor, input))
+  logChange(
+    {
+      subject: "role",
+      actor,
+      targetId: input.userId,
+      from: input.expectedRole,
+      to: input.nextRole,
+    },
+    result
+  )
   return result
 }
