@@ -52,6 +52,7 @@ Use `docs/templates/adr.md`. Number sequentially `NNNN-title.md`. Status: `propo
 - [0044 Integration tests reach the test database through the Vitest config (closes open decision AH)](0044-integration-tests-reach-the-test-database.md)
 - [0045 Add @tanstack/react-router-ssr-query](0045-router-ssr-query-integration.md)
 - [0046 Better Auth hardening: origin check under tests, CSRF on username sign-in, and its logger](0046-better-auth-origin-check-and-logging.md)
+- [0047 Content Security Policy and security headers for the app](0047-content-security-policy.md) (proposed)
 
 
 
