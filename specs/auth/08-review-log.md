@@ -178,8 +178,8 @@
 
 ### Round 1: 2026-11-08
 - **PR:** https://github.com/danaharlian/simlog-start/pull/8 · **Commit reviewed:** `6790a72`
-- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: pending
-- **Verdict:** blocked, needs human decision (subagent, on `6790a72`)
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: Dana Harliansyah (Tech Lead), 2026-11-08, via chat
+- **Verdict:** blocked, needs human decision (subagent, on `6790a72`); approve (Dana Harliansyah, on `50ed5ab`)
 
 | ID | File:line | Review pass | Severity | Finding | Resolution | Status |
 |---|---|---|---|---|---|---|
@@ -200,4 +200,4 @@
 
 **Decisions made in review:** (1) guard seed: `DATABASE_URL` dari shell ditolak, `SEED_ALLOW` hanya dari command line; (2) akun contoh memakai `SEED_SAMPLE_PASSWORD`. Keduanya oleh Dana Harliansyah (Tech Lead), 2026-11-08, via chat.
 
-**Outcome:** blocking findings resolved: yes · PR gate: pending
+**Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #8 approve"
