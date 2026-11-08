@@ -23,6 +23,8 @@ export const listAccounts = createServerFn({ method: "GET" })
   .validator(listAccountsInputSchema)
   .handler(({ context, data }) =>
     withErrorBoundary("auth.listAccounts", async () =>
-      context.superadmin.ok ? listAccountsForAdmin(data) : context.superadmin
+      context.superadmin.ok
+        ? listAccountsForAdmin(context.superadmin.data, data)
+        : context.superadmin
     )
   )

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
 import { Skeleton } from "@/shared/ui/skeleton"
 import {
   UserManagementView,
@@ -13,11 +13,13 @@ export const Route = createFileRoute("/_app/users")({
   head: () => ({ meta: [{ title: "Manajemen pengguna" }] }),
   validateSearch: listAccountsInputSchema,
   loaderDeps: ({ search }) => search,
-  loader: ({ context, deps }) =>
-    context.queryClient.query({
-      ...accountsQueryOptions(deps),
-      staleTime: "static",
-    }),
+  // No staleTime override: a demoted superadmin must not see a cached list (R21, R22, EC17; review T4 S5).
+  loader: async ({ context, deps }) => {
+    const result = await context.queryClient.query(accountsQueryOptions(deps))
+    // A session that ended goes to sign-in (EC19); every other refusal is shown on the page.
+    if (!result.ok && result.error.code === "AUTH_REQUIRED")
+      throw redirect({ to: "/login" })
+  },
   pendingComponent: AccountsSkeleton,
   component: UsersPage,
 })

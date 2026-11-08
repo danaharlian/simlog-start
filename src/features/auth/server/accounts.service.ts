@@ -7,7 +7,9 @@ import type {
   CurrentUser,
   ListAccountsInput,
 } from "@/features/auth/schemas"
+import { z } from "zod"
 import { AUTH_ERROR } from "@/features/auth/errors"
+import type { AuthError } from "@/features/auth/errors"
 import {
   findAccountAccess,
   findCurrentUser,
@@ -22,16 +24,24 @@ export async function getCurrentUserDto(
   return row ?? null
 }
 
+// The proof that authorization passed. Only `authorizeActiveSuperadmin` can make one (a Zod brand,
+// no cast), and every superadmin service takes it, so a handler that skips the check does not
+// type-check (review T4 S1).
+const activeSuperadminSchema = z
+  .object({ actorId: z.uuid() })
+  .brand<"ActiveSuperadmin">()
+export type ActiveSuperadmin = z.infer<typeof activeSuperadminSchema>
+
 // Authorization for every superadmin action (R22, NFR3). The actor's row is read on each call,
 // so a demoted or deactivated superadmin is refused on the next request (R21).
 export async function authorizeActiveSuperadmin(
   userId: string | null
-): Promise<Result<{ actorId: string }>> {
+): Promise<Result<ActiveSuperadmin, AuthError>> {
   const actor =
     userId === null ? undefined : await findAccountAccess(db, userId)
   if (actor === undefined)
     return err(
-      appError.unauthorized(AUTH_ERROR.AUTH_REQUIRED, "no valid session")
+      appError.unauthorized(AUTH_ERROR.SESSION_REQUIRED, "no valid session")
     )
   if (actor.status !== "active" || actor.role !== "superadmin")
     return err(
@@ -40,12 +50,13 @@ export async function authorizeActiveSuperadmin(
         `user ${actor.id} is not an active superadmin`
       )
     )
-  return ok({ actorId: actor.id })
+  return ok(activeSuperadminSchema.parse({ actorId: actor.id }))
 }
 
 export async function listAccountsForAdmin(
+  _actor: ActiveSuperadmin,
   input: ListAccountsInput
-): Promise<Result<AccountsPage>> {
+): Promise<Result<AccountsPage, AuthError>> {
   const { rows, total } = await listAccounts(db, {
     status: input.status,
     sort: input.sort,

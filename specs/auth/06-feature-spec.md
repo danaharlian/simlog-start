@@ -443,6 +443,7 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 | Date | Change | Reason | Re-approved by |
 |---|---|---|---|
 | 2026-11-08 | Section 4: hasil `TODO(verify)` register bersamaan diisi | Diverifikasi di T2 (`sign-up.test.ts`) | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 4) |
+| 2026-11-08 | Section 6: semua kode fitur diberi prefiks `AUTH_` (`AUTH_REQUIRED`, `AUTH_NOT_ACTIVE_SUPERADMIN`, `AUTH_ACCOUNT_STATUS_CHANGED`, dan seterusnya) | Lanjutan R1-15 di T1 (`error-handling.md`); diterapkan mulai T4 | pending: dikonfirmasi reviewer di PR gate T4 |
 | 2026-11-08 | Section 2 (S3) dan 6: kode `USERNAME_REQUIRED` menjadi `AUTH_USERNAME_REQUIRED` | Temuan review T1 R1-15: kode milik fitur diberi prefiks (`error-handling.md`); kode bawaan Better Auth tetap | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
 | 2026-11-08 | Section 4: `sessions.updated_at` dan `accounts.updated_at` tanpa default (koreksi teks agar sesuai output CLI dan migration T1) | Temuan review T1 R1-12 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
 | 2026-11-08 | Section 7: loader `/status` memanggil `currentUserQueryOptions()` tanpa `staleTime: 'static'` (pengecualian dari `tanstack-query.md` rule 4 untuk query pengguna saat ini) | Temuan review T1 R1-4: `'static'` membuat status lama tampil dulu, melawan R21 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |

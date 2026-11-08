@@ -9,12 +9,24 @@ import {
   SelectValue,
 } from "@/shared/ui/select"
 import { ACCOUNT_STATUS_LABEL } from "@/features/auth/components/account-labels"
+import { AUTH_ERROR_TEXT } from "@/features/auth/components/auth-messages"
 import { AccountsTable } from "@/features/auth/components/accounts-table"
 import { accountsQueryOptions } from "@/features/auth/queries"
 import { accountStatusSchema, accountStatuses } from "@/features/auth/schemas"
 import type { ListAccountsInput } from "@/features/auth/schemas"
 
 const ALL_STATUSES = "all"
+
+function emptyText(
+  search: ListAccountsInput,
+  page: number,
+  totalPages: number
+): string {
+  if (page > totalPages) return "Halaman ini kosong. Kembali ke halaman 1."
+  return search.status === undefined
+    ? "Belum ada akun."
+    : "Tidak ada akun dengan status ini."
+}
 const STATUS_FILTER_ITEMS: Record<string, string> = {
   [ALL_STATUSES]: "Semua status",
   ...ACCOUNT_STATUS_LABEL,
@@ -36,7 +48,7 @@ export function UserManagementView({
     return (
       <Alert variant="destructive">
         <AlertDescription>
-          Anda tidak punya akses ke halaman ini.
+          {AUTH_ERROR_TEXT[result.error.code]}
         </AlertDescription>
       </Alert>
     )
@@ -84,7 +96,7 @@ export function UserManagementView({
 
       {items.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          Tidak ada akun dengan status ini.
+          {emptyText(search, page, totalPages)}
         </p>
       ) : (
         <div className="overflow-x-auto rounded-lg border">

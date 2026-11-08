@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest"
-import { loginSchema, registerSchema } from "@/features/auth/schemas"
+import {
+  MAX_ACCOUNTS_PAGE,
+  listAccountsInputSchema,
+  loginSchema,
+  registerSchema,
+} from "@/features/auth/schemas"
 
 const valid = {
   name: "Budi Santoso",
@@ -54,5 +59,44 @@ describe("loginSchema", () => {
     expect(
       loginSchema.safeParse({ identifier: "budi", password: "x" }).success
     ).toBe(true)
+  })
+})
+
+describe("listAccountsInputSchema (search params of /users)", () => {
+  it("nilai yang tidak sah jatuh ke nilai bawaan, bukan error", () => {
+    expect(
+      listAccountsInputSchema.parse({
+        status: "bukan-status",
+        page: -3,
+        sort: "acak",
+      })
+    ).toEqual({
+      status: undefined,
+      page: 1,
+      sort: "pendingFirst",
+    })
+  })
+
+  it("halaman di atas batas jatuh ke halaman 1", () => {
+    expect(
+      listAccountsInputSchema.parse({
+        page: MAX_ACCOUNTS_PAGE + 1,
+        sort: "createdAtDesc",
+      }).page
+    ).toBe(1)
+  })
+
+  it("nilai sah dipertahankan", () => {
+    expect(
+      listAccountsInputSchema.parse({
+        status: "pending",
+        page: 3,
+        sort: "createdAtDesc",
+      })
+    ).toEqual({
+      status: "pending",
+      page: 3,
+      sort: "createdAtDesc",
+    })
   })
 })

@@ -49,8 +49,9 @@ describe("authorizeActiveSuperadmin (AC13, NFR3, R22)", () => {
     const activeSuperadmin = await createAccount("active", "superadmin")
     expect(await authorizeActiveSuperadmin(inactiveSuperadmin)).toMatchObject({
       ok: false,
+      error: { kind: "forbidden", code: "AUTH_NOT_ACTIVE_SUPERADMIN" },
     })
-    expect(await authorizeActiveSuperadmin(activeSuperadmin)).toEqual({
+    expect(await authorizeActiveSuperadmin(activeSuperadmin)).toMatchObject({
       ok: true,
       data: { actorId: activeSuperadmin },
     })
@@ -59,7 +60,7 @@ describe("authorizeActiveSuperadmin (AC13, NFR3, R22)", () => {
   it("id yang tidak ada ditolak sebagai tanpa sesi", async () => {
     expect(await authorizeActiveSuperadmin(randomUUID())).toMatchObject({
       ok: false,
-      error: { kind: "unauthorized" },
+      error: { kind: "unauthorized", code: "AUTH_REQUIRED" },
     })
   })
 })
