@@ -205,7 +205,7 @@
 ## T9: Waktu validasi form (fix task QA D2)
 
 ### Round 1: 2026-11-08
-- **PR:** PR_URL · **Commit reviewed:** `d63d3da` (dengan `4bfeca5` dan `10eb4ad`: dokumen QA ronde 1, fix task, ADR 0047 proposed)
+- **PR:** https://github.com/danaharlian/simlog-start/pull/9 · **Commit reviewed:** `d63d3da` (dengan `4bfeca5` dan `10eb4ad`: dokumen QA ronde 1, fix task, ADR 0047 proposed)
 - **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: pending
 - **Verdict:** approve with should-fix (subagent, on `d63d3da`)
 
