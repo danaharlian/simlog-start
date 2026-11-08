@@ -155,8 +155,8 @@
 
 ### Round 1: 2026-11-08
 - **PR:** https://github.com/danaharlian/simlog-start/pull/7 · **Commit reviewed:** `552da2d`
-- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: pending
-- **Verdict:** request changes (subagent, on `552da2d`)
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: Dana Harliansyah (Tech Lead), 2026-11-08, via chat
+- **Verdict:** request changes (subagent, on `552da2d`); approve (Dana Harliansyah, on `953e2be`)
 
 | ID | File:line | Review pass | Severity | Finding | Resolution | Status |
 |---|---|---|---|---|---|---|
@@ -170,6 +170,6 @@
 
 **Unverified:** tes saling cabut tidak diuji dengan menghapus lock (mutation test); menu, dialog, dan banner di layar dengan keyboard dan pembaca layar (QA, akun seed T7); menu "Manajemen pengguna" muncul atau hilang setelah role berubah (AC17, AC19 sisi navigasi; QA).
 
-**Decisions made in review:** pending (PR gate).
+**Decisions made in review:** (1) `changeAccountRoleSchema` menolak `nextRole` yang sama dengan `expectedRole`; (2) server mengizinkan mencabut superadmin nonaktif; (3) `hooks/use-account-actions.ts` dan `components/account-actions.ts` di luar file list disetujui; (4) peringatan di dialog "Aktifkan" untuk superadmin nonaktif (opsi b), sebagai perubahan terpisah.
 
-**Outcome:** blocking findings resolved: yes · PR gate: pending
+**Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #7 approve, keputusan 1–4 sesuai rekomendasi"
