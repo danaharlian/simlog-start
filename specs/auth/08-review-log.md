@@ -201,3 +201,32 @@
 **Decisions made in review:** (1) guard seed: `DATABASE_URL` dari shell ditolak, `SEED_ALLOW` hanya dari command line; (2) akun contoh memakai `SEED_SAMPLE_PASSWORD`. Keduanya oleh Dana Harliansyah (Tech Lead), 2026-11-08, via chat.
 
 **Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #8 approve"
+
+## T9: Waktu validasi form (fix task QA D2)
+
+### Round 1: 2026-11-08
+- **PR:** PR_URL · **Commit reviewed:** `d63d3da` (dengan `4bfeca5` dan `10eb4ad`: dokumen QA ronde 1, fix task, ADR 0047 proposed)
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: pending
+- **Verdict:** approve with should-fix (subagent, on `d63d3da`)
+
+| ID | File:line | Review pass | Severity | Finding | Resolution | Status |
+|---|---|---|---|---|---|---|
+| R1-S1 | `__tests__/field-validation.test.ts:8` | tests | Non-blocking | Tes membangun `FormApi` sendiri; form yang kembali ke `onBlur` tetap lulus | Fixed in `6d365a5`: `auth-form-options.ts` dipakai form dan tes; dibuktikan dengan mengembalikan `onBlur` (2 tes gagal) | resolved |
+| R1-S2 | `shared/ui/field.tsx:215` | accessibility | Non-blocking | `role="alert"` kini muncul dan hilang saat mengetik; risiko VoiceOver ramai | Walk VoiceOver ulang di QA ronde 2 (T9 "Done when") | resolved (dicek di QA ronde 2) |
+| R1-S3 | ADR 0047 | security | Non-blocking | Header immutable bisa membuat `set` melempar error; respons penting belum masuk tes T8 | Fixed in `6d365a5` (ADR): salin respons sebelum `set`; daftar respons yang dites T8 | resolved |
+| R1-S4 | ADR 0047, `07-tasks.md` T8 | security | Non-blocking | HSTS dipindah ke proxy tanpa mengubah rule 9; T8 tidak menutup D1 sepenuhnya | Fixed in `6d365a5`: `Amends: security.md rule 9`; bagian HSTS di D1 tetap terbuka sebagai item rilis | resolved |
+| R1-S5 | ADR 0047 | security | Non-blocking | HTML dengan nonce bisa masuk cache bersama | Fixed in `6d365a5`: `Cache-Control: no-store` untuk HTML yang membawa nonce | resolved |
+| R1-N1 | `tanstack-form.md:25` | docs | Non-blocking | Rule 4 menaruh cross-field di `onSubmit` | Fixed in `6d365a5` | resolved |
+| R1-N2 | `app-text-field.tsx:32` | docs | Non-blocking | Komentar tidak menyebut perilaku setelah submit pertama | Fixed in `6d365a5` | resolved |
+| R1-N3 | `field-validation.test.ts` | tests | Non-blocking | Kasus konfirmasi password dan form login belum ada | Fixed in `6d365a5` | resolved |
+| R1-N4 | `app-text-field.tsx:28` | dev | Non-blocking | Ekspor non-komponen di file `.tsx` (Fast Refresh) | Fixed in `6d365a5`: `shared/ui/app-field-errors.ts` | resolved |
+| R1-N5 | ADR 0047 | security | Non-blocking | `img-src data:` tanpa penggunaan | Fixed in `6d365a5`: dihapus | resolved |
+| R1-N6 | ADR 0047 | security | Non-blocking | Alternatif `style-src-attr` belum dipertimbangkan | Fixed in `6d365a5`: baris alternatif | resolved |
+| R1-N7 | `09-qa.md:199` | docs | Non-blocking | "Overall: fail" bisa dibaca sebagai hasil akhir | Fixed in `6d365a5`: "Overall (round 1)" | resolved |
+| R1-N8 | `08-review-log.md` | process | Non-blocking | Ronde T9 belum dicatat | Ronde ini | resolved |
+
+**Unverified:** urutan fokus setelah submit dengan error dari server (dicek di QA ronde 2: fokus setelah "Email sudah dipakai"); VoiceOver (R1-S2).
+
+**Decisions made in review:** none yet.
+
+**Outcome:** blocking findings resolved: yes (tidak ada) · PR gate: pending
