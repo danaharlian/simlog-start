@@ -15,6 +15,7 @@ Accounts, sessions, account status, and roles for simlog. Sign-up and sign-in ru
 | `UserManagementView`, `accountsQueryOptions`, `listAccountsInputSchema`, `ListAccountsInput` | `index.ts`        | component, query options, schema, type             | T4    |
 | `SIGN_OUT_TEXT`                                                                              | `index.ts`        | constant (sign-out labels for the app shell)       | T3    |
 | `authHandler`                                                                                | `index.server.ts` | handler for `src/routes/api/auth/$.ts`             | T1    |
+| `seedAccounts`, `SeedReport`, `SeedRefusal` | `index.server.ts` | service, types (for `scripts/seed.ts`) | T7 |
 
 Server functions:
 
@@ -30,6 +31,10 @@ Status changes (T5): one transaction locks the actor's row and the target's row 
 Role changes (T6): the same transaction and lock, then `decideRoleChange` refuses a change to the actor's own role, a role that changed since it was read (`expectedRole`), and promoting an account that is not active. Revoking an inactive superadmin is allowed. Two superadmins revoking each other at once: the first to lock wins, and the other is no longer a superadmin when its turn comes (`AUTH_NOT_ACTIVE_SUPERADMIN`). Because no one can deactivate or revoke themselves and the actor must be an active superadmin in the locked row, the last active superadmin cannot be removed (R20).
 
 Better Auth hardening (ADR 0046): `disableOriginCheck: false`, `formCsrfMiddleware` on `/sign-in/username`, and Better Auth's logs routed to pino with the message only.
+
+## Seed
+
+`pnpm db:seed` (ADR 0042) creates the dev superadmin from `SEED_SUPERADMIN_*` and one sample account per status: `contoh_menunggu`, `contoh_aktif`, `contoh_ditolak`, `contoh_nonaktif` (emails `contoh.menunggu@simlog.test`, `contoh.aktif@simlog.test`, and so on). The sample accounts use the superadmin's password, so no password is written in code. The seed refuses before writing when `NODE_ENV` is `production` or `SEED_ALLOW` is not `true`. A run twice keeps every existing account as it is.
 
 ## Owned tables
 

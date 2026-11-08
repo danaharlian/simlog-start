@@ -111,3 +111,12 @@ export async function updateAccountRole(
     .returning(ACCOUNT_ROW_COLUMNS)
   return row
 }
+
+// Better Auth stores emails in lower case, so the lookup does too.
+export async function findAccountIdByEmail(executor: DbOrTx, email: string) {
+  const [row] = await executor
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, email.toLowerCase()))
+  return row?.id
+}

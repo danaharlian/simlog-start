@@ -16,13 +16,15 @@ Every variable the app or its tooling reads. Update this table in the same PR as
 | `BETTER_AUTH_SECRET` | yes | `serverEnv` (Better Auth) | At least 32 characters (`better-auth.md`, rule 6) |
 | `BETTER_AUTH_URL` | yes | `serverEnv` (Better Auth) | The public origin (`http://localhost:3000` in dev) |
 | `LOG_LEVEL` | no, default `info` | `serverEnv` (`logger.server.ts`) | `fatal` `error` `warn` `info` `debug` `trace` `silent` (pino 10 docs). `silent` turns logging off |
+| `SEED_ALLOW` | for `pnpm db:seed` | `scripts/seed.ts` → `seedAccounts` (auth) | The seed stops before writing unless it is exactly `true`, and always when `NODE_ENV` is `production` (PRD R25). Not in `serverEnv`: the app does not read it |
+| `SEED_SUPERADMIN_NAME`, `SEED_SUPERADMIN_USERNAME`, `SEED_SUPERADMIN_EMAIL`, `SEED_SUPERADMIN_PASSWORD` | for `pnpm db:seed` | same | The dev superadmin (PRD R24). The password is at least 8 characters, and the sample accounts use it too. Dev only: never a real person's credentials |
 ## Rules
 
-1. **Single source:** all env vars are declared in `.env.example` (names + safe example values + comment) and parsed by the env modules in `shared/config/`. Variables read only by tooling outside the app (`TEST_DATABASE_URL`, `DB_TARGET`) are not in the schemas; the table above documents them.
+1. **Single source:** all env vars are declared in `.env.example` (names + safe example values + comment) and parsed by the env modules in `shared/config/`. Variables read only by tooling outside the app (`TEST_DATABASE_URL`, `DB_TARGET`, `SEED_*`) are not in the schemas; the table above documents them.
 2. **Two modules, because they have different readers:**
    - `shared/config/env.server.ts` exports `serverEnv`. Its `.server.` name makes a client import **fail the build** (observed: "Import denied in client environment").
    - `shared/config/env.ts` exports `clientEnv`, `isDev`, and `isProd`, and holds only `VITE_` variables and Vite's built-in flags.
-3. **Never read `process.env` or `import.meta.env` directly** outside those modules. Exception: tool config that runs outside the app (`drizzle.config.ts`). **Lint rejects `process.env` elsewhere under `src/`** (`eslint.code-rules.js`, ADR 0021). `import.meta.env` has no rule, so review checks it.
+3. **Never read `process.env` or `import.meta.env` directly** outside those modules. Exception: tool code that runs outside the app (`drizzle.config.ts`, `scripts/seed.ts`, which hands the record to `seedAccounts` to validate with Zod). **Lint rejects `process.env` elsewhere under `src/`** (`eslint.code-rules.js`, ADR 0021). `import.meta.env` has no rule, so review checks it.
 4. **`VITE_` means public.** Only `VITE_` variables reach client code, and their values are written into the bundle at build time (Vite docs; observed). Never put a secret under that prefix. Unprefixed variables are `undefined` in client code (observed), and a database password did not appear in `dist/client`.
 5. **No secrets in the repo, logs, error messages, or client bundle.** Secrets come from the platform secret manager in deployed environments. **A secret that was exposed is rotated, not just deleted:** pasted in an issue, chat, PR, or doc, logged, or committed (even on a branch). A real secret lives only in the secret store and in your own `.env`.
 6. **Environments:** `local`, `test`, `staging`, `production`. Config differences are env vars, not code branches on `NODE_ENV`. **A dev-only or production-only branch reads `isDev` or `isProd`** from `env.ts`, never `process.env.NODE_ENV`.
