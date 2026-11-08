@@ -101,7 +101,7 @@ Ownership, D1 to D13, public API, events, dan security sudah diputuskan di `05-a
 | `@tanstack/react-router-ssr-query` | 1.167.3 (npm `latest`, 2026-11-08) | [ADR 0045](../../docs/decisions/0045-router-ssr-query-integration.md) |
 | `tsx` | 4.23.15 (npm `latest`, 2026-11-08) | ADR 0042 |
 
-**Deviations from `docs/03-standards/*`:** S1 dan S2 (ADR 0043); `better-auth.md` rule 2, 4, dan 5 (ADR 0040, 0041, S6).
+**Deviations from `docs/03-standards/*`:** S1 dan S2 (ADR 0043); `better-auth.md` rule 2, 4, dan 5 (ADR 0040, 0041, S6). Tabel akun memakai primitive `Table`, bukan `useTable` (`tanstack-table.md`; change log 2026-11-08).
 
 ## 3. Layer breakdown
 
@@ -443,7 +443,8 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 | Date | Change | Reason | Re-approved by |
 |---|---|---|---|
 | 2026-11-08 | Section 4: hasil `TODO(verify)` register bersamaan diisi | Diverifikasi di T2 (`sign-up.test.ts`) | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 4) |
-| 2026-11-08 | Section 6: semua kode fitur diberi prefiks `AUTH_` (`AUTH_REQUIRED`, `AUTH_NOT_ACTIVE_SUPERADMIN`, `AUTH_ACCOUNT_STATUS_CHANGED`, dan seterusnya) | Lanjutan R1-15 di T1 (`error-handling.md`); diterapkan mulai T4 | pending: dikonfirmasi reviewer di PR gate T4 |
+| 2026-11-08 | Section 2 (Deviations): tabel akun memakai primitive `Table` dengan paginasi di server, bukan `useTable` (`tanstack-table.md`) | Review T4 S7: daftar sederhana tanpa sorting kolom; menghindari dependency baru | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 5) |
+| 2026-11-08 | Section 6: semua kode fitur diberi prefiks `AUTH_` (`AUTH_REQUIRED`, `AUTH_NOT_ACTIVE_SUPERADMIN`, `AUTH_ACCOUNT_STATUS_CHANGED`, dan seterusnya) | Lanjutan R1-15 di T1 (`error-handling.md`); diterapkan mulai T4 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 5) |
 | 2026-11-08 | Section 2 (S3) dan 6: kode `USERNAME_REQUIRED` menjadi `AUTH_USERNAME_REQUIRED` | Temuan review T1 R1-15: kode milik fitur diberi prefiks (`error-handling.md`); kode bawaan Better Auth tetap | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
 | 2026-11-08 | Section 4: `sessions.updated_at` dan `accounts.updated_at` tanpa default (koreksi teks agar sesuai output CLI dan migration T1) | Temuan review T1 R1-12 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
 | 2026-11-08 | Section 7: loader `/status` memanggil `currentUserQueryOptions()` tanpa `staleTime: 'static'` (pengecualian dari `tanstack-query.md` rule 4 untuk query pengguna saat ini) | Temuan review T1 R1-4: `'static'` membuat status lama tampil dulu, melawan R21 | Dana Harliansyah (Product Owner, Tech Lead), 2026-11-08, via chat (round 3) |
@@ -469,3 +470,4 @@ Belum diverifikasi, dan dibuktikan di T1 atau task terkait: `@tanstack/react-for
 | 2 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "06-feature-spec auth: setujui perubahan section 3 (auth.repository.ts, session.service.ts, session.functions.ts)". Menyetujui change log 2026-11-08 (nama file di section 3) |
 | 3 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "PR #1 approve. PR #2 approve with notes: rename ke AUTH_USERNAME_REQUIRED sebelum merge, tes Origin otomatis + ADR 0046 di T2, cek Cache-Control RPC di T2. Setujui koreksi spec section 4 dan 7.". Menyetujui change log 2026-11-08: section 4 (`updated_at`), section 7 (loader `/status`), dan kode `AUTH_USERNAME_REQUIRED` |
 | 4 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "PR #3 approve. ADR 0046 accepted. Konfirmasi koreksi spec section 4." Menyetujui change log 2026-11-08: hasil register bersamaan di section 4 |
+| 5 | 2026-11-08 | Dana Harliansyah (Product Owner, Tech Lead) | approve | Pesan reviewer: "T4: pola otorisasi setuju, prefiks AUTH_ setuju, B1 cukup + sisanya QA, S7 pertahankan Table dan catat deviasi. PR #5 approve". Menyetujui change log 2026-11-08: prefiks `AUTH_` di section 6 dan deviasi tabel di section 2 |

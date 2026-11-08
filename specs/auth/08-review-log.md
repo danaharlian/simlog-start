@@ -106,24 +106,24 @@
 
 ### Round 1: 2026-11-08
 - **PR:** https://github.com/danaharlian/simlog-start/pull/5 · **Commit reviewed:** `f93afc1`
-- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: pending (Dana Harliansyah)
-- **Verdict:** request changes (subagent)
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: Dana Harliansyah (Tech Lead), 2026-11-08, via chat
+- **Verdict:** request changes (subagent, on `f93afc1`); approve (Dana Harliansyah, on `6cc413c`)
 
 | ID | File:line | Review pass | Severity | Finding | Resolution | Status |
 |---|---|---|---|---|---|---|
-| R1-B1 | `__tests__/accounts.authorization.test.ts:36` | security, tests | Blocking | Tidak ada bukti bahwa server function `listAccounts` menolak; tes hanya memanggil fungsi keputusan | Bukti RPC di dev (`5ef23f3`): tanpa sesi `unauthorized` / `AUTH_REQUIRED`; pending `forbidden` / `AUTH_NOT_ACTIVE_SUPERADMIN`; keduanya `cache-control: private, no-store`. Pengguna aktif dan superadmin aktif lewat RPC diperiksa di QA (akun seed T7). Ditambah S1: lupa memeriksa kini gagal typecheck | resolved (menunggu konfirmasi reviewer) |
+| R1-B1 | `__tests__/accounts.authorization.test.ts:36` | security, tests | Blocking | Tidak ada bukti bahwa server function `listAccounts` menolak; tes hanya memanggil fungsi keputusan | Bukti RPC di dev (`5ef23f3`): tanpa sesi `unauthorized` / `AUTH_REQUIRED`; pending `forbidden` / `AUTH_NOT_ACTIVE_SUPERADMIN`; keduanya `cache-control: private, no-store`. Pengguna aktif dan superadmin aktif lewat RPC diperiksa di QA (akun seed T7). Ditambah S1: lupa memeriksa kini gagal typecheck | resolved (dikonfirmasi reviewer: dua kasus RPC cukup, sisanya QA) |
 | R1-S1 | `accounts.service.ts:46` | security | Non-blocking | Pola gagal-terbuka bila handler lupa memeriksa | Fixed in `5ef23f3`: `ActiveSuperadmin` (brand Zod) wajib untuk service superadmin | resolved |
 | R1-S2 | `session.functions.ts:27` | errors | Non-blocking | Baca DB di middleware di luar error boundary | Fixed in `5ef23f3` (juga `withSession`) | resolved |
 | R1-S3 | `session.functions.ts:23` | logging | Non-blocking | Tidak ada log `warn` untuk penolakan | Fixed in `5ef23f3`. **Tidak terlihat** di output dev server; kemungkinan karena `LOG_LEVEL` di `.env` (tidak dibaca agent) | resolved (bukti log terbuka) |
 | R1-S4 | `user-management-view.tsx:36` | errors, UI | Non-blocking | Teks error tidak bergantung kode; `AUTH_REQUIRED` tidak ke `/login` | Fixed in `5ef23f3`: `AuthError`, `AUTH_ERROR_TEXT`, loader mengalihkan `AUTH_REQUIRED` | resolved |
 | R1-S5 | `routes/_app/users.tsx:19` | data fetching, security | Non-blocking | Cache `'static'` memperlihatkan daftar ke superadmin yang dicabut | Fixed in `5ef23f3` (change log) | resolved |
 | R1-S6 | `__tests__/accounts.list.test.ts` | tests | Non-blocking | Tes tidak membuktikan klaimnya di database bersama | Fixed in `5ef23f3`: waktu unik per run, tes tie-breaker, cari berdasarkan id, tes schema; EC21 ke QA (change log) | resolved |
-| R1-S7 | `accounts-table.tsx` | design | Non-blocking | Primitive `Table` vs data table `useTable` (`tanstack-table.md`) | Menunggu keputusan reviewer | open |
+| R1-S7 | `accounts-table.tsx` | design | Non-blocking | Primitive `Table` vs data table `useTable` (`tanstack-table.md`) | Keputusan reviewer: pertahankan `Table`, deviasi dicatat di spec section 2 dan change log `07-tasks.md` | resolved |
 | R1-S8 | `07-tasks.md:273` | governance | Non-blocking | Change log mengklaim persetujuan sebelum gate; spec tanpa baris prefiks | Fixed in `5ef23f3` | resolved |
 | R1-N | beberapa file | nits | Non-blocking | Batas halaman, teks kosong, SQL mentah, komentar dua koneksi, `z.iso.datetime()`, nama kunci error | Fixed in `5ef23f3` | resolved |
 
 **Unverified:** RPC untuk pengguna aktif dan superadmin aktif (QA); baris log `warn` di output server; perilaku `Select` dengan keyboard dan pembaca layar (QA).
 
-**Decisions made in review:** menunggu reviewer untuk pola otorisasi di middleware, prefiks `AUTH_`, penundaan dua kasus RPC ke QA, dan S7.
+**Decisions made in review:** pola otorisasi `Result` di `context` dengan brand `ActiveSuperadmin` disetujui; prefiks `AUTH_` disetujui; dua kasus RPC sisanya ke QA; S7: pertahankan `Table` (deviasi dicatat). Bukti log `warn` tetap terbuka (`LOG_LEVEL`).
 
-**Outcome:** blocking findings resolved: yes (menunggu konfirmasi bukti B1) · PR gate passed: not yet (menunggu Dana Harliansyah)
+**Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "T4: pola otorisasi setuju, prefiks AUTH_ setuju, B1 cukup + sisanya QA, S7 pertahankan Table dan catat deviasi. PR #5 approve"
