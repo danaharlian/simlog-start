@@ -8,6 +8,7 @@ import {
   CardDescription,
   CardHeader,
 } from "@/shared/ui/card"
+import { SIGN_OUT_TEXT } from "@/features/auth/components/auth-messages"
 import { FormBanner } from "@/features/auth/components/form-banner"
 import { useSignOut } from "@/features/auth/hooks/use-sign-out"
 import { authKeys } from "@/features/auth/queries"
@@ -26,7 +27,6 @@ const STATUS_TEXT: Record<
   inactive: { title: "Nonaktif", description: "Akun Anda dinonaktifkan." },
 }
 
-const SIGN_OUT_FAILED = "Gagal keluar. Coba lagi."
 const CHECK_FAILED = "Status tidak bisa diperiksa. Coba lagi."
 
 type AccountStatusViewProps = {
@@ -57,7 +57,7 @@ export function AccountStatusView({
 
   const signOutFailed = signOut.data?.ok === false
   const error = signOutFailed
-    ? SIGN_OUT_FAILED
+    ? SIGN_OUT_TEXT.failed
     : checkFailed
       ? CHECK_FAILED
       : undefined
@@ -86,7 +86,7 @@ export function AccountStatusView({
               disabled={signOut.isPending}
               onClick={() => signOut.mutate()}
             >
-              {signOut.isPending ? "Keluar…" : "Keluar"}
+              {signOut.isPending ? SIGN_OUT_TEXT.pending : SIGN_OUT_TEXT.label}
             </Button>
           </div>
         </CardContent>

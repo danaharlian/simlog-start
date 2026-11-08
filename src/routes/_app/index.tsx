@@ -9,5 +9,7 @@ export const Route = createFileRoute("/_app/")({
 
 function HomePage() {
   const { data: user } = useSuspenseQuery(currentUserQueryOptions())
-  return <p className="text-lg">Halo, {user?.name}</p>
+  // The _app guard already sent a visitor without an active session elsewhere.
+  if (user === null) return null
+  return <p className="text-lg">Halo, {user.name}</p>
 }

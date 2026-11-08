@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router"
+import { Link, useMatchRoute } from "@tanstack/react-router"
 import type { LinkProps } from "@tanstack/react-router"
 import {
   ChevronsUpDownIcon,
@@ -35,25 +35,34 @@ import {
 } from "@/shared/ui/sidebar"
 
 // The app shell from the sidebar-07 block, without the team switcher and project list.
-// It knows no feature: the layout route passes the menu and the signed-in user (D6).
+// It knows no feature and holds no feature text: the layout route passes the menu, the
+// signed-in user, and every label (D6; review T3 S2).
 
 export type AppShellNavItem = {
   readonly label: string
   readonly to: LinkProps["to"]
   readonly icon: ReactNode
-  readonly isActive: boolean
 }
 
 export type AppShellUser = { readonly name: string; readonly username: string }
 
+export type AppShellLabels = {
+  readonly navigation: string
+  readonly toggleSidebar: string
+  readonly signOut: string
+  readonly signingOut: string
+}
+
 type AppShellProps = {
   readonly appName: string
+  readonly homeTo: LinkProps["to"]
   readonly title: string
   readonly navItems: ReadonlyArray<AppShellNavItem>
   readonly user: AppShellUser
+  readonly labels: AppShellLabels
   readonly onSignOut: () => void
-  readonly signOutPending: boolean
-  readonly signOutFailed: boolean
+  readonly isSigningOut: boolean
+  readonly signOutError: string | undefined
   readonly children: ReactNode
 }
 
@@ -68,14 +77,29 @@ function initialsOf(name: string): string {
     .join("")
 }
 
+type UserIdentityProps = { readonly user: AppShellUser }
+
+function UserIdentity({ user }: UserIdentityProps) {
+  return (
+    <>
+      <Avatar>
+        <AvatarFallback>{initialsOf(user.name)}</AvatarFallback>
+      </Avatar>
+      <div className="grid flex-1 text-left text-sm leading-tight">
+        <span className="truncate font-medium">{user.name}</span>
+        <span className="truncate text-xs">@{user.username}</span>
+      </div>
+    </>
+  )
+}
+
 type UserMenuProps = Pick<
   AppShellProps,
-  "user" | "onSignOut" | "signOutPending"
+  "user" | "labels" | "onSignOut" | "isSigningOut"
 >
 
-function UserMenu({ user, onSignOut, signOutPending }: UserMenuProps) {
+function UserMenu({ user, labels, onSignOut, isSigningOut }: UserMenuProps) {
   const { isMobile } = useSidebar()
-  const initials = initialsOf(user.name)
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -85,13 +109,7 @@ function UserMenu({ user, onSignOut, signOutPending }: UserMenuProps) {
               <SidebarMenuButton size="lg" className="aria-expanded:bg-muted" />
             }
           >
-            <Avatar>
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs">@{user.username}</span>
-            </div>
+            <UserIdentity user={user} />
             <ChevronsUpDownIcon className="ml-auto size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -102,21 +120,15 @@ function UserMenu({ user, onSignOut, signOutPending }: UserMenuProps) {
             <DropdownMenuGroup>
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar>
-                    <AvatarFallback>{initials}</AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user.name}</span>
-                    <span className="truncate text-xs">@{user.username}</span>
-                  </div>
+                  <UserIdentity user={user} />
                 </div>
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem disabled={signOutPending} onClick={onSignOut}>
+              <DropdownMenuItem disabled={isSigningOut} onClick={onSignOut}>
                 <LogOutIcon />
-                {signOutPending ? "Keluar…" : "Keluar"}
+                {isSigningOut ? labels.signingOut : labels.signOut}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
@@ -126,14 +138,43 @@ function UserMenu({ user, onSignOut, signOutPending }: UserMenuProps) {
   )
 }
 
+type MainNavProps = Pick<AppShellProps, "navItems" | "labels">
+
+function MainNav({ navItems, labels }: MainNavProps) {
+  // The router decides which item is current, so nested paths keep working (review T3 nit 6).
+  const matchRoute = useMatchRoute()
+  return (
+    <nav aria-label={labels.navigation}>
+      <SidebarGroup>
+        <SidebarMenu>
+          {navItems.map((item) => (
+            <SidebarMenuItem key={item.label}>
+              <SidebarMenuButton
+                tooltip={item.label}
+                isActive={matchRoute({ to: item.to }) !== false}
+                render={<Link to={item.to} />}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+    </nav>
+  )
+}
+
 export function AppShell({
   appName,
+  homeTo,
   title,
   navItems,
   user,
+  labels,
   onSignOut,
-  signOutPending,
-  signOutFailed,
+  isSigningOut,
+  signOutError,
   children,
 }: AppShellProps) {
   return (
@@ -142,7 +183,7 @@ export function AppShell({
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="lg" render={<Link to="/" />}>
+              <SidebarMenuButton size="lg" render={<Link to={homeTo} />}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <SquareTerminalIcon className="size-4" />
                 </div>
@@ -152,28 +193,14 @@ export function AppShell({
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup>
-            <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton
-                    tooltip={item.label}
-                    isActive={item.isActive}
-                    render={<Link to={item.to} />}
-                  >
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
+          <MainNav navItems={navItems} labels={labels} />
         </SidebarContent>
         <SidebarFooter>
           <UserMenu
             user={user}
+            labels={labels}
             onSignOut={onSignOut}
-            signOutPending={signOutPending}
+            isSigningOut={isSigningOut}
           />
         </SidebarFooter>
         <SidebarRail />
@@ -181,7 +208,10 @@ export function AppShell({
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-all ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
+            <SidebarTrigger
+              className="-ml-1"
+              aria-label={labels.toggleSidebar}
+            />
             <Separator
               orientation="vertical"
               className="mr-2 data-vertical:h-4 data-vertical:self-auto"
@@ -190,11 +220,11 @@ export function AppShell({
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          {signOutFailed ? (
+          {signOutError === undefined ? null : (
             <Alert variant="destructive">
-              <AlertDescription>Gagal keluar. Coba lagi.</AlertDescription>
+              <AlertDescription>{signOutError}</AlertDescription>
             </Alert>
-          ) : null}
+          )}
           {children}
         </div>
       </SidebarInset>

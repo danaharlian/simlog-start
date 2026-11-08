@@ -64,3 +64,10 @@ export function signUpFormErrors(
   if (fieldError === undefined) return { form: SIGN_UP_FAILED, fields: {} }
   return { fields: { [fieldError.field]: [{ message: fieldError.message }] } }
 }
+
+// Sign-out text, owned here and passed to the shared AppShell by the layout route (review T3 S2).
+export const SIGN_OUT_TEXT = {
+  label: "Keluar",
+  pending: "Keluar…",
+  failed: "Gagal keluar. Coba lagi.",
+} as const
