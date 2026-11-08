@@ -1,4 +1,4 @@
-import type { AccountStatus, Role } from "@/features/auth/schemas"
+import type { AccountStatus, Role, StatusTarget } from "@/features/auth/schemas"
 
 // Indonesian labels for the account list; one owner for the words the UI shows.
 export const ACCOUNT_STATUS_LABEL: Record<AccountStatus, string> = {
@@ -12,9 +12,6 @@ export const ROLE_LABEL: Record<Role, string> = {
   user: "Pengguna",
   superadmin: "Superadmin",
 }
-
-// A status a superadmin can move an account to; no action leads back to pending (spec section 8).
-export type StatusTarget = Exclude<AccountStatus, "pending">
 
 type StatusActionText = {
   readonly label: string

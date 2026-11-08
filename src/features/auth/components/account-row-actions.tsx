@@ -11,8 +11,11 @@ import {
   ACCOUNT_ACTION_TEXT,
   STATUS_ACTION_TEXT,
 } from "@/features/auth/components/account-labels"
-import type { StatusTarget } from "@/features/auth/components/account-labels"
-import type { AccountRow, AccountStatus } from "@/features/auth/schemas"
+import type {
+  AccountRow,
+  AccountStatus,
+  StatusTarget,
+} from "@/features/auth/schemas"
 
 export type AccountAction = {
   readonly row: AccountRow

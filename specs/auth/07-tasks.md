@@ -284,6 +284,9 @@ T2 membuat `/login` dan `/register` bisa dibuka lewat URL, tanpa tautan. T3 meng
 | 2026-11-08 | T5: teks aksi dan dialog di `components/account-labels.ts` (modify); `AccountsTable` menerima prop `actions` dan view yang memasang `AccountRowActions` | Satu pemilik untuk kata yang tampil di UI; tabel tidak tahu aksi apa yang ada (`components.md`: callback naik) |
 | 2026-11-08 | T5: menu aksi memakai daftar pilihan sendiri per status (spec section 8, step 2); `accounts.rules.ts` tetap satu-satunya yang memutuskan | `*.rules.ts` hanya untuk server (`folder-structure.md`); daftar di UI hanya membentuk menu |
 | 2026-11-08 | T5: setelah setiap hasil aksi (berhasil atau gagal), seluruh scope `auth` diinvalidasi lewat `invalidateFeature`, bukan hanya `authKeys.accounts()` | Spec section 8 step 4: setiap kegagalan diikuti daftar dimuat ulang; `currentUser` ikut segar untuk EC17 |
+| 2026-11-08 | T5: unit test `src/shared/lib/query-scope.test.ts` (create) | `tanstack-query.md` rule 12 meminta tes untuk `invalidateFeature`; diletakkan di sebelah kodenya seperti `env.server.test.ts`. Review T5 R1-S1 |
+| 2026-11-08 | T5: `statusTargetSchema` di `schemas.ts`: `nextStatus` tidak menerima `pending`; tipe `StatusTarget` diturunkan dari schema | Review T5 R1-N4: tidak ada aksi yang kembali ke `pending` (spec section 8), jadi validator menolaknya sebelum service |
+| 2026-11-08 | T5: penolakan yang diputuskan di baris terkunci dicatat sebagai `warn` `auth.account_status_refused` (id dan kode) | Review T5 R1-N5: setara dengan log `warn` di middleware; spec section 10 hanya mewajibkan log middleware |
 | 2026-11-08 | T1: tes env di `src/shared/config/env.server.test.ts` (bukan `__tests__/` fitur) | Tes itu menguji modul `shared`, jadi diletakkan di sebelah kodenya (`folder-structure.md`, Naming: tests) |
 
 ## Gate review

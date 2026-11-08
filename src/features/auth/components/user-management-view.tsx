@@ -83,6 +83,12 @@ export function UserManagementView({
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const banner = actionBanner(changeStatus)
 
+  // A banner belongs to the list it was shown on; a new filter or page drops it (review T5 N2).
+  function changeSearch(next: ListAccountsInput) {
+    changeStatus.reset()
+    onSearchChange(next)
+  }
+
   function confirm(action: AccountAction) {
     changeStatus.mutate(
       {
@@ -111,7 +117,7 @@ export function UserManagementView({
           value={search.status ?? ALL_STATUSES}
           onValueChange={(value) => {
             const status = accountStatusSchema.safeParse(value)
-            onSearchChange({
+            changeSearch({
               ...search,
               page: 1,
               status: status.success ? status.data : undefined,
@@ -172,7 +178,7 @@ export function UserManagementView({
             type="button"
             variant="outline"
             disabled={page <= 1}
-            onClick={() => onSearchChange({ ...search, page: page - 1 })}
+            onClick={() => changeSearch({ ...search, page: page - 1 })}
           >
             Sebelumnya
           </Button>
@@ -180,7 +186,7 @@ export function UserManagementView({
             type="button"
             variant="outline"
             disabled={page >= totalPages}
-            onClick={() => onSearchChange({ ...search, page: page + 1 })}
+            onClick={() => changeSearch({ ...search, page: page + 1 })}
           >
             Berikutnya
           </Button>

@@ -20,7 +20,7 @@ Server functions:
 
 - `getCurrentUser` (GET, `withSession`; returns `CurrentUser | null`; `Cache-Control: private, no-store`).
 - `listAccounts` (GET, `requireActiveSuperadmin`; input `listAccountsInputSchema`; returns `Result<AccountsPage>`; `AUTH_REQUIRED` or `AUTH_NOT_ACTIVE_SUPERADMIN` otherwise).
-- `changeAccountStatus` (POST, `requireActiveSuperadmin`; input `changeAccountStatusSchema`; returns `Result<AccountRow>`). Errors: `AUTH_NOT_ACTIVE_SUPERADMIN`, `AUTH_ACCOUNT_NOT_FOUND`, `AUTH_CANNOT_CHANGE_SELF`, `AUTH_ACCOUNT_STATUS_CHANGED`, `AUTH_INVALID_STATUS_TRANSITION`. Logs `auth.account_status_changed` (actor and target ids, from, to).
+- `changeAccountStatus` (POST, `requireActiveSuperadmin`; input `changeAccountStatusSchema`; returns `Result<AccountRow>`). Errors: `AUTH_NOT_ACTIVE_SUPERADMIN`, `AUTH_ACCOUNT_NOT_FOUND`, `AUTH_CANNOT_CHANGE_SELF`, `AUTH_ACCOUNT_STATUS_CHANGED`, `AUTH_INVALID_STATUS_TRANSITION`. Logs `auth.account_status_changed` (actor and target ids, from, to) at `info`, and a refusal decided in the transaction as `auth.account_status_refused` (ids and code) at `warn`. `nextStatus` never accepts `pending`.
 
 Authorization: `requireActiveSuperadmin` reads the actor's row on every call and puts the decision (`Result`) in `context.superadmin`; the handler returns it or calls the service.
 

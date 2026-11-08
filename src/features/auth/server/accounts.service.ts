@@ -167,6 +167,17 @@ export async function changeAccountStatus(
       },
       "account status changed"
     )
+  } else {
+    // Refusals decided on the locked rows (EC14, EC15, EC17); same shape as the middleware's warn.
+    logger.warn(
+      {
+        operation: "auth.account_status_refused",
+        actorId: actor.actorId,
+        targetId: input.userId,
+        code: result.error.code,
+      },
+      "account status change refused"
+    )
   }
   return result
 }

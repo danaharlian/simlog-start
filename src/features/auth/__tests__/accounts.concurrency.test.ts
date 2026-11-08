@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import type { AccountStatus } from "@/features/auth/schemas"
+import type { StatusTarget } from "@/features/auth/schemas"
 import { changeAccountStatus } from "@/features/auth/server/accounts.service"
 import {
   createAccount,
@@ -15,7 +15,7 @@ describe("changeAccountStatus under concurrency (AC20, NFR4, EC14)", () => {
     const actors = await Promise.all(
       Array.from({ length: CALLERS }, () => superadminActor())
     )
-    const nextStatuses: ReadonlyArray<AccountStatus> = actors.map((_, index) =>
+    const nextStatuses: ReadonlyArray<StatusTarget> = actors.map((_, index) =>
       index % 2 === 0 ? "active" : "rejected"
     )
 

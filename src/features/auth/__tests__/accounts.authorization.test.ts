@@ -2,34 +2,13 @@ import { randomUUID } from "node:crypto"
 import { eq } from "drizzle-orm"
 import { describe, expect, it } from "vitest"
 import { users } from "@/features/auth/db/schema"
-import type {
-  AccountStatus,
-  ChangeAccountStatusInput,
-  Role,
-} from "@/features/auth/schemas"
-import { auth } from "@/features/auth/server/auth.repository"
+import type { ChangeAccountStatusInput } from "@/features/auth/schemas"
 import {
   authorizeActiveSuperadmin,
   changeAccountStatus,
 } from "@/features/auth/server/accounts.service"
 import { db } from "@/shared/db/client"
-
-async function createAccount(
-  status: AccountStatus,
-  role: Role
-): Promise<string> {
-  const suffix = randomUUID().slice(0, 8)
-  const { user } = await auth.api.signUpEmail({
-    body: {
-      name: `Indra ${suffix}`,
-      email: `indra.${suffix}@contoh.id`,
-      username: `indra_${suffix}`,
-      password: "rahasia-123",
-    },
-  })
-  await db.update(users).set({ status, role }).where(eq(users.id, user.id))
-  return user.id
-}
+import { createAccount } from "./accounts.helpers"
 
 describe("authorizeActiveSuperadmin (AC13, NFR3, R22)", () => {
   it("tanpa sesi ditolak AUTH_REQUIRED", async () => {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import { changeAccountStatusSchema } from "@/features/auth/schemas"
 import { decideStatusChange } from "@/features/auth/server/accounts.rules"
 import type { AccountStatus } from "@/features/auth/schemas"
 
@@ -65,5 +66,22 @@ describe("decideStatusChange (AC15, AC18, EC14, EC15)", () => {
         nextStatus: "active",
       })
     ).toEqual({ kind: "reject", reason: "changed" })
+  })
+})
+
+describe("changeAccountStatusSchema", () => {
+  it("menolak nextStatus pending sebelum server berjalan", () => {
+    const input = {
+      userId: "7d1f2c1e-0000-4000-8000-000000000001",
+      expectedStatus: "active",
+    }
+    expect(
+      changeAccountStatusSchema.safeParse({ ...input, nextStatus: "pending" })
+        .success
+    ).toBe(false)
+    expect(
+      changeAccountStatusSchema.safeParse({ ...input, nextStatus: "inactive" })
+        .success
+    ).toBe(true)
   })
 })
