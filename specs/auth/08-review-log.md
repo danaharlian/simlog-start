@@ -177,7 +177,7 @@
 ## T7: Seed database dev
 
 ### Round 1: 2026-11-08
-- **PR:** PR_URL · **Commit reviewed:** `6790a72`
+- **PR:** https://github.com/danaharlian/simlog-start/pull/8 · **Commit reviewed:** `6790a72`
 - **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: pending
 - **Verdict:** blocked, needs human decision (subagent, on `6790a72`)
 
