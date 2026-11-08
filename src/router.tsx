@@ -29,4 +29,8 @@ declare module "@tanstack/react-router" {
   interface Register {
     router: ReturnType<typeof getRouter>
   }
+  // A page names itself once; the app shell shows it in the header (07-tasks.md change log, T4).
+  interface StaticDataRouteOption {
+    title?: string
+  }
 }

@@ -13,6 +13,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as GuestRouteImport } from './routes/_guest'
 import { Route as StatusRouteImport } from './routes/_status'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppUsersRouteImport } from './routes/_app/users'
 import { Route as GuestLoginRouteImport } from './routes/_guest/login'
 import { Route as GuestRegisterRouteImport } from './routes/_guest/register'
 import { Route as StatusStatusRouteImport } from './routes/_status/status'
@@ -33,6 +34,11 @@ const StatusRoute = StatusRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsersRoute = AppUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => AppRoute,
 } as any)
 const GuestLoginRoute = GuestLoginRouteImport.update({
@@ -58,6 +64,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/users': typeof AppUsersRoute
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
   '/status': typeof StatusStatusRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
+  '/users': typeof AppUsersRoute
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
   '/status': typeof StatusStatusRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_guest': typeof GuestRouteWithChildren
   '/_status': typeof StatusRouteWithChildren
+  '/_app/users': typeof AppUsersRoute
   '/_guest/login': typeof GuestLoginRoute
   '/_guest/register': typeof GuestRegisterRoute
   '/_status/status': typeof StatusStatusRoute
@@ -83,14 +92,15 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/status' | '/api/auth/$'
+  fullPaths: '/' | '/users' | '/login' | '/register' | '/status' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/status' | '/api/auth/$'
+  to: '/' | '/users' | '/login' | '/register' | '/status' | '/api/auth/$'
   id:
     | '__root__'
     | '/_app'
     | '/_guest'
     | '/_status'
+    | '/_app/users'
     | '/_guest/login'
     | '/_guest/register'
     | '/_status/status'
@@ -135,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/users': {
+      id: '/_app/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AppUsersRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_guest/login': {
       id: '/_guest/login'
       path: '/login'
@@ -167,10 +184,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
