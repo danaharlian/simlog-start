@@ -92,4 +92,37 @@ describe("account changes under concurrency (AC20, NFR4, EC14, EC16)", () => {
       expect(roles.filter((role) => role === "superadmin")).toHaveLength(1)
     }
   })
+
+  it("menonaktifkan dan mencabut saling bersamaan: satu ok, satu NOT_ACTIVE_SUPERADMIN, satu superadmin aktif tersisa", async () => {
+    const firstId = await createAccount("active", "superadmin")
+    const secondId = await createAccount("active", "superadmin")
+    const [first, second] = await Promise.all([
+      superadminActor(firstId),
+      superadminActor(secondId),
+    ])
+
+    // Race: a status change and a role change take the same two row locks (lockActorAndTarget).
+    const results = await Promise.all([
+      changeAccountStatus(first, {
+        userId: secondId,
+        expectedStatus: "active",
+        nextStatus: "inactive",
+      }),
+      changeAccountRole(second, {
+        userId: firstId,
+        expectedRole: "superadmin",
+        nextRole: "user",
+      }),
+    ])
+
+    expect(results.filter((result) => result.ok)).toHaveLength(1)
+    expect(results.find((result) => !result.ok)).toMatchObject({
+      error: { kind: "forbidden", code: "AUTH_NOT_ACTIVE_SUPERADMIN" },
+    })
+    const stored = [await storedAccount(firstId), await storedAccount(secondId)]
+    const activeSuperadmins = stored.filter(
+      (account) => account?.status === "active" && account.role === "superadmin"
+    )
+    expect(activeSuperadmins).toHaveLength(1)
+  })
 })

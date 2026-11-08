@@ -9,8 +9,8 @@ import {
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog"
 import { ACCOUNT_ACTION_TEXT } from "@/features/auth/components/account-labels"
-import { actionText } from "@/features/auth/components/account-row-actions"
-import type { AccountAction } from "@/features/auth/components/account-row-actions"
+import { actionText } from "@/features/auth/components/account-actions"
+import type { AccountAction } from "@/features/auth/components/account-actions"
 
 type ConfirmAccountActionDialogProps = {
   readonly action: AccountAction

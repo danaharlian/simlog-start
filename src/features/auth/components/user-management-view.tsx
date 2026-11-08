@@ -11,7 +11,7 @@ import {
 } from "@/shared/ui/select"
 import { ACCOUNT_STATUS_LABEL } from "@/features/auth/components/account-labels"
 import { AccountRowActions } from "@/features/auth/components/account-row-actions"
-import type { AccountAction } from "@/features/auth/components/account-row-actions"
+import type { AccountAction } from "@/features/auth/components/account-actions"
 import { AUTH_ERROR_TEXT } from "@/features/auth/components/auth-messages"
 import { AccountsTable } from "@/features/auth/components/accounts-table"
 import { ConfirmAccountActionDialog } from "@/features/auth/components/confirm-account-action-dialog"

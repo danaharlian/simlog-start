@@ -206,12 +206,29 @@ async function applyRoleChange(
   return toAccountRow(input.userId, updated)
 }
 
+// Literal names, so a search for an operation finds the line that writes it (logging.md rule 1;
+// review T6 N1).
+const CHANGE_LOG = {
+  status: {
+    changed: "auth.account_status_changed",
+    refused: "auth.account_status_refused",
+    changedMessage: "account status changed",
+    refusedMessage: "account status change refused",
+  },
+  role: {
+    changed: "auth.account_role_changed",
+    refused: "auth.account_role_refused",
+    changedMessage: "account role changed",
+    refusedMessage: "account role change refused",
+  },
+} as const
+
 type ChangeAudit = {
-  readonly subject: "status" | "role"
+  readonly subject: keyof typeof CHANGE_LOG
   readonly actor: ActiveSuperadmin
   readonly targetId: string
-  readonly from: string
-  readonly to: string
+  readonly from: AccountStatus | Role
+  readonly to: AccountStatus | Role
 }
 
 // Audit: ids, values, and codes only (spec section 10, security.md rule 13). A refusal decided on
@@ -220,25 +237,17 @@ function logChange(
   audit: ChangeAudit,
   result: Result<AccountRow, AuthError>
 ): void {
+  const names = CHANGE_LOG[audit.subject]
   const ids = { actorId: audit.actor.actorId, targetId: audit.targetId }
   if (result.ok)
     logger.info(
-      {
-        operation: `auth.account_${audit.subject}_changed`,
-        ...ids,
-        from: audit.from,
-        to: audit.to,
-      },
-      `account ${audit.subject} changed`
+      { operation: names.changed, ...ids, from: audit.from, to: audit.to },
+      names.changedMessage
     )
   else
     logger.warn(
-      {
-        operation: `auth.account_${audit.subject}_refused`,
-        ...ids,
-        code: result.error.code,
-      },
-      `account ${audit.subject} change refused`
+      { operation: names.refused, ...ids, code: result.error.code },
+      names.refusedMessage
     )
 }
 

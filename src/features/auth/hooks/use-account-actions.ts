@@ -1,5 +1,5 @@
 import type { Result } from "@/shared/errors"
-import type { AccountAction } from "@/features/auth/components/account-row-actions"
+import type { AccountAction } from "@/features/auth/components/account-actions"
 import { ACCOUNT_ACTION_TEXT } from "@/features/auth/components/account-labels"
 import { AUTH_ERROR_TEXT } from "@/features/auth/components/auth-messages"
 import type { AuthError } from "@/features/auth/errors"

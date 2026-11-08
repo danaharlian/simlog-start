@@ -133,7 +133,7 @@ export const changeAccountRoleSchema = z
     nextRole: roleSchema,
   })
   .refine((value) => value.nextRole !== value.expectedRole, {
-    message: "nextRole must differ from expectedRole",
+    error: "nextRole must differ from expectedRole",
     path: ["nextRole"],
   })
 export type ChangeAccountRoleInput = z.infer<typeof changeAccountRoleSchema>
