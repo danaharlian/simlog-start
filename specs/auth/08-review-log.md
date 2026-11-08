@@ -173,3 +173,31 @@
 **Decisions made in review:** (1) `changeAccountRoleSchema` menolak `nextRole` yang sama dengan `expectedRole`; (2) server mengizinkan mencabut superadmin nonaktif; (3) `hooks/use-account-actions.ts` dan `components/account-actions.ts` di luar file list disetujui; (4) peringatan di dialog "Aktifkan" untuk superadmin nonaktif (opsi b), sebagai perubahan terpisah.
 
 **Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #7 approve, keputusan 1–4 sesuai rekomendasi"
+
+## T7: Seed database dev
+
+### Round 1: 2026-11-08
+- **PR:** https://github.com/danaharlian/simlog-start/pull/8 · **Commit reviewed:** `6790a72`
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: Dana Harliansyah (Tech Lead), 2026-11-08, via chat
+- **Verdict:** blocked, needs human decision (subagent, on `6790a72`); approve (Dana Harliansyah, on `50ed5ab`)
+
+| ID | File:line | Review pass | Severity | Finding | Resolution | Status |
+|---|---|---|---|---|---|---|
+| R1-B1 | `seed.service.ts:79` | security | Blocking (human decision) | Guard hanya memeriksa `NODE_ENV` dan `SEED_ALLOW`, bukan database tujuan: URL production di shell + `SEED_ALLOW=true` di `.env` men-seed production (R25) | Keputusan Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "Shell URL ditolak". Fixed in `3da8e32`: `DATABASE_URL` dari shell ditolak; `SEED_ALLOW` hanya dari command line | resolved |
+| R1-S1 | `seed.service.test.ts:39` | tests | Non-blocking | Email contoh tetap: jalur pembuatan akun contoh hanya berjalan di database test yang baru | Fixed in `3da8e32`: `sampleTag` di tes; run pertama melaporkan semua contoh `created` | resolved |
+| R1-S2 | `seed.service.ts:94` | concurrency | Non-blocking | Tidak ada tes dua seed bersamaan dan tidak ada komentar `Race:` | Fixed in `3da8e32` | resolved |
+| R1-S3 | `seed.service.ts:142` | data | Non-blocking | Run yang terputus meninggalkan status salah yang dilaporkan `existing` | Fixed in `3da8e32`: status tersimpan ikut dilaporkan; catatan pemulihan di README | resolved |
+| R1-S4 | `environment.md:30` | docs | Non-blocking | Rule 6 bertentangan dengan guard `NODE_ENV` | Fixed in `3da8e32`: pengecualian untuk tool code di luar app | resolved |
+| R1-N1 | `seed.service.ts:97` | robustness | Non-blocking | `createOrFind` bergantung pada sign-up yang melempar error untuk email terpakai | Fixed in `3da8e32`: komentar menyebut syarat konfigurasinya | resolved |
+| R1-N2 | `seed.service.ts:99` | data | Non-blocking | Setiap akun baru dari seed membuat satu sesi yang tidak dipakai | Tidak diubah: data dev, tidak berbahaya | resolved (dicatat) |
+| R1-N3 | `seed.service.ts:103` | errors | Non-blocking | Username terpakai oleh email lain berakhir sebagai stack trace | Fixed in `3da8e32`: penolakan `sign_up_refused`; script hanya mencetak nama error | resolved |
+| R1-N4 | `seed-guard.test.ts` | tests | Non-blocking | "Sebelum menulis" hanya dibuktikan lewat email superadmin | Fixed in `3da8e32`: spy `signUpEmail`; tes password tidak muncul di pesan | resolved |
+| R1-N5 | `index.server.ts:3` | scope | Non-blocking | Export tipe yang tidak dipakai | Fixed in `3da8e32` | resolved |
+| R1-N6 | dependency | process | Non-blocking | Dependency di commit fitur, bukan branch `chore/`; `postinstall` esbuild kini berjalan di bawah `allowBuilds` lama | Dicatat di PR dan di baris `tsx` di `versions.md` | resolved |
+| R1-N7 | `versions.md` | docs | Non-blocking | "Observed" pada baris `tsx` belum mencakup jalur tulis | Fixed in `3da8e32`: jalur tulis di dev dijalankan owner, 2026-11-08 | resolved |
+
+**Unverified:** pesan error tak terduga dari database (script kini hanya mencetak nama error).
+
+**Decisions made in review:** (1) guard seed: `DATABASE_URL` dari shell ditolak, `SEED_ALLOW` hanya dari command line; (2) akun contoh memakai `SEED_SAMPLE_PASSWORD`. Keduanya oleh Dana Harliansyah (Tech Lead), 2026-11-08, via chat.
+
+**Outcome:** blocking findings resolved: yes · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #8 approve"
