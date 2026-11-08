@@ -6,6 +6,9 @@
     "avatar.tsx": {
       "sha256": "782659d874d45f3c886a7243353f8635f6a87991988947a1e37fe9a0f3483b42"
     },
+    "badge.tsx": {
+      "sha256": "d9fb280e266119c4b62a4c518e63152de27b094c68d3e5f8929d05bfb0c1bc6c"
+    },
     "breadcrumb.tsx": {
       "sha256": "3f3315bcb2f91a326b0fcc0f039828bd0c1446af12033a8c3488edf095158b76"
     },
@@ -30,6 +33,9 @@
     "label.tsx": {
       "sha256": "86232709f634da7f357a8aaec0e815f3f562604bb67202c88997fae97659b450"
     },
+    "select.tsx": {
+      "sha256": "3c814b931e522cf2c030b4c8768838eea9da32828a73b9b8799061fb87df3645"
+    },
     "separator.tsx": {
       "sha256": "9a80ff8c110e0c55489509f4f82ebcc929c0174b59544047147b7134f86a54e7"
     },
@@ -41,6 +47,9 @@
     },
     "skeleton.tsx": {
       "sha256": "4c2af7fa9c645358a0fb188779deab6f0b981733b62befc25e18aaebea1350dc"
+    },
+    "table.tsx": {
+      "sha256": "300dc171ff0e09543dce0787f43a3ceb0d168fa800eaecb98b6c5630f3c6d7e9"
     },
     "tooltip.tsx": {
       "sha256": "f83d5f511812573f4ac98b866d397a46fda0f27eeb0af0ea89af01969eefbc5a"
