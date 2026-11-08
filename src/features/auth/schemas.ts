@@ -113,14 +113,27 @@ export type AccountsPage = {
   readonly total: number
 }
 
-// A status change sends the status the superadmin saw, so a change made meanwhile is caught (spec section 4).
 // No action leads back to pending (spec section 8), so the schema refuses it before the server runs.
 export const statusTargetSchema = accountStatusSchema.exclude(["pending"])
 export type StatusTarget = z.infer<typeof statusTargetSchema>
 
+// A status change sends the status the superadmin saw, so a change made meanwhile is caught (spec section 4).
 export const changeAccountStatusSchema = z.object({
   userId: z.uuid(),
   expectedStatus: accountStatusSchema,
   nextStatus: statusTargetSchema,
 })
 export type ChangeAccountStatusInput = z.infer<typeof changeAccountStatusSchema>
+
+// A role change sends the role the superadmin saw (spec section 4); asking for the same role is not a change.
+export const changeAccountRoleSchema = z
+  .object({
+    userId: z.uuid(),
+    expectedRole: roleSchema,
+    nextRole: roleSchema,
+  })
+  .refine((value) => value.nextRole !== value.expectedRole, {
+    error: "nextRole must differ from expectedRole",
+    path: ["nextRole"],
+  })
+export type ChangeAccountRoleInput = z.infer<typeof changeAccountRoleSchema>

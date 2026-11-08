@@ -8,32 +8,16 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu"
 import {
-  ACCOUNT_ACTION_TEXT,
-  STATUS_ACTION_TEXT,
-} from "@/features/auth/components/account-labels"
-import type {
-  AccountRow,
-  AccountStatus,
-  StatusTarget,
-} from "@/features/auth/schemas"
-
-export type AccountAction = {
-  readonly row: AccountRow
-  readonly nextStatus: StatusTarget
-}
-
-// Which choices the menu offers (spec section 8, step 2). The server still decides every
-// change against the locked row (accounts.rules.ts), so this list only shapes the menu.
-const OFFERED: Record<AccountStatus, ReadonlyArray<StatusTarget>> = {
-  pending: ["active", "rejected"],
-  active: ["inactive"],
-  rejected: ["active"],
-  inactive: ["active"],
-}
+  actionKey,
+  actionText,
+  choicesFor,
+} from "@/features/auth/components/account-actions"
+import type { AccountAction } from "@/features/auth/components/account-actions"
+import { ACCOUNT_ACTION_TEXT } from "@/features/auth/components/account-labels"
+import type { AccountRow } from "@/features/auth/schemas"
 
 type AccountRowActionsProps = {
   readonly row: AccountRow
-  // The signed-in superadmin's own row never offers Nonaktifkan (EC15).
   readonly isSelf: boolean
   readonly disabled: boolean
   readonly onChoose: (action: AccountAction) => void
@@ -45,9 +29,7 @@ export function AccountRowActions({
   disabled,
   onChoose,
 }: AccountRowActionsProps) {
-  const choices = OFFERED[row.status].filter(
-    (next) => !(isSelf && next === "inactive")
-  )
+  const choices = choicesFor(row, isSelf)
   if (choices.length === 0) return null
 
   return (
@@ -66,17 +48,18 @@ export function AccountRowActions({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
-          {choices.map((next) => (
-            <DropdownMenuItem
-              key={next}
-              variant={
-                STATUS_ACTION_TEXT[next].destructive ? "destructive" : "default"
-              }
-              onClick={() => onChoose({ row, nextStatus: next })}
-            >
-              {STATUS_ACTION_TEXT[next].label}
-            </DropdownMenuItem>
-          ))}
+          {choices.map((choice) => {
+            const text = actionText(choice)
+            return (
+              <DropdownMenuItem
+                key={actionKey(choice)}
+                variant={text.destructive ? "destructive" : "default"}
+                onClick={() => onChoose(choice)}
+              >
+                {text.label}
+              </DropdownMenuItem>
+            )
+          })}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

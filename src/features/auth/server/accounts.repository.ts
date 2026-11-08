@@ -2,7 +2,7 @@ import { asc, count, desc, eq, inArray } from "drizzle-orm"
 import type { SQL } from "drizzle-orm"
 import type { DbOrTx } from "@/shared/db/client"
 import { users } from "@/features/auth/db/schema"
-import type { AccountStatus } from "@/features/auth/schemas"
+import type { AccountStatus, Role } from "@/features/auth/schemas"
 
 export async function findCurrentUser(executor: DbOrTx, userId: string) {
   const [row] = await executor
@@ -42,21 +42,24 @@ function orderFor(sort: ListAccountsQuery["sort"]): ReadonlyArray<SQL> {
   return [desc(eq(users.status, "pending")), ...newestFirst]
 }
 
+// The R16 columns the account list and a changed row return (NFR6).
+const ACCOUNT_ROW_COLUMNS = {
+  id: users.id,
+  name: users.name,
+  username: users.username,
+  email: users.email,
+  status: users.status,
+  role: users.role,
+  createdAt: users.createdAt,
+}
+
 export async function listAccounts(executor: DbOrTx, query: ListAccountsQuery) {
   const where: SQL | undefined =
     query.status === undefined ? undefined : eq(users.status, query.status)
   // Two pool connections, so the page and the total can come from different snapshots; fine for an admin list.
   const [rows, totals] = await Promise.all([
     executor
-      .select({
-        id: users.id,
-        name: users.name,
-        username: users.username,
-        email: users.email,
-        status: users.status,
-        role: users.role,
-        createdAt: users.createdAt,
-      })
+      .select(ACCOUNT_ROW_COLUMNS)
       .from(users)
       .where(where)
       .orderBy(...orderFor(query.sort))
@@ -93,14 +96,18 @@ export async function updateAccountStatus(
     .update(users)
     .set({ status: input.status, statusChangedAt: input.changedAt })
     .where(eq(users.id, input.id))
-    .returning({
-      id: users.id,
-      name: users.name,
-      username: users.username,
-      email: users.email,
-      status: users.status,
-      role: users.role,
-      createdAt: users.createdAt,
-    })
+    .returning(ACCOUNT_ROW_COLUMNS)
+  return row
+}
+
+export async function updateAccountRole(
+  tx: DbOrTx,
+  input: { readonly id: string; readonly role: Role }
+) {
+  const [row] = await tx
+    .update(users)
+    .set({ role: input.role })
+    .where(eq(users.id, input.id))
+    .returning(ACCOUNT_ROW_COLUMNS)
   return row
 }

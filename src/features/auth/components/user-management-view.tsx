@@ -9,16 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select"
-import {
-  ACCOUNT_ACTION_TEXT,
-  ACCOUNT_STATUS_LABEL,
-} from "@/features/auth/components/account-labels"
+import { ACCOUNT_STATUS_LABEL } from "@/features/auth/components/account-labels"
 import { AccountRowActions } from "@/features/auth/components/account-row-actions"
-import type { AccountAction } from "@/features/auth/components/account-row-actions"
+import type { AccountAction } from "@/features/auth/components/account-actions"
 import { AUTH_ERROR_TEXT } from "@/features/auth/components/auth-messages"
 import { AccountsTable } from "@/features/auth/components/accounts-table"
 import { ConfirmAccountActionDialog } from "@/features/auth/components/confirm-account-action-dialog"
-import { useChangeAccountStatus } from "@/features/auth/hooks/use-change-account-status"
+import { useAccountActions } from "@/features/auth/hooks/use-account-actions"
 import {
   accountsQueryOptions,
   currentUserQueryOptions,
@@ -43,16 +40,6 @@ const STATUS_FILTER_ITEMS: Record<string, string> = {
   ...ACCOUNT_STATUS_LABEL,
 }
 
-type ChangeStatusState = ReturnType<typeof useChangeAccountStatus>
-
-// A failed action shows its text in a banner while the list reloads (spec section 8, step 4).
-function actionBanner(changeStatus: ChangeStatusState): string | undefined {
-  if (changeStatus.isError) return ACCOUNT_ACTION_TEXT.failed
-  return changeStatus.data?.ok === false
-    ? AUTH_ERROR_TEXT[changeStatus.data.error.code]
-    : undefined
-}
-
 type UserManagementViewProps = {
   readonly search: ListAccountsInput
   // The route owns the URL: filter and page live in search params (spec section 8, state location).
@@ -65,7 +52,7 @@ export function UserManagementView({
 }: UserManagementViewProps) {
   const { data: result } = useSuspenseQuery(accountsQueryOptions(search))
   const { data: currentUser } = useSuspenseQuery(currentUserQueryOptions())
-  const changeStatus = useChangeAccountStatus()
+  const actions = useAccountActions()
   // The action waiting for confirmation is temporary UI state (spec section 8, state location).
   const [chosen, setChosen] = useState<AccountAction | null>(null)
 
@@ -81,31 +68,18 @@ export function UserManagementView({
 
   const { items, page, pageSize, total } = result.data
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
-  const banner = actionBanner(changeStatus)
 
   // A banner belongs to the list it was shown on; a new filter or page drops it (review T5 N2).
   function changeSearch(next: ListAccountsInput) {
-    changeStatus.reset()
+    actions.reset()
     onSearchChange(next)
-  }
-
-  function confirm(action: AccountAction) {
-    changeStatus.mutate(
-      {
-        userId: action.row.id,
-        // The status the superadmin saw; the server refuses if it changed meanwhile (EC14).
-        expectedStatus: action.row.status,
-        nextStatus: action.nextStatus,
-      },
-      { onSettled: () => setChosen(null) }
-    )
   }
 
   return (
     <div className="flex flex-col gap-4">
-      {banner === undefined ? null : (
+      {actions.banner === undefined ? null : (
         <Alert variant="destructive">
-          <AlertDescription>{banner}</AlertDescription>
+          <AlertDescription>{actions.banner}</AlertDescription>
         </Alert>
       )}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -155,10 +129,7 @@ export function UserManagementView({
               <AccountRowActions
                 row={row}
                 isSelf={row.id === currentUser?.id}
-                disabled={
-                  changeStatus.isPending &&
-                  changeStatus.variables.userId === row.id
-                }
+                disabled={actions.runningUserId === row.id}
                 onChoose={setChosen}
               />
             )}
@@ -196,8 +167,8 @@ export function UserManagementView({
       {chosen === null ? null : (
         <ConfirmAccountActionDialog
           action={chosen}
-          isPending={changeStatus.isPending}
-          onConfirm={confirm}
+          isPending={actions.isPending}
+          onConfirm={(action) => actions.run(action, () => setChosen(null))}
           onDismiss={() => setChosen(null)}
         />
       )}

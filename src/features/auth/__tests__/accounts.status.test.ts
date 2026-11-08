@@ -15,33 +15,36 @@ import {
 
 describe("changeAccountStatus (AC15, AC16, AC18, M1)", () => {
   it("aktifkan, tolak, nonaktifkan, aktifkan kembali", async () => {
-    const actor = await superadminActor()
-    const a = await createAccount("pending")
-    const b = await createAccount("pending")
-    const c = await createAccount("active")
-    const d = await createAccount("rejected")
-    const results = [
-      await changeAccountStatus(actor, {
+    // Independent accounts, so setup and changes run in parallel (keeps the test inside its timeout).
+    const [actor, a, b, c, d] = await Promise.all([
+      superadminActor(),
+      createAccount("pending"),
+      createAccount("pending"),
+      createAccount("active"),
+      createAccount("rejected"),
+    ])
+    const results = await Promise.all([
+      changeAccountStatus(actor, {
         userId: a,
         expectedStatus: "pending",
         nextStatus: "active",
       }),
-      await changeAccountStatus(actor, {
+      changeAccountStatus(actor, {
         userId: b,
         expectedStatus: "pending",
         nextStatus: "rejected",
       }),
-      await changeAccountStatus(actor, {
+      changeAccountStatus(actor, {
         userId: c,
         expectedStatus: "active",
         nextStatus: "inactive",
       }),
-      await changeAccountStatus(actor, {
+      changeAccountStatus(actor, {
         userId: d,
         expectedStatus: "rejected",
         nextStatus: "active",
       }),
-    ]
+    ])
     expect(results.every((result) => result.ok)).toBe(true)
     expect((await storedAccount(a))?.status).toBe("active")
     expect((await storedAccount(b))?.status).toBe("rejected")
