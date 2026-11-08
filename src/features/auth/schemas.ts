@@ -81,3 +81,34 @@ export const loginSchema = z.object({
 })
 export type LoginInput = z.infer<typeof loginSchema>
 export type LoginFormValues = z.input<typeof loginSchema>
+
+// The account list for superadmins (spec sections 5 and 6). `.catch` keeps a bad URL from throwing.
+export const ACCOUNTS_PAGE_SIZE = 20
+// Bounds the offset a URL can ask for (zod.md rule 8).
+export const MAX_ACCOUNTS_PAGE = 10_000
+export const accountSorts = ["pendingFirst", "createdAtDesc"] as const
+
+export const listAccountsInputSchema = z.object({
+  status: accountStatusSchema.optional().catch(undefined),
+  page: z.number().int().min(1).max(MAX_ACCOUNTS_PAGE).catch(1),
+  sort: z.enum(accountSorts).catch("pendingFirst"),
+})
+export type ListAccountsInput = z.infer<typeof listAccountsInputSchema>
+
+export const accountRowSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  username: z.string(),
+  email: z.string(),
+  status: accountStatusSchema,
+  role: roleSchema,
+  createdAt: z.iso.datetime(),
+})
+export type AccountRow = z.infer<typeof accountRowSchema>
+
+export type AccountsPage = {
+  readonly items: ReadonlyArray<AccountRow>
+  readonly page: number
+  readonly pageSize: number
+  readonly total: number
+}

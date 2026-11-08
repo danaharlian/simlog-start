@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { currentUserQueryOptions } from "@/features/auth"
 
 export const Route = createFileRoute("/_app/")({
+  staticData: { title: "Beranda" },
   head: () => ({ meta: [{ title: "Beranda" }] }),
   component: HomePage,
 })

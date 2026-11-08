@@ -1,4 +1,5 @@
 import { AUTH_ERROR } from "@/features/auth/errors"
+import type { AuthErrorCode } from "@/features/auth/errors"
 
 export type AuthFormErrors = {
   readonly form?: string
@@ -71,3 +72,11 @@ export const SIGN_OUT_TEXT = {
   pending: "Keluar…",
   failed: "Gagal keluar. Coba lagi.",
 } as const
+
+// One text per code this feature defines; a new code fails typecheck here until it has a text.
+export const AUTH_ERROR_TEXT: Record<AuthErrorCode, string> = {
+  [AUTH_ERROR.USERNAME_REQUIRED]: "Username wajib diisi",
+  [AUTH_ERROR.SESSION_REQUIRED]:
+    "Sesi Anda sudah berakhir. Muat ulang halaman untuk masuk lagi.",
+  [AUTH_ERROR.NOT_ACTIVE_SUPERADMIN]: "Anda tidak punya akses ke halaman ini.",
+}
