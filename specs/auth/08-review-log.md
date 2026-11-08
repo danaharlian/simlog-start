@@ -77,8 +77,8 @@
 
 ### Round 1: 2026-11-08
 - **PR:** https://github.com/danaharlian/simlog-start/pull/4 · **Commit reviewed:** `6be8076`
-- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: pending (Dana Harliansyah)
-- **Verdict:** approve setelah should-fix 1 sampai 3 (subagent); tidak ada temuan blocking
+- **Review passes:** separate-context pass (`code-review`): subagent general-purpose dengan konteks baru, read-only, tanpa berpindah branch, 2026-11-08 · human review: Dana Harliansyah (Tech Lead), 2026-11-08, via chat
+- **Verdict:** approve setelah should-fix 1 sampai 3 (subagent, on `6be8076`); approve (Dana Harliansyah, on `17fcbac`)
 
 | ID | File:line | Review pass | Severity | Finding | Resolution | Status |
 |---|---|---|---|---|---|---|
@@ -100,4 +100,4 @@
 
 **Decisions made in review:** cek manual AC6 dan AC12 ditunda ke QA (keputusan owner, 2026-11-08); judul header pindah ke T4.
 
-**Outcome:** blocking findings resolved: yes (tidak ada) · PR gate passed: not yet (menunggu Dana Harliansyah)
+**Outcome:** blocking findings resolved: yes (tidak ada) · PR gate passed by Dana Harliansyah (Tech Lead), 2026-11-08, via chat: "PR #4 approve."
