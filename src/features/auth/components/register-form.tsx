@@ -25,8 +25,9 @@ export function RegisterForm({ onRegistered }: RegisterFormProps) {
   const form = useAppForm({
     defaultValues: EMPTY_REGISTER_VALUES,
     validators: {
-      // onBlur: a rule on every keystroke is noise (tanstack-form.md, rule 4); submit validates again.
-      onBlur: registerSchema,
+      // onChange, so an error clears as soon as the value is valid; AppTextField shows it only after
+      // the field is left or the form is submitted (QA D2; tanstack-form.md, rule 4).
+      onChange: registerSchema,
       onSubmitAsync: async ({ value }) => {
         const result = await signUp.mutateAsync(registerSchema.parse(value))
         if (!result.ok) return signUpFormErrors(result.code, result.status)

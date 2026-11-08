@@ -22,7 +22,7 @@ verified_against: "TanStack Form validation, basic-concepts, form-composition, a
 1. **One schema, two uses.** The Zod schema in the feature's `schemas.ts` is used by the form validator **and** the server function `.validator(...)`. Never maintain two copies.
 2. **Server is authoritative.** Client validation is UX. A server `validation` `AppError` (returned in a `Result`) MUST be mappable back to field errors with `toFormErrors` in `validators.onSubmitAsync`, which returns `{ form, fields }`; test this path (`docs/03-standards/error-handling.md`).
 3. **Default values are explicit and typed** from the schema's input type, and come from one mapper (below). Beware schemas with transforms or coercions: form input type and output type differ; follow the docs for the installed Zod/Form versions.
-4. **Validation timing:** `onChange` for cheap rules, `onBlur` for noisy ones, `onSubmit` for cross-field and server-backed checks. Debounce async checks.
+4. **Validation timing:** `onChange` for cheap rules, `onBlur` for noisy ones, `onSubmit` for cross-field and server-backed checks. Debounce async checks. A form-level schema of cheap rules runs `onChange`, and the field component waits to **show** its error until the field is left or the form is submitted (example below; `useStore` is deprecated in `@tanstack/react-store` 0.11.2, use `useSelector`).
 5. **Accessible fields:** every input has a visible `<label>` (or equivalent), `aria-invalid` + `aria-describedby` for errors, and focus moves to the first error on failed submit.
 6. **Compose with shadcn/ui primitives** in `shared/ui`. shadcn has a TanStack Form guide (`Field`, `FieldLabel`, `FieldDescription`, `FieldError`; `data-invalid` on `Field`, `aria-invalid` on the control): use those primitives, inside field components registered once in `createFormHook`, not repeated per form. Do not copy shadcn's form guidance for other libraries.
 7. **Submission:** call a mutation (`useMutation`) that wraps a server function; disable submit while `isSubmitting`; read `data.ok` from the returned `Result` (an `ok: false` result is a successful call to Query); show a non-field error banner for `AppError`s that are not field-specific.
@@ -71,10 +71,15 @@ function toErrorMessages(errors: ReadonlyArray<unknown>): ReadonlyArray<string> 
   })
 }
 
+// Forms validate onChange, so an error clears as soon as the value is valid; it is shown only after
+// the field is left (isBlurred) or a submit, so typing is not interrupted (specs/auth QA D2, 2026-11-08).
+// With an onBlur validator, an old error stays until the next blur.
 export function AppTextField({ label }: { readonly label: string }) {
   const field = useFieldContext<string>()
-  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-  const messages = toErrorMessages(field.state.meta.errors)
+  const submissionAttempts = useSelector(field.form.store, (state) => state.submissionAttempts)
+  const settled = field.state.meta.isBlurred || submissionAttempts > 0
+  const messages = settled ? toErrorMessages(field.state.meta.errors) : []
+  const isInvalid = messages.length > 0
   // value={field.state.value}, onBlur={field.handleBlur},
   // onChange={(event) => field.handleChange(event.target.value)}, aria-invalid={isInvalid}
 }

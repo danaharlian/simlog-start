@@ -1,4 +1,5 @@
 import { useId } from "react"
+import { useSelector } from "@tanstack/react-form"
 import { z } from "zod"
 import { useFieldContext } from "@/shared/ui/app-form-context"
 import { Field, FieldError, FieldLabel } from "@/shared/ui/field"
@@ -14,6 +15,22 @@ function toErrorMessages(
     const issue = validationIssueSchema.safeParse(error)
     return issue.success ? [issue.data.message] : []
   })
+}
+
+type FieldErrorMeta = {
+  readonly isBlurred: boolean
+  readonly errors: ReadonlyArray<unknown>
+}
+
+// Forms validate on change, so an error clears as soon as the value is valid. It is shown only
+// once the field was left or the form was submitted, so typing is not interrupted (QA D2;
+// tanstack-form.md, rule 4).
+export function visibleFieldErrors(
+  meta: FieldErrorMeta,
+  submissionAttempts: number
+): ReadonlyArray<string> {
+  const settled = meta.isBlurred || submissionAttempts > 0
+  return settled ? toErrorMessages(meta.errors) : []
 }
 
 type AppTextFieldProps = {
@@ -32,8 +49,12 @@ export function AppTextField({
   const field = useFieldContext<string>()
   const inputId = useId()
   const errorId = `${inputId}-error`
-  const messages = toErrorMessages(field.state.meta.errors)
-  const isInvalid = field.state.meta.isTouched && messages.length > 0
+  const submissionAttempts = useSelector(
+    field.form.store,
+    (state) => state.submissionAttempts
+  )
+  const messages = visibleFieldErrors(field.state.meta, submissionAttempts)
+  const isInvalid = messages.length > 0
 
   return (
     <Field data-invalid={isInvalid}>

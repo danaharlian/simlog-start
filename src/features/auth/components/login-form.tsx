@@ -22,8 +22,9 @@ export function LoginForm({ onSignedIn }: LoginFormProps) {
   const form = useAppForm({
     defaultValues: EMPTY_LOGIN_VALUES,
     validators: {
-      // onBlur: a rule on every keystroke is noise (tanstack-form.md, rule 4); submit validates again.
-      onBlur: loginSchema,
+      // onChange, so an error clears as soon as the value is valid; AppTextField shows it only after
+      // the field is left or the form is submitted (QA D2; tanstack-form.md, rule 4).
+      onChange: loginSchema,
       onSubmitAsync: async ({ value }) => {
         const result = await signIn.mutateAsync(loginSchema.parse(value))
         if (!result.ok)
