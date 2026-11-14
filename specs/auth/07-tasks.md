@@ -22,7 +22,9 @@ Tasks gate digabung dengan Spec gate (`06-feature-spec.md`, header `Tasks gate`)
 | T4 | Superadmin melihat daftar akun di `/users` dengan saringan status; pengguna biasa ditolak | medium: otorisasi pertama di server function; DTO tanpa kolom sensitif | T3 | AC10 (untuk `/users`), AC12 (menu superadmin), AC13, AC14, NFR3, NFR6 | | [#5](https://github.com/danaharlian/simlog-start/pull/5) | merged |
 | T5 | Superadmin mengaktifkan, menolak, menonaktifkan, dan mengaktifkan kembali akun; aksi bersamaan tidak saling menimpa | high: transaksi dengan `.for('update')`, aturan transisi, larangan diri sendiri | T4 (butuh tabel `/users` untuk aksi baris) | AC15, AC16, AC18 (status), AC20 (status), NFR4 | | [#6](https://github.com/danaharlian/simlog-start/pull/6) | merged |
 | T6 | Superadmin mengangkat dan mencabut superadmin; minimal satu superadmin aktif tetap ada | high: invariant R20 di bawah konkurensi | T5 (memakai transaksi dan dialog dari T5) | AC17, AC18 (role), AC19, AC20 (saling cabut), NFR4 | | [#7](https://github.com/danaharlian/simlog-start/pull/7) | merged |
-| T7 | Pengembang mengisi database dev dengan `pnpm db:seed` | low: `tsx` dengan alias `@/` (ADR 0042) | T6 (seed mengubah status dan role lewat service dari T5 dan T6) | AC22, AC23 | | [#8](https://github.com/danaharlian/simlog-start/pull/8) | in review |
+| T7 | Pengembang mengisi database dev dengan `pnpm db:seed` | low: `tsx` dengan alias `@/` (ADR 0042) | T6 (seed mengubah status dan role lewat service dari T5 dan T6) | AC22, AC23 | | [#8](https://github.com/danaharlian/simlog-start/pull/8) | merged |
+| T8 | Build production mengirim header keamanan (CSP dengan nonce, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, perlindungan frame) | high: `src/start.ts` mematikan CSRF otomatis Start, jadi CSRF dipasang eksplisit; CSP salah membuat halaman kosong | ADR 0047 diterima | QA D1 (`security.md` rule 9) | | | in progress |
+| T9 | Error kolom form hilang segera setelah nilainya benar, tetap muncul baru setelah kolom ditinggalkan | low: komponen form bersama dan dua form | none | QA D2 (AC2, AC26, NFR5) | | [#9](https://github.com/danaharlian/simlog-start/pull/9) | in review |
 
 Urutan mengikuti risiko, kecuali T5 dan T6 yang menunggu T4 karena aksinya ada di baris tabel `/users`, dan T3 yang menunggu T2 karena memakai `useSignOut` dan `resolveAccessRedirect`.
 
@@ -226,6 +228,18 @@ Urutan mengikuti risiko, kecuali T5 dan T6 yang menunggu T4 karena aksinya ada d
 - **Public API or events added:** `seedAccounts` (`index.server.ts`).
 - **Done when:** tes di atas lulus; `pnpm db:seed` di dev membuat akun dan superadmin bisa login; review memastikan `scripts/seed.ts` hanya mengimpor `@/features/auth/index.server` (lint boundary tidak memeriksa `scripts/`).
 
+### T8: Header keamanan (fix task QA D1)
+- **Asal:** `09-qa.md` D1 (High). Tidak mengubah PRD atau AC; menutup `security.md` rule 9 yang belum ada task-nya.
+- **Files this task may change:** `src/start.ts` (create), `src/shared/server/security-headers.ts` (create), `src/router.tsx` (modify: `ssr.nonce`), tes header, `docs/04-stack/tanstack-start.md` ("Security headers", "CSRF": hasil yang diamati), `docs/decisions/0047-*.md`, `docs/decisions/README.md` (decision AC).
+- **Tests written first:** header ada di halaman, server function, dan 404; RPC POST lintas origin tetap 403 (CSRF eksplisit); halaman merender dan hydrate dengan CSP aktif tanpa pelanggaran CSP di console (walk browser QA ronde 2).
+- **Done when:** QA ronde 2 melihat semua header di build production; tidak ada pelanggaran CSP di console; CSRF RPC tetap 403 lintas origin.
+
+### T9: Waktu validasi form (fix task QA D2)
+- **Asal:** `09-qa.md` D2 (Medium), keputusan owner: diperbaiki.
+- **Files this task may change:** `src/shared/ui/app-text-field.tsx`, `src/features/auth/components/register-form.tsx`, `login-form.tsx`, tes, `docs/04-stack/tanstack-form.md` (contoh komponen kolom, bila perlu).
+- **Tests written first:** error kolom tampil setelah blur dan setelah submit, tidak saat mengetik pertama kali; error hilang begitu nilai menjadi sah tanpa blur lagi.
+- **Done when:** walk QA ronde 2 untuk item 7 ok, termasuk VoiceOver: pesan error yang muncul atau hilang saat mengetik tidak terlalu ramai (review T9 S2); AC2 dan AC26 tetap lulus.
+
 ## Entry point visibility
 T2 membuat `/login` dan `/register` bisa dibuka lewat URL, tanpa tautan. T3 mengganti `/` scaffold dengan dashboard, sehingga siapa pun yang membuka `/` diarahkan ke `/login`: di sinilah fitur terlihat. T4 menambah menu Manajemen pengguna untuk superadmin. Semua ini hanya sampai ke staging sampai Release gate.
 
@@ -301,6 +315,8 @@ T2 membuat `/login` dan `/register` bisa dibuka lewat URL, tanpa tautan. T3 meng
 | 2026-11-08 | T7: penolakan seed memakai tipe `SeedRefusal` (`production`, `not_allowed`, `invalid_config`, `superadmin_not_active`), bukan kode `AUTH_*` | Seed tidak punya UI; kode `AUTH_*` mewajibkan teks di `AUTH_ERROR_TEXT` yang tidak pernah tampil |
 | 2026-11-08 | T7: guard seed (spec section 1, R25) juga menolak `DATABASE_URL` yang diset di shell, dan `SEED_ALLOW` hanya diterima dari command line (nilai di `.env` diabaikan). `scripts/seed.ts` menyalin variabel shell, memuat `.env` sendiri, lalu mengimpor `index.server` secara dinamis; `db:seed` menjadi `tsx scripts/seed.ts` | Review T7 R1-B1: migrasi production dijalankan dengan URL di shell (`environment.md`), sehingga `SEED_ALLOW=true` di `.env` bisa men-seed production. Keputusan Dana Harliansyah (Tech Lead), 2026-11-08, via chat (pilihan "Shell URL ditolak (Recommended)") |
 | 2026-11-08 | T7: `seedAccounts` menerima `{ env, shell, sampleTag? }`; `sampleTag` hanya untuk tes, agar jalur pembuatan akun contoh berjalan di setiap run pada database test bersama | Review T7 R1-S1 |
+| 2026-11-08 | T8 dan T9 (fix task QA ronde 1): D1 header keamanan, D2 waktu validasi form. Ruang lingkup dan AC tidak berubah | `sdlc-pipeline.md` section 4: setiap defect yang memblokir menjadi fix task lewat change log. Keputusan Dana Harliansyah (QA Lead), 2026-11-08, via chat: "D1 High, perbaiki D1 dan D2 lalu QA ronde 2" |
+| 2026-11-08 | T9: `components/auth-form-options.ts` (create, opsi statis form register dan login lewat `formOptions`), `shared/ui/app-field-errors.ts` (create, `visibleFieldErrors`), tes `__tests__/field-validation.test.ts` (create) | Tes komponen DOM belum disiapkan (`versions.md`, baris Vitest), jadi keputusan tampil atau tidak dipisah menjadi fungsi murni. Tes dibangun dari opsi form yang sama, sehingga form yang kembali ke `onBlur` gagal di tes (review T9 S1, N4) |
 | 2026-11-08 | T1: tes env di `src/shared/config/env.server.test.ts` (bukan `__tests__/` fitur) | Tes itu menguji modul `shared`, jadi diletakkan di sebelah kodenya (`folder-structure.md`, Naming: tests) |
 
 ## Gate review

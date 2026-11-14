@@ -1,20 +1,9 @@
 import { useId } from "react"
-import { z } from "zod"
+import { useSelector } from "@tanstack/react-form"
+import { visibleFieldErrors } from "@/shared/ui/app-field-errors"
 import { useFieldContext } from "@/shared/ui/app-form-context"
 import { Field, FieldError, FieldLabel } from "@/shared/ui/field"
 import { Input } from "@/shared/ui/input"
-
-// field.state.meta.errors is typed any; read each entry through a schema (tanstack-form.md).
-const validationIssueSchema = z.object({ message: z.string() })
-
-function toErrorMessages(
-  errors: ReadonlyArray<unknown>
-): ReadonlyArray<string> {
-  return errors.flatMap((error) => {
-    const issue = validationIssueSchema.safeParse(error)
-    return issue.success ? [issue.data.message] : []
-  })
-}
 
 type AppTextFieldProps = {
   readonly label: string
@@ -32,8 +21,12 @@ export function AppTextField({
   const field = useFieldContext<string>()
   const inputId = useId()
   const errorId = `${inputId}-error`
-  const messages = toErrorMessages(field.state.meta.errors)
-  const isInvalid = field.state.meta.isTouched && messages.length > 0
+  const submissionAttempts = useSelector(
+    field.form.store,
+    (state) => state.submissionAttempts
+  )
+  const messages = visibleFieldErrors(field.state.meta, submissionAttempts)
+  const isInvalid = messages.length > 0
 
   return (
     <Field data-invalid={isInvalid}>

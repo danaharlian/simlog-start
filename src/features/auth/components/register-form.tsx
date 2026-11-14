@@ -3,19 +3,11 @@ import { useRef } from "react"
 import { focusFirstInvalidControl, useAppForm } from "@/shared/ui/app-form"
 import { FieldDescription, FieldGroup } from "@/shared/ui/field"
 import { signUpFormErrors } from "@/features/auth/components/auth-messages"
+import { registerFormOptions } from "@/features/auth/components/auth-form-options"
 import { AuthSplitLayout } from "@/features/auth/components/auth-split-layout"
 import { FormBanner } from "@/features/auth/components/form-banner"
 import { useSignUp } from "@/features/auth/hooks/use-sign-up"
 import { registerSchema } from "@/features/auth/schemas"
-import type { RegisterFormValues } from "@/features/auth/schemas"
-
-const EMPTY_REGISTER_VALUES = {
-  name: "",
-  username: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-} satisfies RegisterFormValues
 
 type RegisterFormProps = { readonly onRegistered: () => Promise<void> | void }
 
@@ -23,10 +15,9 @@ export function RegisterForm({ onRegistered }: RegisterFormProps) {
   const signUp = useSignUp()
   const formRef = useRef<HTMLFormElement>(null)
   const form = useAppForm({
-    defaultValues: EMPTY_REGISTER_VALUES,
+    ...registerFormOptions,
     validators: {
-      // onBlur: a rule on every keystroke is noise (tanstack-form.md, rule 4); submit validates again.
-      onBlur: registerSchema,
+      ...registerFormOptions.validators,
       onSubmitAsync: async ({ value }) => {
         const result = await signUp.mutateAsync(registerSchema.parse(value))
         if (!result.ok) return signUpFormErrors(result.code, result.status)

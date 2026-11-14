@@ -52,6 +52,7 @@ Use `docs/templates/adr.md`. Number sequentially `NNNN-title.md`. Status: `propo
 - [0044 Integration tests reach the test database through the Vitest config (closes open decision AH)](0044-integration-tests-reach-the-test-database.md)
 - [0045 Add @tanstack/react-router-ssr-query](0045-router-ssr-query-integration.md)
 - [0046 Better Auth hardening: origin check under tests, CSRF on username sign-in, and its logger](0046-better-auth-origin-check-and-logging.md)
+- [0047 Content Security Policy and security headers for the app](0047-content-security-policy.md)
 
 
 
@@ -132,6 +133,7 @@ Scaffold: `pnpm dlx shadcn@latest init -t start` (checked 2026-10-15 in the shad
 | Cross-feature query freshness | **A query that joins another feature's data declares `meta.dependsOn` with the owner's scope; mutation hooks invalidate with `invalidateFeature` from `shared/lib/query-scope.ts`, only when `data.ok`** | owner approval; ADR 0035 |
 | Test database access (AH) | **`vitest.config.ts` sets `test.env.DATABASE_URL` from `TEST_DATABASE_URL` and refuses the dev URL** | owner decision; ADR 0044 |
 | Seed runner (AB) | **`tsx` as a dev dependency, script `db:seed`** | owner decision; ADR 0042 |
+| Content Security Policy (AC) | **A request middleware sets a nonce-based CSP (`script-src` nonce only, `style-src 'self' 'unsafe-inline'` for component style attributes, everything else `'self'`, `frame-ancestors 'none'`), `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options`, and `no-store` on HTML with a nonce; CSRF is explicit in `src/start.ts`; HSTS is set where TLS ends** | owner decision; ADR 0047 |
 | Agents and `.env` | **The installer merges `Read` deny rules for `.env` and its local and mode variants into `.claude/settings.json`; `.env.example` stays readable** | owner approval; ADR 0033 |
 
 ## Open decisions
@@ -140,7 +142,6 @@ Scaffold: `pnpm dlx shadcn@latest init -t start` (checked 2026-10-15 in the shad
 |---|---|---|---|
 | S | Placement and naming of adapters for external services (email, payments, storage) | needs a `boundaries/files` category so layer rules apply | `design-principles.md` |
 | X | Performance budgets and how to measure them | Page load, API latency, bundle size: default targets and tooling. The owner's QA template has rows for them; no tooling is installed | `testing.md`, `templates/qa.md` |
-| AC | Content Security Policy for a real app | A nonce setup works on a bare page; allowed style, font, and image sources, and component-library inline styles, are not checked | ADR 0015, `tanstack-start.md` |
 | AE | A check for a missing later artifact | Warn when a feature stops before `12-measure.md`; needs a rule for features paused on purpose | ADR 0016 |
 | AG | What one stored minor unit of IDR is, and `formatMoney` | `Intl` shows IDR with 0 fraction digits; `typescript.md` rule 13 asks for integer minor units. Decide with the first money column | ADR 0032, `components.md` |
 | AD | Env check before the container takes traffic | A request middleware fails at the first request; a startup check depends on the hosting setup (F) | ADR 0015, `environment.md` |
